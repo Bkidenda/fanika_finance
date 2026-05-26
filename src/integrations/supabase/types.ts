@@ -14,7 +14,261 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      budgets: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          limit_amount: number
+          month: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          limit_amount?: number
+          month: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          limit_amount?: number
+          month?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      deductions: {
+        Row: {
+          created_at: string
+          frequency: Database["public"]["Enums"]["frequency_type"]
+          id: string
+          name: string
+          rule: Database["public"]["Enums"]["rule_type"]
+          type: Database["public"]["Enums"]["deduction_type"]
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          frequency?: Database["public"]["Enums"]["frequency_type"]
+          id?: string
+          name: string
+          rule?: Database["public"]["Enums"]["rule_type"]
+          type: Database["public"]["Enums"]["deduction_type"]
+          user_id: string
+          value?: number
+        }
+        Update: {
+          created_at?: string
+          frequency?: Database["public"]["Enums"]["frequency_type"]
+          id?: string
+          name?: string
+          rule?: Database["public"]["Enums"]["rule_type"]
+          type?: Database["public"]["Enums"]["deduction_type"]
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      devotionals: {
+        Row: {
+          created_at: string
+          egw_quote: string
+          egw_source: string | null
+          id: string
+          reflection: string
+          tag: string
+          verse: string
+          verse_reference: string
+        }
+        Insert: {
+          created_at?: string
+          egw_quote: string
+          egw_source?: string | null
+          id?: string
+          reflection: string
+          tag?: string
+          verse: string
+          verse_reference: string
+        }
+        Update: {
+          created_at?: string
+          egw_quote?: string
+          egw_source?: string | null
+          id?: string
+          reflection?: string
+          tag?: string
+          verse?: string
+          verse_reference?: string
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          payment_method: string | null
+          tags: string[] | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          payment_method?: string | null
+          tags?: string[] | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          payment_method?: string | null
+          tags?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      incomes: {
+        Row: {
+          amount: number
+          created_at: string
+          frequency: Database["public"]["Enums"]["frequency_type"]
+          id: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          frequency?: Database["public"]["Enums"]["frequency_type"]
+          id?: string
+          source: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          frequency?: Database["public"]["Enums"]["frequency_type"]
+          id?: string
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      investments: {
+        Row: {
+          amount_invested: number
+          created_at: string
+          current_value: number
+          id: string
+          institution: string | null
+          name: string
+          notes: string | null
+          start_date: string | null
+          type: Database["public"]["Enums"]["investment_type"]
+          user_id: string
+        }
+        Insert: {
+          amount_invested?: number
+          created_at?: string
+          current_value?: number
+          id?: string
+          institution?: string | null
+          name: string
+          notes?: string | null
+          start_date?: string | null
+          type?: Database["public"]["Enums"]["investment_type"]
+          user_id: string
+        }
+        Update: {
+          amount_invested?: number
+          created_at?: string
+          current_value?: number
+          id?: string
+          institution?: string | null
+          name?: string
+          notes?: string | null
+          start_date?: string | null
+          type?: Database["public"]["Enums"]["investment_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          currency: string
+          email: string | null
+          full_name: string | null
+          gross_income: number
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          email?: string | null
+          full_name?: string | null
+          gross_income?: number
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          email?: string | null
+          full_name?: string | null
+          gross_income?: number
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      savings_goals: {
+        Row: {
+          created_at: string
+          current_amount: number
+          deadline: string | null
+          id: string
+          name: string
+          target_amount: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_amount?: number
+          deadline?: string | null
+          id?: string
+          name: string
+          target_amount: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_amount?: number
+          deadline?: string | null
+          id?: string
+          name?: string
+          target_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +277,18 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      deduction_type: "statutory" | "custom"
+      frequency_type: "monthly" | "annual" | "one_time"
+      investment_type:
+        | "savings"
+        | "sacco"
+        | "stocks"
+        | "crypto"
+        | "bonds"
+        | "fixed_deposit"
+        | "business"
+        | "other"
+      rule_type: "fixed" | "percentage"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +415,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      deduction_type: ["statutory", "custom"],
+      frequency_type: ["monthly", "annual", "one_time"],
+      investment_type: [
+        "savings",
+        "sacco",
+        "stocks",
+        "crypto",
+        "bonds",
+        "fixed_deposit",
+        "business",
+        "other",
+      ],
+      rule_type: ["fixed", "percentage"],
+    },
   },
 } as const
