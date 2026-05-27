@@ -11,11 +11,17 @@ export const Route = createFileRoute("/_app")({
 
 const TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
+  "/salary": "Salary Breakdown",
+  "/insights": "Insights",
+  "/advisor": "AI Advisor",
+  "/income": "Income",
   "/budgets": "Budgets",
   "/expenses": "Expenses",
+  "/subscriptions": "Subscriptions",
+  "/debts": "Debts",
+  "/accounts": "Accounts",
   "/investments": "Investments",
   "/goals": "Goals",
-  "/insights": "Insights",
   "/stewardship": "Stewardship",
   "/settings": "Settings",
 };
