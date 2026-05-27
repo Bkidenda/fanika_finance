@@ -1,35 +1,32 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard,
-  Wallet,
-  Receipt,
-  TrendingUp,
-  Target,
-  BookOpen,
-  Sparkles,
-  Settings,
-  Sprout,
+  LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
+  Settings, Sprout, Calculator, Landmark, Repeat, CreditCard, Coins, Bot,
 } from "lucide-react";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
+  SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar,
 } from "@/components/ui/sidebar";
 
-const items = [
+const overview = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Salary Breakdown", url: "/salary", icon: Calculator },
+  { title: "Insights", url: "/insights", icon: Sparkles },
+  { title: "AI Advisor", url: "/advisor", icon: Bot },
+] as const;
+
+const money = [
+  { title: "Income", url: "/income", icon: Coins },
   { title: "Budgets", url: "/budgets", icon: Wallet },
   { title: "Expenses", url: "/expenses", icon: Receipt },
+  { title: "Subscriptions", url: "/subscriptions", icon: Repeat },
+  { title: "Debts", url: "/debts", icon: CreditCard },
+] as const;
+
+const wealth = [
+  { title: "Accounts", url: "/accounts", icon: Landmark },
   { title: "Investments", url: "/investments", icon: TrendingUp },
   { title: "Goals", url: "/goals", icon: Target },
-  { title: "Insights", url: "/insights", icon: Sparkles },
   { title: "Stewardship", url: "/stewardship", icon: BookOpen },
 ] as const;
 
@@ -37,6 +34,26 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const path = useRouterState({ select: (r) => r.location.pathname });
+
+  const renderGroup = (label: string, items: ReadonlyArray<{ title: string; url: string; icon: typeof LayoutDashboard }>) => (
+    <SidebarGroup>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.url}>
+              <SidebarMenuButton asChild isActive={path === item.url}>
+                <Link to={item.url} className="flex items-center gap-3">
+                  <item.icon className="h-4 w-4" />
+                  {!collapsed && <span>{item.title}</span>}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
 
   return (
     <Sidebar collapsible="icon">
@@ -54,24 +71,9 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Modules</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={path === item.url}>
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
+        {renderGroup("Overview", overview)}
+        {renderGroup("Money", money)}
+        {renderGroup("Wealth", wealth)}
         <SidebarGroup>
           <SidebarGroupLabel>Account</SidebarGroupLabel>
           <SidebarGroupContent>
