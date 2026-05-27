@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppStewardshipRouteImport } from './routes/_app/stewardship'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppSalaryRouteImport } from './routes/_app/salary'
 import { Route as AppInvestmentsRouteImport } from './routes/_app/investments'
 import { Route as AppInsightsRouteImport } from './routes/_app/insights'
 import { Route as AppGoalsRouteImport } from './routes/_app/goals'
@@ -49,6 +50,11 @@ const AppStewardshipRoute = AppStewardshipRouteImport.update({
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalaryRoute = AppSalaryRouteImport.update({
+  id: '/salary',
+  path: '/salary',
   getParentRoute: () => AppRoute,
 } as any)
 const AppInvestmentsRoute = AppInvestmentsRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/goals': typeof AppGoalsRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
+  '/salary': typeof AppSalaryRoute
   '/settings': typeof AppSettingsRoute
   '/stewardship': typeof AppStewardshipRoute
 }
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/goals': typeof AppGoalsRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
+  '/salary': typeof AppSalaryRoute
   '/settings': typeof AppSettingsRoute
   '/stewardship': typeof AppStewardshipRoute
 }
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/_app/goals': typeof AppGoalsRoute
   '/_app/insights': typeof AppInsightsRoute
   '/_app/investments': typeof AppInvestmentsRoute
+  '/_app/salary': typeof AppSalaryRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/stewardship': typeof AppStewardshipRoute
 }
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/insights'
     | '/investments'
+    | '/salary'
     | '/settings'
     | '/stewardship'
   fileRoutesByTo: FileRoutesByTo
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/insights'
     | '/investments'
+    | '/salary'
     | '/settings'
     | '/stewardship'
   id:
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/_app/goals'
     | '/_app/insights'
     | '/_app/investments'
+    | '/_app/salary'
     | '/_app/settings'
     | '/_app/stewardship'
   fileRoutesById: FileRoutesById
@@ -217,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/salary': {
+      id: '/_app/salary'
+      path: '/salary'
+      fullPath: '/salary'
+      preLoaderRoute: typeof AppSalaryRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/investments': {
       id: '/_app/investments'
       path: '/investments'
@@ -269,6 +288,7 @@ interface AppRouteChildren {
   AppGoalsRoute: typeof AppGoalsRoute
   AppInsightsRoute: typeof AppInsightsRoute
   AppInvestmentsRoute: typeof AppInvestmentsRoute
+  AppSalaryRoute: typeof AppSalaryRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppStewardshipRoute: typeof AppStewardshipRoute
 }
@@ -280,6 +300,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppGoalsRoute: AppGoalsRoute,
   AppInsightsRoute: AppInsightsRoute,
   AppInvestmentsRoute: AppInvestmentsRoute,
+  AppSalaryRoute: AppSalaryRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppStewardshipRoute: AppStewardshipRoute,
 }
@@ -295,3 +316,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
