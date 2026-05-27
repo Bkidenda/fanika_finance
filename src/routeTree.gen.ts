@@ -25,6 +25,7 @@ import { Route as AppExpensesRouteImport } from './routes/_app/expenses'
 import { Route as AppDebtsRouteImport } from './routes/_app/debts'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppBudgetsRouteImport } from './routes/_app/budgets'
+import { Route as AppAdvisorRouteImport } from './routes/_app/advisor'
 import { Route as AppAccountsRouteImport } from './routes/_app/accounts'
 
 const SignupRoute = SignupRouteImport.update({
@@ -106,6 +107,11 @@ const AppBudgetsRoute = AppBudgetsRouteImport.update({
   path: '/budgets',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdvisorRoute = AppAdvisorRouteImport.update({
+  id: '/advisor',
+  path: '/advisor',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAccountsRoute = AppAccountsRouteImport.update({
   id: '/accounts',
   path: '/accounts',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/accounts': typeof AppAccountsRoute
+  '/advisor': typeof AppAdvisorRoute
   '/budgets': typeof AppBudgetsRoute
   '/dashboard': typeof AppDashboardRoute
   '/debts': typeof AppDebtsRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/accounts': typeof AppAccountsRoute
+  '/advisor': typeof AppAdvisorRoute
   '/budgets': typeof AppBudgetsRoute
   '/dashboard': typeof AppDashboardRoute
   '/debts': typeof AppDebtsRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_app/accounts': typeof AppAccountsRoute
+  '/_app/advisor': typeof AppAdvisorRoute
   '/_app/budgets': typeof AppBudgetsRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/debts': typeof AppDebtsRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/accounts'
+    | '/advisor'
     | '/budgets'
     | '/dashboard'
     | '/debts'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/accounts'
+    | '/advisor'
     | '/budgets'
     | '/dashboard'
     | '/debts'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/_app/accounts'
+    | '/_app/advisor'
     | '/_app/budgets'
     | '/_app/dashboard'
     | '/_app/debts'
@@ -347,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBudgetsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/advisor': {
+      id: '/_app/advisor'
+      path: '/advisor'
+      fullPath: '/advisor'
+      preLoaderRoute: typeof AppAdvisorRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/accounts': {
       id: '/_app/accounts'
       path: '/accounts'
@@ -359,6 +378,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppAccountsRoute: typeof AppAccountsRoute
+  AppAdvisorRoute: typeof AppAdvisorRoute
   AppBudgetsRoute: typeof AppBudgetsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppDebtsRoute: typeof AppDebtsRoute
@@ -375,6 +395,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAccountsRoute: AppAccountsRoute,
+  AppAdvisorRoute: AppAdvisorRoute,
   AppBudgetsRoute: AppBudgetsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppDebtsRoute: AppDebtsRoute,
