@@ -279,7 +279,7 @@ export function useAIInsights() {
     queryFn: async () => {
       const { data, error } = await supabase.from("ai_insights").select("*").order("created_at", { ascending: false }).limit(10);
       if (error) throw error;
-      return (data ?? []) as AIInsight[];
+      return (data ?? []) as unknown as AIInsight[];
     },
   });
 }
