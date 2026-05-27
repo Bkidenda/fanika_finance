@@ -13,6 +13,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSubscriptionsRouteImport } from './routes/_app/subscriptions'
 import { Route as AppStewardshipRouteImport } from './routes/_app/stewardship'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppSalaryRouteImport } from './routes/_app/salary'
@@ -43,6 +44,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppSubscriptionsRoute = AppSubscriptionsRouteImport.update({
+  id: '/subscriptions',
+  path: '/subscriptions',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppStewardshipRoute = AppStewardshipRouteImport.update({
   id: '/stewardship',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/salary': typeof AppSalaryRoute
   '/settings': typeof AppSettingsRoute
   '/stewardship': typeof AppStewardshipRoute
+  '/subscriptions': typeof AppSubscriptionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/salary': typeof AppSalaryRoute
   '/settings': typeof AppSettingsRoute
   '/stewardship': typeof AppStewardshipRoute
+  '/subscriptions': typeof AppSubscriptionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/_app/salary': typeof AppSalaryRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/stewardship': typeof AppStewardshipRoute
+  '/_app/subscriptions': typeof AppSubscriptionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/salary'
     | '/settings'
     | '/stewardship'
+    | '/subscriptions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/salary'
     | '/settings'
     | '/stewardship'
+    | '/subscriptions'
   id:
     | '__root__'
     | '/'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/_app/salary'
     | '/_app/settings'
     | '/_app/stewardship'
+    | '/_app/subscriptions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -238,6 +250,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/subscriptions': {
+      id: '/_app/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/subscriptions'
+      preLoaderRoute: typeof AppSubscriptionsRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/stewardship': {
       id: '/_app/stewardship'
@@ -331,6 +350,7 @@ interface AppRouteChildren {
   AppSalaryRoute: typeof AppSalaryRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppStewardshipRoute: typeof AppStewardshipRoute
+  AppSubscriptionsRoute: typeof AppSubscriptionsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -345,6 +365,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSalaryRoute: AppSalaryRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppStewardshipRoute: AppStewardshipRoute,
+  AppSubscriptionsRoute: AppSubscriptionsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
