@@ -18,6 +18,7 @@ import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppSalaryRouteImport } from './routes/_app/salary'
 import { Route as AppInvestmentsRouteImport } from './routes/_app/investments'
 import { Route as AppInsightsRouteImport } from './routes/_app/insights'
+import { Route as AppIncomeRouteImport } from './routes/_app/income'
 import { Route as AppGoalsRouteImport } from './routes/_app/goals'
 import { Route as AppExpensesRouteImport } from './routes/_app/expenses'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
@@ -67,6 +68,11 @@ const AppInsightsRoute = AppInsightsRouteImport.update({
   path: '/insights',
   getParentRoute: () => AppRoute,
 } as any)
+const AppIncomeRoute = AppIncomeRouteImport.update({
+  id: '/income',
+  path: '/income',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppGoalsRoute = AppGoalsRouteImport.update({
   id: '/goals',
   path: '/goals',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/expenses': typeof AppExpensesRoute
   '/goals': typeof AppGoalsRoute
+  '/income': typeof AppIncomeRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
   '/salary': typeof AppSalaryRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/expenses': typeof AppExpensesRoute
   '/goals': typeof AppGoalsRoute
+  '/income': typeof AppIncomeRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
   '/salary': typeof AppSalaryRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/expenses': typeof AppExpensesRoute
   '/_app/goals': typeof AppGoalsRoute
+  '/_app/income': typeof AppIncomeRoute
   '/_app/insights': typeof AppInsightsRoute
   '/_app/investments': typeof AppInvestmentsRoute
   '/_app/salary': typeof AppSalaryRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/expenses'
     | '/goals'
+    | '/income'
     | '/insights'
     | '/investments'
     | '/salary'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/expenses'
     | '/goals'
+    | '/income'
     | '/insights'
     | '/investments'
     | '/salary'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/expenses'
     | '/_app/goals'
+    | '/_app/income'
     | '/_app/insights'
     | '/_app/investments'
     | '/_app/salary'
@@ -250,6 +262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInsightsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/income': {
+      id: '/_app/income'
+      path: '/income'
+      fullPath: '/income'
+      preLoaderRoute: typeof AppIncomeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/goals': {
       id: '/_app/goals'
       path: '/goals'
@@ -286,6 +305,7 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppExpensesRoute: typeof AppExpensesRoute
   AppGoalsRoute: typeof AppGoalsRoute
+  AppIncomeRoute: typeof AppIncomeRoute
   AppInsightsRoute: typeof AppInsightsRoute
   AppInvestmentsRoute: typeof AppInvestmentsRoute
   AppSalaryRoute: typeof AppSalaryRoute
@@ -298,6 +318,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppExpensesRoute: AppExpensesRoute,
   AppGoalsRoute: AppGoalsRoute,
+  AppIncomeRoute: AppIncomeRoute,
   AppInsightsRoute: AppInsightsRoute,
   AppInvestmentsRoute: AppInvestmentsRoute,
   AppSalaryRoute: AppSalaryRoute,
