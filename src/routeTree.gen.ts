@@ -25,7 +25,9 @@ import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppSalaryRouteImport } from './routes/_app/salary'
 import { Route as AppInvestmentsRouteImport } from './routes/_app/investments'
 import { Route as AppInsightsRouteImport } from './routes/_app/insights'
+import { Route as AppIncomeEntriesRouteImport } from './routes/_app/income-entries'
 import { Route as AppIncomeRouteImport } from './routes/_app/income'
+import { Route as AppHistoryRouteImport } from './routes/_app/history'
 import { Route as AppGoalsRouteImport } from './routes/_app/goals'
 import { Route as AppExpensesRouteImport } from './routes/_app/expenses'
 import { Route as AppDebtsRouteImport } from './routes/_app/debts'
@@ -113,9 +115,19 @@ const AppInsightsRoute = AppInsightsRouteImport.update({
   path: '/insights',
   getParentRoute: () => AppRoute,
 } as any)
+const AppIncomeEntriesRoute = AppIncomeEntriesRouteImport.update({
+  id: '/income-entries',
+  path: '/income-entries',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppIncomeRoute = AppIncomeRouteImport.update({
   id: '/income',
   path: '/income',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => AppRoute,
 } as any)
 const AppGoalsRoute = AppGoalsRouteImport.update({
@@ -171,7 +183,9 @@ export interface FileRoutesByFullPath {
   '/debts': typeof AppDebtsRoute
   '/expenses': typeof AppExpensesRoute
   '/goals': typeof AppGoalsRoute
+  '/history': typeof AppHistoryRoute
   '/income': typeof AppIncomeRoute
+  '/income-entries': typeof AppIncomeEntriesRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
   '/salary': typeof AppSalaryRoute
@@ -196,7 +210,9 @@ export interface FileRoutesByTo {
   '/debts': typeof AppDebtsRoute
   '/expenses': typeof AppExpensesRoute
   '/goals': typeof AppGoalsRoute
+  '/history': typeof AppHistoryRoute
   '/income': typeof AppIncomeRoute
+  '/income-entries': typeof AppIncomeEntriesRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
   '/salary': typeof AppSalaryRoute
@@ -223,7 +239,9 @@ export interface FileRoutesById {
   '/_app/debts': typeof AppDebtsRoute
   '/_app/expenses': typeof AppExpensesRoute
   '/_app/goals': typeof AppGoalsRoute
+  '/_app/history': typeof AppHistoryRoute
   '/_app/income': typeof AppIncomeRoute
+  '/_app/income-entries': typeof AppIncomeEntriesRoute
   '/_app/insights': typeof AppInsightsRoute
   '/_app/investments': typeof AppInvestmentsRoute
   '/_app/salary': typeof AppSalaryRoute
@@ -250,7 +268,9 @@ export interface FileRouteTypes {
     | '/debts'
     | '/expenses'
     | '/goals'
+    | '/history'
     | '/income'
+    | '/income-entries'
     | '/insights'
     | '/investments'
     | '/salary'
@@ -275,7 +295,9 @@ export interface FileRouteTypes {
     | '/debts'
     | '/expenses'
     | '/goals'
+    | '/history'
     | '/income'
+    | '/income-entries'
     | '/insights'
     | '/investments'
     | '/salary'
@@ -301,7 +323,9 @@ export interface FileRouteTypes {
     | '/_app/debts'
     | '/_app/expenses'
     | '/_app/goals'
+    | '/_app/history'
     | '/_app/income'
+    | '/_app/income-entries'
     | '/_app/insights'
     | '/_app/investments'
     | '/_app/salary'
@@ -437,11 +461,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInsightsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/income-entries': {
+      id: '/_app/income-entries'
+      path: '/income-entries'
+      fullPath: '/income-entries'
+      preLoaderRoute: typeof AppIncomeEntriesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/income': {
       id: '/_app/income'
       path: '/income'
       fullPath: '/income'
       preLoaderRoute: typeof AppIncomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/history': {
+      id: '/_app/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/goals': {
@@ -504,7 +542,9 @@ interface AppRouteChildren {
   AppDebtsRoute: typeof AppDebtsRoute
   AppExpensesRoute: typeof AppExpensesRoute
   AppGoalsRoute: typeof AppGoalsRoute
+  AppHistoryRoute: typeof AppHistoryRoute
   AppIncomeRoute: typeof AppIncomeRoute
+  AppIncomeEntriesRoute: typeof AppIncomeEntriesRoute
   AppInsightsRoute: typeof AppInsightsRoute
   AppInvestmentsRoute: typeof AppInvestmentsRoute
   AppSalaryRoute: typeof AppSalaryRoute
@@ -521,7 +561,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppDebtsRoute: AppDebtsRoute,
   AppExpensesRoute: AppExpensesRoute,
   AppGoalsRoute: AppGoalsRoute,
+  AppHistoryRoute: AppHistoryRoute,
   AppIncomeRoute: AppIncomeRoute,
+  AppIncomeEntriesRoute: AppIncomeEntriesRoute,
   AppInsightsRoute: AppInsightsRoute,
   AppInvestmentsRoute: AppInvestmentsRoute,
   AppSalaryRoute: AppSalaryRoute,
