@@ -95,6 +95,7 @@ export type Debt = {
   start_date: string | null;
   due_date: string | null;
   notes: string | null;
+  kind: "formal" | "informal";
 };
 
 export type AIInsight = {
@@ -105,6 +106,22 @@ export type AIInsight = {
   summary: string;
   recommendations: Array<{ kind: string; text: string }>;
   created_at: string;
+};
+
+export type IncomeEntry = {
+  id: string;
+  date: string;
+  source: string;
+  amount: number;
+  account_id: string | null;
+  notes: string | null;
+};
+
+export type MonthClosure = {
+  id: string;
+  period: string;
+  closed_at: string;
+  snapshot: Record<string, unknown>;
 };
 
 // ---------- Existing ----------
