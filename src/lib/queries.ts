@@ -300,3 +300,38 @@ export function useAIInsights() {
     },
   });
 }
+
+export function useIncomeEntries(month?: string) {
+  const { user } = useAuth();
+  const m = month ?? monthKey();
+  const d = new Date(m);
+  d.setMonth(d.getMonth() + 1);
+  const end = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+  return useQuery({
+    queryKey: ["income-entries", user?.id, m],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("income_entries").select("*").gte("date", m).lt("date", end).order("date", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as IncomeEntry[];
+    },
+  });
+}
+
+export function useMonthClosures() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["month-closures", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("month_closures").select("*").order("period", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as MonthClosure[];
+    },
+  });
+}
+
+export function useIsMonthClosed(period: string) {
+  const closures = useMonthClosures();
+  return (closures.data ?? []).some((c) => c.period === period);
+}
