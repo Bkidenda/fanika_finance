@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  Settings, Sprout, Calculator, Landmark, Repeat, CreditCard, Coins, Bot,
+  Settings, Sprout, Calculator, Landmark, Repeat, CreditCard, Coins, Bot, History, Globe,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -13,10 +13,12 @@ const overview = [
   { title: "Salary Breakdown", url: "/salary", icon: Calculator },
   { title: "Insights", url: "/insights", icon: Sparkles },
   { title: "AI Advisor", url: "/advisor", icon: Bot },
+  { title: "History", url: "/history", icon: History },
 ] as const;
 
 const money = [
   { title: "Income", url: "/income", icon: Coins },
+  { title: "Income Entries", url: "/income-entries", icon: Receipt },
   { title: "Budgets", url: "/budgets", icon: Wallet },
   { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Subscriptions", url: "/subscriptions", icon: Repeat },
@@ -83,6 +85,14 @@ export function AppSidebar() {
                   <Link to="/settings" className="flex items-center gap-3">
                     <Settings className="h-4 w-4" />
                     {!collapsed && <span>Settings</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/" className="flex items-center gap-3">
+                    <Globe className="h-4 w-4" />
+                    {!collapsed && <span>Marketing site</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -95,6 +95,7 @@ export type Debt = {
   start_date: string | null;
   due_date: string | null;
   notes: string | null;
+  kind: "formal" | "informal";
 };
 
 export type AIInsight = {
@@ -105,6 +106,22 @@ export type AIInsight = {
   summary: string;
   recommendations: Array<{ kind: string; text: string }>;
   created_at: string;
+};
+
+export type IncomeEntry = {
+  id: string;
+  date: string;
+  source: string;
+  amount: number;
+  account_id: string | null;
+  notes: string | null;
+};
+
+export type MonthClosure = {
+  id: string;
+  period: string;
+  closed_at: string;
+  snapshot: Record<string, unknown>;
 };
 
 // ---------- Existing ----------
@@ -282,4 +299,39 @@ export function useAIInsights() {
       return (data ?? []) as unknown as AIInsight[];
     },
   });
+}
+
+export function useIncomeEntries(month?: string) {
+  const { user } = useAuth();
+  const m = month ?? monthKey();
+  const d = new Date(m);
+  d.setMonth(d.getMonth() + 1);
+  const end = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+  return useQuery({
+    queryKey: ["income-entries", user?.id, m],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("income_entries").select("*").gte("date", m).lt("date", end).order("date", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as IncomeEntry[];
+    },
+  });
+}
+
+export function useMonthClosures() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["month-closures", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("month_closures").select("*").order("period", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as MonthClosure[];
+    },
+  });
+}
+
+export function useIsMonthClosed(period: string) {
+  const closures = useMonthClosures();
+  return (closures.data ?? []).some((c) => c.period === period);
 }

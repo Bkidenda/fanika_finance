@@ -9,8 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StewardshipPhilosophyRouteImport } from './routes/stewardship-philosophy'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSubscriptionsRouteImport } from './routes/_app/subscriptions'
@@ -19,7 +25,9 @@ import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppSalaryRouteImport } from './routes/_app/salary'
 import { Route as AppInvestmentsRouteImport } from './routes/_app/investments'
 import { Route as AppInsightsRouteImport } from './routes/_app/insights'
+import { Route as AppIncomeEntriesRouteImport } from './routes/_app/income-entries'
 import { Route as AppIncomeRouteImport } from './routes/_app/income'
+import { Route as AppHistoryRouteImport } from './routes/_app/history'
 import { Route as AppGoalsRouteImport } from './routes/_app/goals'
 import { Route as AppExpensesRouteImport } from './routes/_app/expenses'
 import { Route as AppDebtsRouteImport } from './routes/_app/debts'
@@ -28,14 +36,44 @@ import { Route as AppBudgetsRouteImport } from './routes/_app/budgets'
 import { Route as AppAdvisorRouteImport } from './routes/_app/advisor'
 import { Route as AppAccountsRouteImport } from './routes/_app/accounts'
 
+const StewardshipPhilosophyRoute = StewardshipPhilosophyRouteImport.update({
+  id: '/stewardship-philosophy',
+  path: '/stewardship-philosophy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -77,9 +115,19 @@ const AppInsightsRoute = AppInsightsRouteImport.update({
   path: '/insights',
   getParentRoute: () => AppRoute,
 } as any)
+const AppIncomeEntriesRoute = AppIncomeEntriesRouteImport.update({
+  id: '/income-entries',
+  path: '/income-entries',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppIncomeRoute = AppIncomeRouteImport.update({
   id: '/income',
   path: '/income',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => AppRoute,
 } as any)
 const AppGoalsRoute = AppGoalsRouteImport.update({
@@ -120,8 +168,14 @@ const AppAccountsRoute = AppAccountsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/features': typeof FeaturesRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
+  '/stewardship-philosophy': typeof StewardshipPhilosophyRoute
   '/accounts': typeof AppAccountsRoute
   '/advisor': typeof AppAdvisorRoute
   '/budgets': typeof AppBudgetsRoute
@@ -129,7 +183,9 @@ export interface FileRoutesByFullPath {
   '/debts': typeof AppDebtsRoute
   '/expenses': typeof AppExpensesRoute
   '/goals': typeof AppGoalsRoute
+  '/history': typeof AppHistoryRoute
   '/income': typeof AppIncomeRoute
+  '/income-entries': typeof AppIncomeEntriesRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
   '/salary': typeof AppSalaryRoute
@@ -139,8 +195,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/features': typeof FeaturesRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
+  '/stewardship-philosophy': typeof StewardshipPhilosophyRoute
   '/accounts': typeof AppAccountsRoute
   '/advisor': typeof AppAdvisorRoute
   '/budgets': typeof AppBudgetsRoute
@@ -148,7 +210,9 @@ export interface FileRoutesByTo {
   '/debts': typeof AppDebtsRoute
   '/expenses': typeof AppExpensesRoute
   '/goals': typeof AppGoalsRoute
+  '/history': typeof AppHistoryRoute
   '/income': typeof AppIncomeRoute
+  '/income-entries': typeof AppIncomeEntriesRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
   '/salary': typeof AppSalaryRoute
@@ -160,8 +224,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/features': typeof FeaturesRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
+  '/stewardship-philosophy': typeof StewardshipPhilosophyRoute
   '/_app/accounts': typeof AppAccountsRoute
   '/_app/advisor': typeof AppAdvisorRoute
   '/_app/budgets': typeof AppBudgetsRoute
@@ -169,7 +239,9 @@ export interface FileRoutesById {
   '/_app/debts': typeof AppDebtsRoute
   '/_app/expenses': typeof AppExpensesRoute
   '/_app/goals': typeof AppGoalsRoute
+  '/_app/history': typeof AppHistoryRoute
   '/_app/income': typeof AppIncomeRoute
+  '/_app/income-entries': typeof AppIncomeEntriesRoute
   '/_app/insights': typeof AppInsightsRoute
   '/_app/investments': typeof AppInvestmentsRoute
   '/_app/salary': typeof AppSalaryRoute
@@ -181,8 +253,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/contact'
+    | '/features'
+    | '/how-it-works'
     | '/login'
+    | '/pricing'
     | '/signup'
+    | '/stewardship-philosophy'
     | '/accounts'
     | '/advisor'
     | '/budgets'
@@ -190,7 +268,9 @@ export interface FileRouteTypes {
     | '/debts'
     | '/expenses'
     | '/goals'
+    | '/history'
     | '/income'
+    | '/income-entries'
     | '/insights'
     | '/investments'
     | '/salary'
@@ -200,8 +280,14 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/contact'
+    | '/features'
+    | '/how-it-works'
     | '/login'
+    | '/pricing'
     | '/signup'
+    | '/stewardship-philosophy'
     | '/accounts'
     | '/advisor'
     | '/budgets'
@@ -209,7 +295,9 @@ export interface FileRouteTypes {
     | '/debts'
     | '/expenses'
     | '/goals'
+    | '/history'
     | '/income'
+    | '/income-entries'
     | '/insights'
     | '/investments'
     | '/salary'
@@ -220,8 +308,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_app'
+    | '/about'
+    | '/contact'
+    | '/features'
+    | '/how-it-works'
     | '/login'
+    | '/pricing'
     | '/signup'
+    | '/stewardship-philosophy'
     | '/_app/accounts'
     | '/_app/advisor'
     | '/_app/budgets'
@@ -229,7 +323,9 @@ export interface FileRouteTypes {
     | '/_app/debts'
     | '/_app/expenses'
     | '/_app/goals'
+    | '/_app/history'
     | '/_app/income'
+    | '/_app/income-entries'
     | '/_app/insights'
     | '/_app/investments'
     | '/_app/salary'
@@ -241,12 +337,25 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  ContactRoute: typeof ContactRoute
+  FeaturesRoute: typeof FeaturesRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
+  PricingRoute: typeof PricingRoute
   SignupRoute: typeof SignupRoute
+  StewardshipPhilosophyRoute: typeof StewardshipPhilosophyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/stewardship-philosophy': {
+      id: '/stewardship-philosophy'
+      path: '/stewardship-philosophy'
+      fullPath: '/stewardship-philosophy'
+      preLoaderRoute: typeof StewardshipPhilosophyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -254,11 +363,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -317,11 +461,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInsightsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/income-entries': {
+      id: '/_app/income-entries'
+      path: '/income-entries'
+      fullPath: '/income-entries'
+      preLoaderRoute: typeof AppIncomeEntriesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/income': {
       id: '/_app/income'
       path: '/income'
       fullPath: '/income'
       preLoaderRoute: typeof AppIncomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/history': {
+      id: '/_app/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/goals': {
@@ -384,7 +542,9 @@ interface AppRouteChildren {
   AppDebtsRoute: typeof AppDebtsRoute
   AppExpensesRoute: typeof AppExpensesRoute
   AppGoalsRoute: typeof AppGoalsRoute
+  AppHistoryRoute: typeof AppHistoryRoute
   AppIncomeRoute: typeof AppIncomeRoute
+  AppIncomeEntriesRoute: typeof AppIncomeEntriesRoute
   AppInsightsRoute: typeof AppInsightsRoute
   AppInvestmentsRoute: typeof AppInvestmentsRoute
   AppSalaryRoute: typeof AppSalaryRoute
@@ -401,7 +561,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppDebtsRoute: AppDebtsRoute,
   AppExpensesRoute: AppExpensesRoute,
   AppGoalsRoute: AppGoalsRoute,
+  AppHistoryRoute: AppHistoryRoute,
   AppIncomeRoute: AppIncomeRoute,
+  AppIncomeEntriesRoute: AppIncomeEntriesRoute,
   AppInsightsRoute: AppInsightsRoute,
   AppInvestmentsRoute: AppInvestmentsRoute,
   AppSalaryRoute: AppSalaryRoute,
@@ -415,19 +577,15 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  AboutRoute: AboutRoute,
+  ContactRoute: ContactRoute,
+  FeaturesRoute: FeaturesRoute,
+  HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
+  PricingRoute: PricingRoute,
   SignupRoute: SignupRoute,
+  StewardshipPhilosophyRoute: StewardshipPhilosophyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

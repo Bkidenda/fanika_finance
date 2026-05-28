@@ -16,7 +16,6 @@ export const TITHE_RATE = 0.1;
 export function nssfContribution(gross: number, mode: "simple" | "tiered" = "tiered"): number {
   if (gross <= 0) return 0;
   if (mode === "simple") return +(gross * 0.06).toFixed(2);
-  // Tiered (current statutory model)
   const tier1 = Math.min(gross, 8000) * 0.06;
   const tier2 = Math.max(0, Math.min(gross, 72000) - 8000) * 0.06;
   return +(tier1 + tier2).toFixed(2);
@@ -30,7 +29,6 @@ export function ahlContribution(gross: number): number {
   return +(Math.max(0, gross) * 0.015).toFixed(2);
 }
 
-// Progressive PAYE (Kenya, current bands). Personal relief KES 2,400/m for residents.
 export function payeKenya(taxableIncome: number, isResident = true): number {
   if (taxableIncome <= 0) return 0;
   const bands = [
@@ -62,10 +60,10 @@ export type SalaryBreakdown = {
   allowableDeductions: number;
   taxableIncome: number;
   paye: number;
-  netStatutory: number; // after NSSF/SHIF/AHL/PAYE
-  customDeductions: number; // user-defined recurring obligations (loans, etc.)
+  netStatutory: number;
+  customDeductions: number;
   tithe: number;
-  netDisposable: number; // final amount available to allocate
+  netDisposable: number;
   titheBase: "gross" | "net";
 };
 
@@ -95,55 +93,41 @@ export function computeSalaryBreakdown(
   const tithe = titheBase === "gross" ? g * TITHE_RATE : netStatutory * TITHE_RATE;
   const netDisposable = Math.max(0, netStatutory - custom - tithe);
 
-  return {
-    gross: g,
-    nssf,
-    shif,
-    ahl,
-    allowableDeductions: allowable,
-    taxableIncome: taxable,
-    paye,
-    netStatutory,
-    customDeductions: custom,
-    tithe,
-    netDisposable,
-    titheBase,
-  };
+  return { gross: g, nssf, shif, ahl, allowableDeductions: allowable, taxableIncome: taxable, paye, netStatutory, customDeductions: custom, tithe, netDisposable, titheBase };
 }
 
-// Backwards-compatible breakdown for existing UI (dashboard/insights/settings).
-export function computeBreakdown(grossMonthly: number, deductions: Deduction[]) {
-  const b = computeSalaryBreakdown(grossMonthly, { deductions });
-  return {
-    gross: b.gross,
-    tithe: b.tithe,
-    statutory: b.nssf + b.shif + b.ahl + b.paye,
-    custom: b.customDeductions,
-    net: b.netDisposable,
-  };
+export function computeBreakdown(grossMonthly: number, deductions: Deduction[], opts: { titheBase?: "gross" | "net"; nssfMode?: "simple" | "tiered"; isResident?: boolean } = {}) {
+  const b = computeSalaryBreakdown(grossMonthly, { deductions, ...opts });
+  return { gross: b.gross, tithe: b.tithe, statutory: b.nssf + b.shif + b.ahl + b.paye, custom: b.customDeductions, net: b.netDisposable };
 }
 
 export function computeDeductionAmount(d: Deduction, grossMonthly: number): number {
-  if (d.rule === "percentage") {
-    const base = d.frequency === "annual" ? grossMonthly : grossMonthly;
-    return (base * d.value) / 100;
-  }
+  if (d.rule === "percentage") return (grossMonthly * d.value) / 100;
   return d.frequency === "annual" ? d.value / 12 : d.value;
 }
 
-// ---------- Categories (expanded for African household model) ----------
+// ---------- Net worth ----------
+
+export function computeNetWorth(opts: {
+  accounts: { balance: number }[];
+  investments: { current_value: number }[];
+  debts: { balance: number }[];
+}): { assets: number; liabilities: number; net: number } {
+  const cash = opts.accounts.reduce((s, a) => s + Number(a.balance), 0);
+  const inv = opts.investments.reduce((s, i) => s + Number(i.current_value), 0);
+  const debt = opts.debts.reduce((s, d) => s + Number(d.balance), 0);
+  const assets = cash + inv;
+  return { assets, liabilities: debt, net: assets - debt };
+}
+
+// ---------- Categories ----------
 
 export const BUDGET_CATEGORY_GROUPS = {
   Essentials: ["Rent", "Food & Groceries", "Transport", "Utilities", "Medical"],
   Family: [
-    "Parents support",
-    "Siblings support",
-    "Extended family support",
-    "Girlfriend allowance",
-    "Wife allowance",
-    "Children allowance",
-    "School fees",
-    "Emergency family support",
+    "Parents support", "Siblings support", "Extended family support",
+    "Girlfriend allowance", "Wife allowance", "Children allowance",
+    "School fees", "Emergency family support",
   ],
   Lifestyle: ["Subscriptions", "Personal care", "Entertainment", "Dining out", "Clothing"],
   Financial: ["Insurance", "Loans / Debt repayment", "Savings", "Investments", "Charity & Giving"],
@@ -152,17 +136,16 @@ export const BUDGET_CATEGORY_GROUPS = {
 
 export const DEFAULT_BUDGET_CATEGORIES: string[] = Object.values(BUDGET_CATEGORY_GROUPS).flatMap((v) => [...v]);
 
-export const DEFAULT_STATUTORY: Array<Omit<Deduction, "id">> = [
-  // The new statutory engine handles NSSF/SHIF/AHL/PAYE automatically;
-  // these seeds remain for legacy compatibility but are optional.
-];
+export function groupForCategory(cat: string): string {
+  for (const [group, list] of Object.entries(BUDGET_CATEGORY_GROUPS)) {
+    if ((list as readonly string[]).includes(cat)) return group;
+  }
+  return "Other";
+}
 
-export function healthScore(opts: {
-  savingsRate: number;
-  givingRate: number;
-  budgetAdherence: number;
-  debtRatio: number;
-}) {
+export const DEFAULT_STATUTORY: Array<Omit<Deduction, "id">> = [];
+
+export function healthScore(opts: { savingsRate: number; givingRate: number; budgetAdherence: number; debtRatio: number }) {
   const s = Math.min(1, opts.savingsRate / 0.2) * 30;
   const g = Math.min(1, opts.givingRate / 0.1) * 25;
   const b = opts.budgetAdherence * 30;
@@ -171,7 +154,6 @@ export function healthScore(opts: {
 }
 
 export function diversificationScore(streams: { amount: number }[]): number {
-  // Higher = more diversified (Herfindahl-Hirschman inverse)
   const total = streams.reduce((s, x) => s + Math.max(0, x.amount), 0);
   if (total <= 0 || streams.length === 0) return 0;
   const hhi = streams.reduce((s, x) => s + Math.pow(Math.max(0, x.amount) / total, 2), 0);

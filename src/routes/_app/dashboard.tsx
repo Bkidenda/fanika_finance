@@ -1,12 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals, useDevotional } from "@/lib/queries";
-import { computeBreakdown, healthScore } from "@/lib/finance";
-import { formatCurrency, formatPercent, monthLabel } from "@/lib/format";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals, useDevotional, useAccounts, useDebts, useIsMonthClosed, useIncomeEntries } from "@/lib/queries";
+import { computeBreakdown, healthScore, computeNetWorth } from "@/lib/finance";
+import { formatCurrency, formatPercent, monthLabel, monthKey } from "@/lib/format";
 import { StatCard } from "@/components/stat-card";
 import { Progress } from "@/components/ui/progress";
-import { Wallet, TrendingUp, PiggyBank, HandCoins, Target, Sparkles, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Wallet, TrendingUp, PiggyBank, HandCoins, Target, Sparkles, BookOpen, Scale, Lock, CheckCircle2 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Link } from "@tanstack/react-router";
+import { closeMonth } from "@/lib/close-month.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: Dashboard,

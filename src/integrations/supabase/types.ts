@@ -145,6 +145,7 @@ export type Database = {
       }
       debt_payments: {
         Row: {
+          account_id: string | null
           amount: number
           created_at: string
           date: string
@@ -154,6 +155,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           amount: number
           created_at?: string
           date?: string
@@ -163,6 +165,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           amount?: number
           created_at?: string
           date?: string
@@ -181,6 +184,7 @@ export type Database = {
           due_date: string | null
           id: string
           interest_rate: number
+          kind: string
           monthly_payment: number
           name: string
           notes: string | null
@@ -195,6 +199,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           interest_rate?: number
+          kind?: string
           monthly_payment?: number
           name: string
           notes?: string | null
@@ -209,6 +214,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           interest_rate?: number
+          kind?: string
           monthly_payment?: number
           name?: string
           notes?: string | null
@@ -326,6 +332,39 @@ export type Database = {
         }
         Relationships: []
       }
+      income_entries: {
+        Row: {
+          account_id: string | null
+          amount: number
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          source: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       incomes: {
         Row: {
           amount: number
@@ -388,6 +427,30 @@ export type Database = {
           notes?: string | null
           start_date?: string | null
           type?: Database["public"]["Enums"]["investment_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      month_closures: {
+        Row: {
+          closed_at: string
+          id: string
+          period: string
+          snapshot: Json
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string
+          id?: string
+          period: string
+          snapshot?: Json
+          user_id: string
+        }
+        Update: {
+          closed_at?: string
+          id?: string
+          period?: string
+          snapshot?: Json
           user_id?: string
         }
         Relationships: []
@@ -463,6 +526,7 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          account_id: string | null
           active: boolean
           amount: number
           category: string
@@ -475,6 +539,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           active?: boolean
           amount?: number
           category?: string
@@ -487,6 +552,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           active?: boolean
           amount?: number
           category?: string
@@ -505,7 +571,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      apply_account_delta: {
+        Args: { p_account: string; p_delta: number }
+        Returns: undefined
+      }
     }
     Enums: {
       deduction_type: "statutory" | "custom"
