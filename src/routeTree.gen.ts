@@ -15,14 +15,11 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as FeaturesRouteImport } from './routes/features'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSubscriptionsRouteImport } from './routes/_app/subscriptions'
 import { Route as AppStewardshipRouteImport } from './routes/_app/stewardship'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
-import { Route as AppSalaryRouteImport } from './routes/_app/salary'
 import { Route as AppInvestmentsRouteImport } from './routes/_app/investments'
 import { Route as AppInsightsRouteImport } from './routes/_app/insights'
 import { Route as AppIncomeEntriesRouteImport } from './routes/_app/income-entries'
@@ -66,16 +63,6 @@ const FeaturesRoute = FeaturesRouteImport.update({
   path: '/features',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -98,11 +85,6 @@ const AppStewardshipRoute = AppStewardshipRouteImport.update({
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppSalaryRoute = AppSalaryRouteImport.update({
-  id: '/salary',
-  path: '/salary',
   getParentRoute: () => AppRoute,
 } as any)
 const AppInvestmentsRoute = AppInvestmentsRouteImport.update({
@@ -168,8 +150,6 @@ const AppAccountsRoute = AppAccountsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
@@ -188,15 +168,12 @@ export interface FileRoutesByFullPath {
   '/income-entries': typeof AppIncomeEntriesRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
-  '/salary': typeof AppSalaryRoute
   '/settings': typeof AppSettingsRoute
   '/stewardship': typeof AppStewardshipRoute
   '/subscriptions': typeof AppSubscriptionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
@@ -215,7 +192,6 @@ export interface FileRoutesByTo {
   '/income-entries': typeof AppIncomeEntriesRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
-  '/salary': typeof AppSalaryRoute
   '/settings': typeof AppSettingsRoute
   '/stewardship': typeof AppStewardshipRoute
   '/subscriptions': typeof AppSubscriptionsRoute
@@ -224,8 +200,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
-  '/about': typeof AboutRoute
-  '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
@@ -244,7 +218,6 @@ export interface FileRoutesById {
   '/_app/income-entries': typeof AppIncomeEntriesRoute
   '/_app/insights': typeof AppInsightsRoute
   '/_app/investments': typeof AppInvestmentsRoute
-  '/_app/salary': typeof AppSalaryRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/stewardship': typeof AppStewardshipRoute
   '/_app/subscriptions': typeof AppSubscriptionsRoute
@@ -253,8 +226,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
-    | '/contact'
     | '/features'
     | '/how-it-works'
     | '/login'
@@ -273,15 +244,12 @@ export interface FileRouteTypes {
     | '/income-entries'
     | '/insights'
     | '/investments'
-    | '/salary'
     | '/settings'
     | '/stewardship'
     | '/subscriptions'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
-    | '/contact'
     | '/features'
     | '/how-it-works'
     | '/login'
@@ -300,7 +268,6 @@ export interface FileRouteTypes {
     | '/income-entries'
     | '/insights'
     | '/investments'
-    | '/salary'
     | '/settings'
     | '/stewardship'
     | '/subscriptions'
@@ -308,8 +275,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_app'
-    | '/about'
-    | '/contact'
     | '/features'
     | '/how-it-works'
     | '/login'
@@ -328,7 +293,6 @@ export interface FileRouteTypes {
     | '/_app/income-entries'
     | '/_app/insights'
     | '/_app/investments'
-    | '/_app/salary'
     | '/_app/settings'
     | '/_app/stewardship'
     | '/_app/subscriptions'
@@ -337,8 +301,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
-  AboutRoute: typeof AboutRoute
-  ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
@@ -391,20 +353,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -438,13 +386,6 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/salary': {
-      id: '/_app/salary'
-      path: '/salary'
-      fullPath: '/salary'
-      preLoaderRoute: typeof AppSalaryRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/investments': {
@@ -547,7 +488,6 @@ interface AppRouteChildren {
   AppIncomeEntriesRoute: typeof AppIncomeEntriesRoute
   AppInsightsRoute: typeof AppInsightsRoute
   AppInvestmentsRoute: typeof AppInvestmentsRoute
-  AppSalaryRoute: typeof AppSalaryRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppStewardshipRoute: typeof AppStewardshipRoute
   AppSubscriptionsRoute: typeof AppSubscriptionsRoute
@@ -566,7 +506,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppIncomeEntriesRoute: AppIncomeEntriesRoute,
   AppInsightsRoute: AppInsightsRoute,
   AppInvestmentsRoute: AppInvestmentsRoute,
-  AppSalaryRoute: AppSalaryRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppStewardshipRoute: AppStewardshipRoute,
   AppSubscriptionsRoute: AppSubscriptionsRoute,
@@ -577,8 +516,6 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
-  AboutRoute: AboutRoute,
-  ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
   HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
@@ -589,3 +526,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
