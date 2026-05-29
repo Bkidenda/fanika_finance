@@ -8,10 +8,7 @@ export type Profile = {
   full_name: string | null;
   email: string | null;
   currency: string;
-  gross_income: number;
-  tithe_base: "gross" | "net";
-  is_resident: boolean;
-  nssf_mode: "simple" | "tiered";
+  net_income: number;
 };
 
 export type Deduction = {
@@ -134,7 +131,7 @@ export function useProfile() {
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles").select("*").eq("id", user!.id).single();
       if (error) throw error;
-      return data as Profile;
+      return data as unknown as Profile;
     },
   });
 }

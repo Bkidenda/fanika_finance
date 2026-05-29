@@ -16,8 +16,8 @@ function Insights() {
   const investments = useInvestments();
 
   const currency = profile.data?.currency ?? "KES";
-  const gross = profile.data?.gross_income ?? 0;
-  const breakdown = computeBreakdown(gross, deductions.data ?? []);
+  const net = profile.data?.net_income ?? 0;
+  const breakdown = computeBreakdown(net, deductions.data ?? []);
 
   const currentMonth = monthKey();
   const thisMonth = (expenses.data ?? []).filter((e) => e.date >= currentMonth);
@@ -26,13 +26,12 @@ function Insights() {
   const totalSpent = Array.from(spendByCat.values()).reduce((s, v) => s + v, 0);
   const budgetTotal = (budgets.data ?? []).reduce((s, b) => s + Number(b.limit_amount), 0);
 
-  const savingsRate = breakdown.gross > 0 ? Math.max(0, breakdown.net - totalSpent) / breakdown.gross : 0;
-  const givingRate = breakdown.gross > 0 ? breakdown.tithe / breakdown.gross : 0;
+  const savingsRate = breakdown.net > 0 ? Math.max(0, breakdown.disposable - totalSpent) / breakdown.net : 0;
+  const givingRate = breakdown.net > 0 ? breakdown.tithe / breakdown.net : 0;
   const adherence = budgetTotal > 0 ? Math.max(0, 1 - Math.max(0, totalSpent - budgetTotal) / budgetTotal) : 1;
-  const debtRatio = breakdown.gross > 0 ? breakdown.custom / breakdown.gross : 0;
+  const debtRatio = breakdown.net > 0 ? breakdown.custom / breakdown.net : 0;
   const score = healthScore({ savingsRate, givingRate, budgetAdherence: adherence, debtRatio });
 
-  // 6-month trend
   const trend: { month: string; spent: number }[] = [];
   for (let i = 5; i >= 0; i--) {
     const d = new Date();
@@ -54,7 +53,7 @@ function Insights() {
       });
     }
   });
-  if (savingsRate < 0.1 && gross > 0) {
+  if (savingsRate < 0.1 && net > 0) {
     insights.push({ kind: "warn", text: `Your savings rate is ${formatPercent(savingsRate * 100)} — below the 15% threshold.` });
   } else if (savingsRate > 0.2) {
     insights.push({ kind: "good", text: `Strong savings rate of ${formatPercent(savingsRate * 100)} — great discipline.` });
@@ -63,7 +62,7 @@ function Insights() {
     insights.push({ kind: "good", text: "Consistent tithing pattern detected. Faithful stewardship." });
   }
   if (debtRatio > 0.3) {
-    insights.push({ kind: "warn", text: `Custom deductions are ${formatPercent(debtRatio * 100)} of gross income — review obligations.` });
+    insights.push({ kind: "warn", text: `Custom deductions are ${formatPercent(debtRatio * 100)} of net income — review obligations.` });
   }
   const topCat = Array.from(spendByCat.entries()).sort((a, b) => b[1] - a[1])[0];
   if (topCat) {

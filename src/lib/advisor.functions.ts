@@ -6,10 +6,8 @@ const AdvisorInput = z.object({
   period: z.string().min(1).max(20),
   context: z.object({
     currency: z.string(),
-    gross: z.number(),
-    netDisposable: z.number(),
-    statutory: z.number(),
-    paye: z.number(),
+    net: z.number(),
+    disposable: z.number(),
     tithe: z.number(),
     customDeductions: z.number(),
     monthlySpend: z.number(),
@@ -32,9 +30,9 @@ export const runAdvisor = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI gateway not configured");
 
-    const system = `You are Nuru Steward — a calm, practical personal finance advisor for African households.
-You analyze the user's monthly snapshot and return: (1) a 0-100 financial health score, (2) a 2-3 sentence narrative summary, (3) 4-7 specific, actionable recommendations.
-Consider: Kenya statutory context (NSSF, SHIF, AHL, PAYE), family support obligations, subscription waste, debt risk, savings discipline, stewardship/tithing.
+    const system = `You are Nuru Steward — a calm, practical personal finance advisor.
+You analyze the user's monthly snapshot (which starts from NET take-home income, in their local currency) and return: (1) a 0-100 financial health score, (2) a 2-3 sentence narrative summary, (3) 4-7 specific, actionable recommendations.
+Consider: family support obligations, subscription waste, debt risk, savings discipline, stewardship/tithing.
 Tone: warm, direct, never preachy. Currency: ${data.context.currency}.`;
 
     const userMsg = `Period: ${data.period}\n\nSnapshot:\n${JSON.stringify(data.context, null, 2)}`;

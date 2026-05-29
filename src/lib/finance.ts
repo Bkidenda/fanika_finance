@@ -1,4 +1,6 @@
-// Nuru Steward — Kenya-aware salary & finance engine
+// Nuru Steward — multi-country, net-salary based finance engine.
+// We deliberately do NOT model gross/PAYE/statutory deductions: the system
+// starts from the user's NET take-home (in any currency) so it works anywhere.
 
 export type Deduction = {
   id: string;
@@ -11,99 +13,29 @@ export type Deduction = {
 
 export const TITHE_RATE = 0.1;
 
-// ---------- Kenya statutory deductions ----------
-
-export function nssfContribution(gross: number, mode: "simple" | "tiered" = "tiered"): number {
-  if (gross <= 0) return 0;
-  if (mode === "simple") return +(gross * 0.06).toFixed(2);
-  const tier1 = Math.min(gross, 8000) * 0.06;
-  const tier2 = Math.max(0, Math.min(gross, 72000) - 8000) * 0.06;
-  return +(tier1 + tier2).toFixed(2);
+export function computeDeductionAmount(d: Deduction, base: number): number {
+  if (d.rule === "percentage") return (base * d.value) / 100;
+  return d.frequency === "annual" ? d.value / 12 : d.value;
 }
 
-export function shifContribution(gross: number): number {
-  return +(Math.max(0, gross) * 0.0275).toFixed(2);
-}
-
-export function ahlContribution(gross: number): number {
-  return +(Math.max(0, gross) * 0.015).toFixed(2);
-}
-
-export function payeKenya(taxableIncome: number, isResident = true): number {
-  if (taxableIncome <= 0) return 0;
-  const bands = [
-    { upTo: 24000, rate: 0.1 },
-    { upTo: 32333, rate: 0.25 },
-    { upTo: 500000, rate: 0.3 },
-    { upTo: 800000, rate: 0.325 },
-    { upTo: Infinity, rate: 0.35 },
-  ];
-  let remaining = taxableIncome;
-  let prev = 0;
-  let tax = 0;
-  for (const b of bands) {
-    const slice = Math.max(0, Math.min(remaining, b.upTo - prev));
-    tax += slice * b.rate;
-    remaining -= slice;
-    prev = b.upTo;
-    if (remaining <= 0) break;
-  }
-  const relief = isResident ? 2400 : 0;
-  return +Math.max(0, tax - relief).toFixed(2);
-}
-
-export type SalaryBreakdown = {
-  gross: number;
-  nssf: number;
-  shif: number;
-  ahl: number;
-  allowableDeductions: number;
-  taxableIncome: number;
-  paye: number;
-  netStatutory: number;
-  customDeductions: number;
-  tithe: number;
-  netDisposable: number;
-  titheBase: "gross" | "net";
+export type Breakdown = {
+  net: number;            // raw take-home before any further allocations
+  tithe: number;          // 10% of net
+  custom: number;         // user-defined recurring deductions
+  disposable: number;     // net - tithe - custom
 };
 
-export function computeSalaryBreakdown(
-  gross: number,
-  opts: {
-    deductions?: Deduction[];
-    nssfMode?: "simple" | "tiered";
-    isResident?: boolean;
-    titheBase?: "gross" | "net";
-  } = {}
-): SalaryBreakdown {
-  const g = Math.max(0, gross || 0);
-  const nssf = nssfContribution(g, opts.nssfMode ?? "tiered");
-  const shif = shifContribution(g);
-  const ahl = ahlContribution(g);
-  const allowable = nssf + shif + ahl;
-  const taxable = Math.max(0, g - allowable);
-  const paye = payeKenya(taxable, opts.isResident ?? true);
-  const netStatutory = Math.max(0, g - allowable - paye);
-
-  const custom = (opts.deductions ?? [])
+export function computeBreakdown(
+  netMonthly: number,
+  deductions: Deduction[] = [],
+): Breakdown {
+  const net = Math.max(0, netMonthly || 0);
+  const tithe = net * TITHE_RATE;
+  const custom = deductions
     .filter((d) => d.type === "custom")
-    .reduce((s, d) => s + computeDeductionAmount(d, g), 0);
-
-  const titheBase = opts.titheBase ?? "gross";
-  const tithe = titheBase === "gross" ? g * TITHE_RATE : netStatutory * TITHE_RATE;
-  const netDisposable = Math.max(0, netStatutory - custom - tithe);
-
-  return { gross: g, nssf, shif, ahl, allowableDeductions: allowable, taxableIncome: taxable, paye, netStatutory, customDeductions: custom, tithe, netDisposable, titheBase };
-}
-
-export function computeBreakdown(grossMonthly: number, deductions: Deduction[], opts: { titheBase?: "gross" | "net"; nssfMode?: "simple" | "tiered"; isResident?: boolean } = {}) {
-  const b = computeSalaryBreakdown(grossMonthly, { deductions, ...opts });
-  return { gross: b.gross, tithe: b.tithe, statutory: b.nssf + b.shif + b.ahl + b.paye, custom: b.customDeductions, net: b.netDisposable };
-}
-
-export function computeDeductionAmount(d: Deduction, grossMonthly: number): number {
-  if (d.rule === "percentage") return (grossMonthly * d.value) / 100;
-  return d.frequency === "annual" ? d.value / 12 : d.value;
+    .reduce((s, d) => s + computeDeductionAmount(d, net), 0);
+  const disposable = Math.max(0, net - tithe - custom);
+  return { net, tithe, custom, disposable };
 }
 
 // ---------- Net worth ----------
@@ -142,8 +74,6 @@ export function groupForCategory(cat: string): string {
   }
   return "Other";
 }
-
-export const DEFAULT_STATUTORY: Array<Omit<Deduction, "id">> = [];
 
 export function healthScore(opts: { savingsRate: number; givingRate: number; budgetAdherence: number; debtRatio: number }) {
   const s = Math.min(1, opts.savingsRate / 0.2) * 30;

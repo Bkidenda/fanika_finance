@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  Settings, Sprout, Calculator, Landmark, Repeat, CreditCard, Coins, Bot, History, Globe,
+  Settings, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, Globe,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -10,7 +10,6 @@ import {
 
 const overview = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Salary Breakdown", url: "/salary", icon: Calculator },
   { title: "Insights", url: "/insights", icon: Sparkles },
   { title: "AI Advisor", url: "/advisor", icon: Bot },
   { title: "History", url: "/history", icon: History },
