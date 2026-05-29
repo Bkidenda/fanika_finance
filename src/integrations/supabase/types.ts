@@ -461,11 +461,8 @@ export type Database = {
           currency: string
           email: string | null
           full_name: string | null
-          gross_income: number
           id: string
-          is_resident: boolean
-          nssf_mode: string
-          tithe_base: string
+          net_income: number
           updated_at: string
         }
         Insert: {
@@ -473,11 +470,8 @@ export type Database = {
           currency?: string
           email?: string | null
           full_name?: string | null
-          gross_income?: number
           id: string
-          is_resident?: boolean
-          nssf_mode?: string
-          tithe_base?: string
+          net_income?: number
           updated_at?: string
         }
         Update: {
@@ -485,11 +479,8 @@ export type Database = {
           currency?: string
           email?: string | null
           full_name?: string | null
-          gross_income?: number
           id?: string
-          is_resident?: boolean
-          nssf_mode?: string
-          tithe_base?: string
+          net_income?: number
           updated_at?: string
         }
         Relationships: []
