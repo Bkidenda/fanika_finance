@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { runAdvisor } from "@/lib/advisor.functions";
 import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useIncomes, useSubscriptions, useDebts, useAIInsights } from "@/lib/queries";
-import { computeSalaryBreakdown } from "@/lib/finance";
+import { computeBreakdown } from "@/lib/finance";
 import { formatCurrency, monthKey } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Bot, Sparkles, AlertTriangle, CheckCircle2, Wand2 } from "lucide-react";
@@ -30,10 +30,8 @@ function Advisor() {
   });
 
   const currency = profile.data?.currency ?? "KES";
-  const gross = profile.data?.gross_income ?? 0;
-  const b = computeSalaryBreakdown(gross, {
-    deductions: deductions.data ?? [], nssfMode: profile.data?.nssf_mode, isResident: profile.data?.is_resident, titheBase: profile.data?.tithe_base,
-  });
+  const net = profile.data?.net_income ?? 0;
+  const b = computeBreakdown(net, deductions.data ?? []);
 
   const spendByCat = new Map<string, number>();
   (expenses.data ?? []).forEach((e) => spendByCat.set(e.category, (spendByCat.get(e.category) ?? 0) + Number(e.amount)));
@@ -46,19 +44,18 @@ function Advisor() {
   const debtsTotal = (debts.data ?? []).reduce((s, d) => s + Number(d.balance), 0);
   const portfolioValue = (investments.data ?? []).reduce((s, i) => s + Number(i.current_value), 0);
   const budgetTotal = (budgets.data ?? []).reduce((s, x) => s + Number(x.limit_amount), 0);
-  const savingsRate = b.gross > 0 ? Math.max(0, b.netDisposable - monthlySpend) / b.gross : 0;
-  const debtRatio = b.gross > 0 ? (b.customDeductions + (debts.data ?? []).reduce((s, d) => s + Number(d.monthly_payment), 0)) / b.gross : 0;
-  const familySupportRatio = b.gross > 0 ? familyTotal / b.gross : 0;
+  const savingsRate = b.net > 0 ? Math.max(0, b.disposable - monthlySpend) / b.net : 0;
+  const debtRatio = b.net > 0 ? (b.custom + (debts.data ?? []).reduce((s, d) => s + Number(d.monthly_payment), 0)) / b.net : 0;
+  const familySupportRatio = b.net > 0 ? familyTotal / b.net : 0;
 
   function runAnalysis() {
-    if (gross === 0) { toast.error("Set your gross income in Settings first."); return; }
+    if (net === 0) { toast.error("Set your net monthly income in Settings first."); return; }
     m.mutate({
       data: {
         period: monthKey(),
         context: {
-          currency, gross: b.gross, netDisposable: b.netDisposable,
-          statutory: b.nssf + b.shif + b.ahl, paye: b.paye, tithe: b.tithe,
-          customDeductions: b.customDeductions, monthlySpend, budgetTotal,
+          currency, net: b.net, disposable: b.disposable, tithe: b.tithe,
+          customDeductions: b.custom, monthlySpend, budgetTotal,
           savingsRate, debtRatio, familySupportRatio, subscriptionsMonthly: subsMonthly,
           debtsTotal, portfolioValue,
           topCategories: Array.from(spendByCat.entries()).map(([category, amount]) => ({ category, amount })).sort((a, b) => b.amount - a.amount).slice(0, 10),
@@ -80,7 +77,7 @@ function Advisor() {
       <div className="rounded-2xl border bg-gradient-hero p-6 text-primary-foreground shadow-elevated">
         <div className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-80"><Bot className="h-4 w-4" /> Snapshot</div>
         <div className="mt-3 grid gap-3 md:grid-cols-4">
-          <Tile l="Disposable" v={formatCurrency(b.netDisposable, currency)} />
+          <Tile l="Disposable" v={formatCurrency(b.disposable, currency)} />
           <Tile l="Monthly spend" v={formatCurrency(monthlySpend, currency)} />
           <Tile l="Family support" v={formatCurrency(familyTotal, currency)} />
           <Tile l="Debt balance" v={formatCurrency(debtsTotal, currency)} />

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals, useDevotional, useAccounts, useDebts, useIsMonthClosed, useIncomeEntries } from "@/lib/queries";
+import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals, useDevotional, useAccounts, useDebts, useIsMonthClosed } from "@/lib/queries";
 import { computeBreakdown, healthScore, computeNetWorth } from "@/lib/finance";
 import { formatCurrency, formatPercent, monthLabel, monthKey } from "@/lib/format";
 import { StatCard } from "@/components/stat-card";
@@ -15,9 +15,7 @@ import { Link } from "@tanstack/react-router";
 import { closeMonth } from "@/lib/close-month.functions";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/dashboard")({
-  component: Dashboard,
-});
+export const Route = createFileRoute("/_app/dashboard")({ component: Dashboard });
 
 function Dashboard() {
   const profile = useProfile();
@@ -27,10 +25,18 @@ function Dashboard() {
   const investments = useInvestments();
   const goals = useGoals();
   const devo = useDevotional();
+  const accounts = useAccounts();
+  const debts = useDebts();
+  const period = monthKey();
+  const isClosed = useIsMonthClosed(period);
+  const qc = useQueryClient();
+  const closeFn = useServerFn(closeMonth);
+  const [closing, setClosing] = useState(false);
+  const [confirm, setConfirm] = useState(false);
 
   const currency = profile.data?.currency ?? "KES";
-  const gross = profile.data?.gross_income ?? 0;
-  const breakdown = computeBreakdown(gross, deductions.data ?? []);
+  const net = profile.data?.net_income ?? 0;
+  const breakdown = computeBreakdown(net, deductions.data ?? []);
 
   const spendByCat = new Map<string, number>();
   (expenses.data ?? []).forEach((e) => {
@@ -39,26 +45,40 @@ function Dashboard() {
   const totalSpent = Array.from(spendByCat.values()).reduce((s, v) => s + v, 0);
 
   const budgetTotal = (budgets.data ?? []).reduce((s, b) => s + Number(b.limit_amount), 0);
-  const savingsRate = breakdown.gross > 0 ? Math.max(0, breakdown.net - totalSpent) / breakdown.gross : 0;
-  const givingRate = breakdown.gross > 0 ? breakdown.tithe / breakdown.gross : 0;
-
+  const savingsRate = breakdown.net > 0 ? Math.max(0, breakdown.disposable - totalSpent) / breakdown.net : 0;
+  const givingRate = breakdown.net > 0 ? breakdown.tithe / breakdown.net : 0;
   const adherence = budgetTotal > 0 ? Math.max(0, 1 - Math.max(0, totalSpent - budgetTotal) / budgetTotal) : 1;
-  const debtRatio = breakdown.gross > 0 ? breakdown.custom / breakdown.gross : 0;
+  const debtRatio = breakdown.net > 0 ? breakdown.custom / breakdown.net : 0;
   const score = healthScore({ savingsRate, givingRate, budgetAdherence: adherence, debtRatio });
 
   const portfolioValue = (investments.data ?? []).reduce((s, i) => s + Number(i.current_value), 0);
+  const nw = computeNetWorth({
+    accounts: accounts.data ?? [],
+    investments: investments.data ?? [],
+    debts: debts.data ?? [],
+  });
 
-  const allocation = (budgets.data ?? []).map((b) => ({
-    name: b.category,
-    value: Number(b.limit_amount),
-  }));
-
+  const allocation = (budgets.data ?? []).map((b) => ({ name: b.category, value: Number(b.limit_amount) }));
   const categorySpend = Array.from(spendByCat.entries())
     .map(([category, amount]) => ({ category, amount }))
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 8);
 
   const COLORS = ["#0e9488", "#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#ec4899", "#14b8a6", "#64748b"];
+
+  async function handleClose() {
+    setClosing(true);
+    try {
+      await closeFn({ data: { period } });
+      toast.success(`${period} closed and reconciled`);
+      qc.invalidateQueries({ queryKey: ["month-closures"] });
+      setConfirm(false);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setClosing(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -69,6 +89,15 @@ function Dashboard() {
             Welcome{profile.data?.full_name ? `, ${profile.data.full_name.split(" ")[0]}` : ""}.
           </h2>
         </div>
+        {isClosed ? (
+          <div className="flex items-center gap-2 rounded-full bg-success/15 px-3 py-1.5 text-xs font-medium text-success">
+            <CheckCircle2 className="h-3.5 w-3.5" /> {period} closed
+          </div>
+        ) : (
+          <Button variant="outline" onClick={() => setConfirm(true)}>
+            <Lock className="mr-1 h-4 w-4" /> Close month
+          </Button>
+        )}
       </div>
 
       {/* Hero stat row */}
@@ -77,20 +106,20 @@ function Dashboard() {
           accent
           label="Net Income"
           value={formatCurrency(breakdown.net, currency)}
-          hint={`From ${formatCurrency(breakdown.gross, currency)} gross`}
+          hint="Monthly take-home"
           icon={<Wallet className="h-5 w-5" />}
         />
         <StatCard
-          label="Tithes Returned"
+          label="Tithes (10% of net)"
           value={formatCurrency(breakdown.tithe, currency)}
-          hint="10% of gross — automatic"
+          hint="Automatic"
           icon={<HandCoins className="h-5 w-5" />}
         />
         <StatCard
-          label="Statutory Deductions"
-          value={formatCurrency(breakdown.statutory, currency)}
-          hint={`${(deductions.data ?? []).filter((d) => d.type === "statutory").length} rules`}
-          icon={<PiggyBank className="h-5 w-5" />}
+          label="Net Worth"
+          value={formatCurrency(nw.net, currency)}
+          hint={`Assets ${formatCurrency(nw.assets, currency)} · Debts ${formatCurrency(nw.liabilities, currency)}`}
+          icon={<Scale className="h-5 w-5" />}
         />
         <StatCard
           label="Portfolio Value"
@@ -105,19 +134,18 @@ function Dashboard() {
         <div className="rounded-2xl border bg-card p-6 shadow-card lg:col-span-2">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Financial Health
-              </div>
+              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Financial Health</div>
               <div className="mt-1 text-3xl font-semibold tabular-nums">{score}<span className="text-base text-muted-foreground"> / 100</span></div>
             </div>
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary">
               <Sparkles className="h-6 w-6" />
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-4">
+          <div className="mt-4 grid grid-cols-4 gap-4">
             <Metric label="Savings rate" value={formatPercent(savingsRate * 100)} />
             <Metric label="Giving ratio" value={formatPercent(givingRate * 100)} />
             <Metric label="Budget discipline" value={formatPercent(adherence * 100)} />
+            <Metric label="Disposable" value={formatCurrency(breakdown.disposable, currency)} />
           </div>
         </div>
 
@@ -130,10 +158,9 @@ function Dashboard() {
             <>
               <p className="mt-3 text-sm leading-relaxed italic">"{devo.data.verse}"</p>
               <p className="mt-1 text-xs opacity-80">— {devo.data.verse_reference}</p>
-              <p className="mt-4 text-sm leading-relaxed opacity-90">{devo.data.egw_quote}</p>
-              <Link to="/stewardship" className="mt-4 inline-block text-xs font-medium underline opacity-90">
-                Open devotional →
-              </Link>
+              <p className="mt-4 text-sm leading-relaxed opacity-90">"{devo.data.egw_quote}"</p>
+              {devo.data.egw_source && <p className="mt-1 text-[11px] opacity-70">— {devo.data.egw_source}</p>}
+              <Link to="/stewardship" className="mt-4 inline-block text-xs font-medium underline opacity-90">Open devotional →</Link>
             </>
           ) : (
             <p className="mt-3 text-sm opacity-80">Loading today's reflection…</p>
@@ -227,9 +254,7 @@ function Dashboard() {
                   </div>
                   <div className="mt-2 text-lg font-semibold tabular-nums">
                     {formatCurrency(g.current_amount, currency)}
-                    <span className="ml-1 text-xs font-normal text-muted-foreground">
-                      / {formatCurrency(g.target_amount, currency)}
-                    </span>
+                    <span className="ml-1 text-xs font-normal text-muted-foreground">/ {formatCurrency(g.target_amount, currency)}</span>
                   </div>
                   <Progress value={pct} className="mt-3" />
                 </div>
@@ -240,6 +265,25 @@ function Dashboard() {
           <EmptyState className="mt-4" label="No goals yet" to="/goals" cta="Create a goal" />
         )}
       </div>
+
+      <Dialog open={confirm} onOpenChange={setConfirm}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Close {period}?</DialogTitle></DialogHeader>
+          <div className="space-y-3 text-sm">
+            <p>This locks the current month and produces a reconciliation snapshot. Income, expenses and balances for {period} will be archived and protected from edits.</p>
+            <div className="rounded-xl border bg-secondary/50 p-3 text-xs">
+              <div className="flex justify-between"><span>Net income</span><span className="font-medium tabular-nums">{formatCurrency(breakdown.net, currency)}</span></div>
+              <div className="flex justify-between"><span>Total spend</span><span className="font-medium tabular-nums">{formatCurrency(totalSpent, currency)}</span></div>
+              <div className="flex justify-between"><span>Tithe set aside</span><span className="font-medium tabular-nums">{formatCurrency(breakdown.tithe, currency)}</span></div>
+              <div className="flex justify-between"><span>Net worth</span><span className="font-medium tabular-nums">{formatCurrency(nw.net, currency)}</span></div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="ghost" onClick={() => setConfirm(false)} disabled={closing}>Cancel</Button>
+              <Button onClick={handleClose} disabled={closing}>{closing ? "Closing…" : "Confirm close"}</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

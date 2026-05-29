@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Heart, Sparkles } from "lucide-react";
+import { BookOpen, Heart, Sparkles, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_app/stewardship")({ component: Stewardship });
 
@@ -27,6 +27,15 @@ function Stewardship() {
         <h2 className="text-2xl font-semibold tracking-tight">Word & wisdom for your finances</h2>
       </div>
 
+      <div className="flex items-start gap-2 rounded-xl border bg-secondary/40 p-3 text-xs text-muted-foreground">
+        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+        <p>
+          Scripture is quoted from the King James Version (public domain). Quotations attributed to Ellen G. White
+          are short fragments cited from her published works (chapter references shown). Please cross-check against
+          a printed edition before sharing — and notify us at <a href="mailto:bkidenda@gmail.com" className="underline">bkidenda@gmail.com</a> if you spot an error.
+        </p>
+      </div>
+
       {today && (
         <div className="rounded-3xl border bg-gradient-hero p-8 text-primary-foreground shadow-elevated">
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-80">
@@ -38,7 +47,7 @@ function Stewardship() {
           <p className="mt-2 text-sm opacity-90">— {today.verse_reference}</p>
           <div className="mt-6 rounded-2xl bg-white/10 p-5 backdrop-blur">
             <div className="text-xs uppercase tracking-widest opacity-80">Ellen G. White</div>
-            <p className="mt-2 leading-relaxed">{today.egw_quote}</p>
+            <p className="mt-2 leading-relaxed">"{today.egw_quote}"</p>
             {today.egw_source && <p className="mt-2 text-xs opacity-80">— {today.egw_source}</p>}
           </div>
           <div className="mt-6 rounded-2xl bg-white/10 p-5 backdrop-blur">
@@ -60,7 +69,8 @@ function Stewardship() {
               </div>
               <p className="mt-2 italic leading-relaxed">"{d.verse}"</p>
               <p className="mt-1 text-xs text-muted-foreground">— {d.verse_reference}</p>
-              <p className="mt-3 text-sm text-muted-foreground">{d.egw_quote}</p>
+              <p className="mt-3 text-sm">"{d.egw_quote}"</p>
+              {d.egw_source && <p className="mt-1 text-[11px] text-muted-foreground">— {d.egw_source}</p>}
             </div>
           ))}
         </div>

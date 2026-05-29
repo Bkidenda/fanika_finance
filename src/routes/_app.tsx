@@ -11,7 +11,6 @@ export const Route = createFileRoute("/_app")({
 
 const TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
-  "/salary": "Salary Breakdown",
   "/insights": "Insights",
   "/advisor": "AI Advisor",
   "/history": "History",

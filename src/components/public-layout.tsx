@@ -1,8 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Sprout, Menu, X } from "lucide-react";
+import { Sprout, Menu, X, Mail, Phone, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { AIChatbot } from "@/components/ai-chatbot";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -10,9 +11,12 @@ const NAV = [
   { to: "/how-it-works", label: "How it works" },
   { to: "/stewardship-philosophy", label: "Stewardship" },
   { to: "/pricing", label: "Pricing" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact" },
 ] as const;
+
+const EMAIL = "bkidenda@gmail.com";
+const PHONE_DISPLAY = "+254 708 096 833";
+const PHONE_TEL = "+254708096833";
+const WHATSAPP_URL = "https://wa.me/254708096833";
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -29,26 +33,28 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             </div>
             <span className="font-semibold tracking-tight">Nuru Steward</span>
           </Link>
-          <nav className="hidden items-center gap-1 lg:flex">
-            {NAV.map((n) => (
-              <Link
-                key={n.to}
-                to={n.to}
-                className={`rounded-md px-3 py-1.5 text-sm transition ${path === n.to ? "bg-secondary font-medium text-primary" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                {n.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="hidden items-center gap-2 lg:flex">
-            {user ? (
-              <Button asChild size="sm"><Link to="/dashboard">Open app</Link></Button>
-            ) : (
-              <>
-                <Button asChild variant="ghost" size="sm"><Link to="/login">Sign in</Link></Button>
-                <Button asChild size="sm"><Link to="/signup">Get started</Link></Button>
-              </>
-            )}
+          <div className="ml-auto hidden items-center gap-6 lg:flex">
+            <nav className="flex items-center gap-1">
+              {NAV.map((n) => (
+                <Link
+                  key={n.to}
+                  to={n.to}
+                  className={`rounded-md px-3 py-1.5 text-sm transition ${path === n.to ? "bg-secondary font-medium text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  {n.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="flex items-center gap-2">
+              {user ? (
+                <Button asChild size="sm"><Link to="/dashboard">Open app</Link></Button>
+              ) : (
+                <>
+                  <Button asChild variant="ghost" size="sm"><Link to="/login">Sign in</Link></Button>
+                  <Button asChild size="sm"><Link to="/signup">Get started</Link></Button>
+                </>
+              )}
+            </div>
           </div>
           <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -77,7 +83,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         )}
       </header>
       <main>{children}</main>
-      <footer className="mt-24 border-t bg-card">
+      <footer id="contact" className="mt-24 border-t bg-card">
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
@@ -92,14 +98,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <li><Link to="/features" className="hover:text-foreground">Features</Link></li>
               <li><Link to="/how-it-works" className="hover:text-foreground">How it works</Link></li>
               <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
-            </ul>
-          </div>
-          <div>
-            <div className="text-sm font-semibold">Company</div>
-            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/about" className="hover:text-foreground">About</Link></li>
               <li><Link to="/stewardship-philosophy" className="hover:text-foreground">Stewardship</Link></li>
-              <li><Link to="/contact" className="hover:text-foreground">Contact</Link></li>
             </ul>
           </div>
           <div>
@@ -109,9 +108,61 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <li><Link to="/login" className="hover:text-foreground">Sign in</Link></li>
             </ul>
           </div>
+          <div>
+            <div className="text-sm font-semibold">Contact</div>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li>
+                <a href={`mailto:${EMAIL}`} className="flex items-center gap-2 hover:text-foreground">
+                  <Mail className="h-3.5 w-3.5" /> {EMAIL}
+                </a>
+              </li>
+              <li>
+                <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 hover:text-foreground">
+                  <Phone className="h-3.5 w-3.5" /> {PHONE_DISPLAY}
+                </a>
+              </li>
+              <li>
+                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-foreground">
+                  <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
+                </a>
+              </li>
+            </ul>
+            <ContactForm />
+          </div>
         </div>
         <div className="border-t py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Nuru Steward</div>
       </footer>
+      <AIChatbot />
     </div>
+  );
+}
+
+function ContactForm() {
+  const [name, setName] = useState("");
+  const [msg, setMsg] = useState("");
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const body = `Hi Brian,%0D%0A%0D%0A${encodeURIComponent(msg)}%0D%0A%0D%0A— ${encodeURIComponent(name || "Nuru visitor")}`;
+    window.location.href = `mailto:${EMAIL}?subject=Question%20from%20Nuru%20Steward&body=${body}`;
+  }
+  return (
+    <form onSubmit={submit} className="mt-4 space-y-2">
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Your name"
+        className="w-full rounded-md border bg-background px-2 py-1.5 text-xs"
+      />
+      <textarea
+        value={msg}
+        onChange={(e) => setMsg(e.target.value)}
+        placeholder="Ask a question…"
+        rows={3}
+        className="w-full rounded-md border bg-background px-2 py-1.5 text-xs"
+      />
+      <button type="submit" className="w-full rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90">
+        Send
+      </button>
+    </form>
   );
 }

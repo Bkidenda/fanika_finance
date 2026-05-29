@@ -1,17 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Calculator, Landmark } from "lucide-react";
+import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark, Sparkles } from "lucide-react";
 import { PublicLayout } from "@/components/public-layout";
-import heroImg from "@/assets/hero.jpg";
+import heroImg from "@/assets/hero-founder.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Nuru Steward — Personal Finance, Anchored in Stewardship" },
-      { name: "description", content: "Track budgets, expenses, savings, investments, statutory deductions, debts and tithing — all from one stewardship-first dashboard." },
+      { name: "description", content: "Track budgets, expenses, savings, investments, debts and tithing — in any currency, anywhere. A stewardship-first personal finance OS." },
       { property: "og:title", content: "Nuru Steward — Personal Finance, Anchored in Stewardship" },
-      { property: "og:description", content: "The personal finance OS for disciplined stewards. Budgets, taxes, debts, investments, devotionals." },
+      { property: "og:description", content: "The personal finance OS for disciplined stewards. Budgets, debts, investments, devotionals." },
+      { property: "og:url", content: "https://nurusteward.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://nurusteward.lovable.app/" }],
   }),
   component: Home,
 });
@@ -29,7 +31,7 @@ function Home() {
               Your <span className="text-gradient-primary">personal finance</span> operating system.
             </h1>
             <p className="mt-5 max-w-lg text-lg text-muted-foreground">
-              Automate tithes, statutory deductions, and budgets. Track expenses, savings, debts and investments across every account — all anchored in daily devotional wisdom.
+              Start from your net take-home, automate tithes, plan budgets, and track expenses, savings, debts and investments across every account — all anchored in daily devotional wisdom. Works in any currency.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button size="lg" asChild>
@@ -40,13 +42,20 @@ function Home() {
               </Button>
             </div>
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
-              <span>✓ Kenya statutory (NSSF · SHIF · AHL · PAYE)</span>
+              <span>✓ Multi-currency</span>
               <span>✓ Multi-account net worth</span>
               <span>✓ Monthly close & reconciliation</span>
+              <span>✓ AI advisor & chatbot</span>
             </div>
           </div>
           <div className="overflow-hidden rounded-3xl border bg-card shadow-elevated">
-            <img src={heroImg} alt="Steward reviewing personal finances on a tablet at sunrise" width={1920} height={1080} className="h-full w-full object-cover" />
+            <img
+              src={heroImg}
+              alt="Brian Kidenda, founder of Nuru Steward, holding a tablet showing the dashboard"
+              width={1080}
+              height={1440}
+              className="h-full w-full object-cover"
+            />
           </div>
         </div>
       </section>
@@ -58,12 +67,12 @@ function Home() {
         </div>
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {[
-            { i: Calculator, t: "Salary breakdown intelligence", d: "See your gross flow into NSSF, SHIF, AHL, PAYE, tithe, and disposable income — automatically." },
             { i: Wallet, t: "Budgets & expenses", d: "Plan by category, log against your budget, and emergency-flag what doesn't fit." },
-            { i: Landmark, t: "Unified accounts", d: "Bank, M-Pesa, SACCO, cash. One net-worth view that updates when you spend or earn." },
+            { i: Landmark, t: "Unified accounts", d: "Bank, mobile money, SACCO, cash. One net-worth view that updates when you spend or earn." },
             { i: PiggyBank, t: "Debt & subscription control", d: "Track formal loans and informal lending. Watch subscriptions before they pile up." },
             { i: TrendingUp, t: "Investments & goals", d: "Portfolio ROI, savings goals, and diversification scoring for every income stream." },
-            { i: BookOpen, t: "Daily stewardship", d: "Scripture & Ellen G. White wisdom tied to your financial behavior, every day." },
+            { i: Sparkles, t: "AI advisor + chatbot", d: "Monthly analysis with actionable recommendations, plus an always-on assistant." },
+            { i: BookOpen, t: "Daily stewardship", d: "Scripture and short, verified quotations to ground every financial decision." },
           ].map((f) => (
             <div key={f.t} className="rounded-2xl border bg-card p-6 shadow-card transition hover:shadow-elevated">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-primary"><f.i className="h-5 w-5" /></div>
@@ -71,6 +80,19 @@ function Home() {
               <p className="mt-1 text-sm text-muted-foreground">{f.d}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* About / founder section (merged from former /about page) */}
+      <section className="mx-auto max-w-5xl px-6 py-16">
+        <div className="rounded-3xl border bg-card p-10 shadow-card">
+          <p className="text-sm font-medium text-primary">About</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight">Stewardship made operational.</h2>
+          <div className="prose prose-neutral mt-6 max-w-none text-muted-foreground">
+            <p>Nuru Steward exists for the household that wants to take faithful stewardship seriously — not as a Sunday idea, but as a daily operating system.</p>
+            <p>We started by asking: what would personal finance look like if tithing wasn't an afterthought, if family obligations were budgeted instead of guessed, and if every shilling — or dollar, or rupee — was visible across every account?</p>
+            <p>The answer is what you see here. Budgets that group around how real households actually spend. A monthly close so the past is reconciled before the next month begins. And devotional context, because numbers without wisdom is just spreadsheets.</p>
+          </div>
         </div>
       </section>
 
