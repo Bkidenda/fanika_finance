@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals, useDevotional, useAccounts, useDebts, useIsMonthClosed } from "@/lib/queries";
+import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals, useDevotional, useAccounts, useDebts, useIsMonthClosed, useIncomeEntries } from "@/lib/queries";
 import { computeBreakdown, healthScore, computeNetWorth } from "@/lib/finance";
 import { formatCurrency, formatPercent, monthLabel, monthKey } from "@/lib/format";
 import { StatCard } from "@/components/stat-card";
@@ -27,7 +27,8 @@ function Dashboard() {
   const devo = useDevotional();
   const accounts = useAccounts();
   const debts = useDebts();
-  const period = monthKey();
+  const incomeEntries = useIncomeEntries();
+  const period = monthKey().slice(0, 7); // YYYY-MM (validator format)
   const isClosed = useIsMonthClosed(period);
   const qc = useQueryClient();
   const closeFn = useServerFn(closeMonth);
@@ -35,17 +36,23 @@ function Dashboard() {
   const [confirm, setConfirm] = useState(false);
 
   const currency = profile.data?.currency ?? "KES";
-  const net = profile.data?.net_income ?? 0;
-  const breakdown = computeBreakdown(net, deductions.data ?? []);
+
+  // Total income for the month = sum of recorded income entries (single source of truth).
+  // Fallback to the configured net_income in Settings only when no entries exist yet.
+  const receivedIncome = (incomeEntries.data ?? []).reduce((s, e) => s + Number(e.amount), 0);
+  const fallbackNet = profile.data?.net_income ?? 0;
+  const netForMonth = receivedIncome > 0 ? receivedIncome : fallbackNet;
+  const breakdown = computeBreakdown(netForMonth, deductions.data ?? []);
 
   const spendByCat = new Map<string, number>();
   (expenses.data ?? []).forEach((e) => {
     spendByCat.set(e.category, (spendByCat.get(e.category) ?? 0) + Number(e.amount));
   });
   const totalSpent = Array.from(spendByCat.values()).reduce((s, v) => s + v, 0);
+  const remaining = breakdown.net - breakdown.tithe - breakdown.custom - totalSpent;
 
   const budgetTotal = (budgets.data ?? []).reduce((s, b) => s + Number(b.limit_amount), 0);
-  const savingsRate = breakdown.net > 0 ? Math.max(0, breakdown.disposable - totalSpent) / breakdown.net : 0;
+  const savingsRate = breakdown.net > 0 ? Math.max(0, remaining) / breakdown.net : 0;
   const givingRate = breakdown.net > 0 ? breakdown.tithe / breakdown.net : 0;
   const adherence = budgetTotal > 0 ? Math.max(0, 1 - Math.max(0, totalSpent - budgetTotal) / budgetTotal) : 1;
   const debtRatio = breakdown.net > 0 ? breakdown.custom / breakdown.net : 0;
@@ -104,15 +111,15 @@ function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           accent
-          label="Net Income"
+          label="Income received"
           value={formatCurrency(breakdown.net, currency)}
-          hint="Monthly take-home"
+          hint={receivedIncome > 0 ? `${(incomeEntries.data ?? []).length} entries this month` : "Set in Settings or record an entry"}
           icon={<Wallet className="h-5 w-5" />}
         />
         <StatCard
-          label="Tithes (10% of net)"
-          value={formatCurrency(breakdown.tithe, currency)}
-          hint="Automatic"
+          label="Remaining balance"
+          value={formatCurrency(Math.max(0, remaining), currency)}
+          hint={remaining < 0 ? `Over by ${formatCurrency(-remaining, currency)}` : "After tithe + spend"}
           icon={<HandCoins className="h-5 w-5" />}
         />
         <StatCard
@@ -129,6 +136,26 @@ function Dashboard() {
         />
       </div>
 
+      {/* Account balances reconciliation */}
+      {(accounts.data?.length ?? 0) > 0 && (
+        <div className="rounded-2xl border bg-card p-6 shadow-card">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Where your money is</h3>
+            <Link to="/accounts" className="text-xs font-medium text-primary hover:underline">Manage accounts</Link>
+          </div>
+          <p className="text-xs text-muted-foreground">Live balances — auto-updated by every income, expense and debt payment.</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {(accounts.data ?? []).map((a) => (
+              <div key={a.id} className="rounded-xl border p-3">
+                <div className="text-xs text-muted-foreground capitalize">{a.type}{a.institution ? ` · ${a.institution}` : ""}</div>
+                <div className="mt-0.5 text-sm font-medium">{a.name}</div>
+                <div className="mt-1 text-lg font-semibold tabular-nums">{formatCurrency(Number(a.balance), currency)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Health + Devotional */}
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border bg-card p-6 shadow-card lg:col-span-2">
@@ -142,10 +169,10 @@ function Dashboard() {
             </div>
           </div>
           <div className="mt-4 grid grid-cols-4 gap-4">
-            <Metric label="Savings rate" value={formatPercent(savingsRate * 100)} />
-            <Metric label="Giving ratio" value={formatPercent(givingRate * 100)} />
-            <Metric label="Budget discipline" value={formatPercent(adherence * 100)} />
-            <Metric label="Disposable" value={formatCurrency(breakdown.disposable, currency)} />
+            <Metric label="Total income" value={formatCurrency(breakdown.net, currency)} />
+            <Metric label="Tithe (10%)" value={formatCurrency(breakdown.tithe, currency)} />
+            <Metric label="Spent" value={formatCurrency(totalSpent, currency)} />
+            <Metric label="Disposable" value={formatCurrency(Math.max(0, remaining), currency)} />
           </div>
         </div>
 
