@@ -25,13 +25,13 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gradient-surface">
-      <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-primary/20 bg-gradient-to-r from-[oklch(0.45_0.12_180)] via-[oklch(0.52_0.12_175)] to-[oklch(0.58_0.13_185)] text-primary-foreground shadow-card backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary shadow-card">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 backdrop-blur">
               <Sprout className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-semibold tracking-tight">Nuru Steward</span>
+            <span className="font-semibold tracking-tight text-primary-foreground">Nuru Steward</span>
           </Link>
           <div className="ml-auto hidden items-center gap-6 lg:flex">
             <nav className="flex items-center gap-1">
@@ -39,7 +39,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`rounded-md px-3 py-1.5 text-sm transition ${path === n.to ? "bg-secondary font-medium text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                  className={`rounded-md px-3 py-1.5 text-sm transition ${path === n.to ? "bg-white/20 font-medium text-primary-foreground" : "text-primary-foreground/80 hover:bg-white/10 hover:text-primary-foreground"}`}
                 >
                   {n.label}
                 </Link>
@@ -47,11 +47,11 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             </nav>
             <div className="flex items-center gap-2">
               {user ? (
-                <Button asChild size="sm"><Link to="/dashboard">Open app</Link></Button>
+                <Button asChild size="sm" variant="secondary"><Link to="/dashboard">Open app</Link></Button>
               ) : (
                 <>
-                  <Button asChild variant="ghost" size="sm"><Link to="/login">Sign in</Link></Button>
-                  <Button asChild size="sm"><Link to="/signup">Get started</Link></Button>
+                  <Button asChild variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"><Link to="/login">Sign in</Link></Button>
+                  <Button asChild size="sm" variant="secondary"><Link to="/signup">Get started</Link></Button>
                 </>
               )}
             </div>

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark, Sparkles } from "lucide-react";
 import { PublicLayout } from "@/components/public-layout";
-import heroImg from "@/assets/hero-founder.jpg";
+import heroImg from "@/assets/founder-white.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -48,14 +48,37 @@ function Home() {
               <span>✓ AI advisor & chatbot</span>
             </div>
           </div>
-          <div className="overflow-hidden rounded-3xl border bg-card shadow-elevated">
-            <img
-              src={heroImg}
-              alt="Brian Kidenda, founder of Nuru Steward, holding a tablet showing the dashboard"
-              width={1080}
-              height={1440}
-              className="h-full w-full object-cover"
-            />
+          <div className="relative">
+            {/* Decorative floating graphics */}
+            <div aria-hidden className="pointer-events-none absolute -left-6 -top-6 h-24 w-24 rounded-3xl bg-gradient-primary opacity-20 blur-2xl animate-pulse" />
+            <div aria-hidden className="pointer-events-none absolute -right-8 top-12 h-28 w-28 rounded-full bg-[oklch(0.72_0.14_175)] opacity-25 blur-3xl animate-pulse [animation-delay:600ms]" />
+            <div aria-hidden className="pointer-events-none absolute -bottom-6 right-10 h-32 w-32 rounded-3xl bg-[oklch(0.78_0.15_75)] opacity-20 blur-3xl animate-pulse [animation-delay:1200ms]" />
+
+            {/* Floating finance stat chips */}
+            <div className="pointer-events-none absolute left-2 top-10 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur duration-700 animate-in fade-in slide-in-from-left-4 md:block">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Tithe</div>
+              <div className="text-sm font-semibold tabular-nums text-primary">10% set aside</div>
+            </div>
+            <div className="pointer-events-none absolute right-2 top-32 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-200 duration-700 animate-in fade-in slide-in-from-right-4 md:block">
+              <div className="flex items-center gap-1.5"><TrendingUp className="h-3 w-3 text-success" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Net worth</span></div>
+              <div className="text-sm font-semibold tabular-nums">+12.4%</div>
+            </div>
+            <div className="pointer-events-none absolute -left-2 bottom-14 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-500 duration-700 animate-in fade-in slide-in-from-bottom-4 md:block">
+              <div className="flex items-center gap-1.5"><PiggyBank className="h-3 w-3 text-primary" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Goals</span></div>
+              <div className="text-sm font-semibold tabular-nums">3 on track</div>
+            </div>
+
+            {/* Photo frame on white */}
+            <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
+              <img
+                src={heroImg}
+                alt="Brian Kidenda, founder of Nuru Steward"
+                width={1080}
+                height={1440}
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
+              />
+              <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-primary/5" />
+            </div>
           </div>
         </div>
       </section>

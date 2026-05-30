@@ -16,8 +16,7 @@ const overview = [
 ] as const;
 
 const money = [
-  { title: "Income", url: "/income", icon: Coins },
-  { title: "Income Entries", url: "/income-entries", icon: Receipt },
+  { title: "Income", url: "/income-entries", icon: Coins },
   { title: "Budgets", url: "/budgets", icon: Wallet },
   { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Subscriptions", url: "/subscriptions", icon: Repeat },
