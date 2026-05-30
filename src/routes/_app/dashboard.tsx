@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals, useDevotional, useAccounts, useDebts, useIsMonthClosed, useIncomeEntries } from "@/lib/queries";
 import { computeBreakdown, healthScore, computeNetWorth } from "@/lib/finance";
-import { formatCurrency, formatPercent, monthLabel, monthKey } from "@/lib/format";
+import { formatCurrency, monthLabel, monthKey } from "@/lib/format";
 import { StatCard } from "@/components/stat-card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
