@@ -53,7 +53,7 @@ function IncomeEntries() {
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between">
-        <div><p className="text-sm text-muted-foreground">Money actually received this month</p><h2 className="text-2xl font-semibold tracking-tight">Income Entries</h2></div>
+        <div><p className="text-sm text-muted-foreground">Money actually received — every entry updates the linked account balance and feeds the dashboard.</p><h2 className="text-2xl font-semibold tracking-tight">Income</h2></div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button disabled={isClosed}><Plus className="mr-1 h-4 w-4" /> Record income</Button></DialogTrigger>
           <DialogContent>
