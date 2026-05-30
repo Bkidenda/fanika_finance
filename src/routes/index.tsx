@@ -55,30 +55,28 @@ function Home() {
             <div aria-hidden className="pointer-events-none absolute -bottom-6 right-10 h-32 w-32 rounded-3xl bg-[oklch(0.78_0.15_75)] opacity-20 blur-3xl animate-pulse [animation-delay:1200ms]" />
 
             {/* Floating finance stat chips */}
-            <div className="pointer-events-none absolute left-2 top-10 z-10 hidden animate-fade-in rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur md:block" style={{ animation: "fade-in 0.6s ease-out both" }}>
+            <div className="pointer-events-none absolute left-2 top-10 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur duration-700 animate-in fade-in slide-in-from-left-4 md:block">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Tithe</div>
               <div className="text-sm font-semibold tabular-nums text-primary">10% set aside</div>
             </div>
-            <div className="pointer-events-none absolute right-2 top-32 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur md:block" style={{ animation: "fade-in 0.8s ease-out 0.2s both" }}>
+            <div className="pointer-events-none absolute right-2 top-32 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-200 duration-700 animate-in fade-in slide-in-from-right-4 md:block">
               <div className="flex items-center gap-1.5"><TrendingUp className="h-3 w-3 text-success" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Net worth</span></div>
               <div className="text-sm font-semibold tabular-nums">+12.4%</div>
             </div>
-            <div className="pointer-events-none absolute -left-2 bottom-14 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur md:block" style={{ animation: "fade-in 1s ease-out 0.4s both" }}>
+            <div className="pointer-events-none absolute -left-2 bottom-14 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-500 duration-700 animate-in fade-in slide-in-from-bottom-4 md:block">
               <div className="flex items-center gap-1.5"><PiggyBank className="h-3 w-3 text-primary" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Goals</span></div>
               <div className="text-sm font-semibold tabular-nums">3 on track</div>
             </div>
 
             {/* Photo frame on white */}
-            <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated" style={{ animation: "scale-in 0.7s ease-out both" }}>
+            <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
               <img
                 src={heroImg}
                 alt="Brian Kidenda, founder of Nuru Steward"
                 width={1080}
                 height={1440}
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
-                style={{ animation: "fade-in 0.8s ease-out both" }}
               />
-              {/* subtle sweep highlight */}
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-primary/5" />
             </div>
           </div>
