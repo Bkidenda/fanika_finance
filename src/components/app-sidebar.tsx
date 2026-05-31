@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  Settings, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, Globe,
+  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, Globe, CalendarDays,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -10,6 +10,7 @@ import {
 
 const overview = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Calendar", url: "/calendar", icon: CalendarDays },
   { title: "Insights", url: "/insights", icon: Sparkles },
   { title: "AI Advisor", url: "/advisor", icon: Bot },
   { title: "History", url: "/history", icon: History },
@@ -81,8 +82,8 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={path === "/settings"}>
                   <Link to="/settings" className="flex items-center gap-3">
-                    <Settings className="h-4 w-4" />
-                    {!collapsed && <span>Settings</span>}
+                    <UserCircle className="h-4 w-4" />
+                    {!collapsed && <span>My Profile</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
