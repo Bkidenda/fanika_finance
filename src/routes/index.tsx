@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark, Sparkles } from "lucide-react";
+import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark, Sparkles, Calendar, Eye, HandHeart, Bot, Target } from "lucide-react";
 import { PublicLayout } from "@/components/public-layout";
-import heroImg from "@/assets/founder-white.jpg";
+import heroImg from "@/assets/hero-tablet.jpg";
+
+const DEMO_MAILTO = `mailto:bkidenda@gmail.com?subject=Book%20a%20free%20Nuru%20Steward%20demo&body=Hi%20Brian%2C%0D%0A%0D%0AI'd%20like%20to%20book%20a%20free%20demo%20of%20Nuru%20Steward.%0D%0A`;
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Nuru Steward — Personal Finance, Anchored in Stewardship" },
-      { name: "description", content: "Track budgets, expenses, savings, investments, debts and tithing — in any currency, anywhere. A stewardship-first personal finance OS." },
-      { property: "og:title", content: "Nuru Steward — Personal Finance, Anchored in Stewardship" },
-      { property: "og:description", content: "The personal finance OS for disciplined stewards. Budgets, debts, investments, devotionals." },
+      { title: "Nuru Steward — Manage Money with Purpose. Build Wealth with Discipline." },
+      { name: "description", content: "Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning — rooted in stewardship." },
+      { property: "og:title", content: "Nuru Steward — Manage Money with Purpose" },
+      { property: "og:description", content: "Personal finance OS for disciplined stewards. Budgets, debts, investments, devotionals." },
       { property: "og:url", content: "https://nurusteward.lovable.app/" },
     ],
     links: [{ rel: "canonical", href: "https://nurusteward.lovable.app/" }],
@@ -21,23 +23,31 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <PublicLayout>
-      <section className="mx-auto max-w-7xl px-6 pb-16 pt-14">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <div>
+      {/* HERO */}
+      <section className="relative mx-auto max-w-7xl px-6 pb-16 pt-8">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+          <div className="duration-700 animate-in fade-in slide-in-from-left-4">
             <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-card">
               <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Stewardship-first finance
             </span>
-            <h1 className="mt-5 text-balance text-5xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
-              Your <span className="text-gradient-primary">personal finance</span> operating system.
+            <h1 className="mt-5 text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
+              Manage Money with <span className="text-gradient-primary">Purpose</span>.<br />
+              Build Wealth with <span className="text-gradient-primary">Discipline</span>.
             </h1>
-            <p className="mt-5 max-w-lg text-lg text-muted-foreground">
-              Start from your net take-home, automate tithes, plan budgets, and track expenses, savings, debts and investments across every account — all anchored in daily devotional wisdom. Works in any currency.
+            <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">
+              Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning. Nuru Steward helps you make intentional financial decisions rooted in stewardship, accountability, and long-term prosperity.
+            </p>
+            <p className="mt-4 max-w-xl text-sm text-muted-foreground">
+              Start from your net take-home pay, automate tithes and giving, plan monthly budgets, track spending, manage debts, monitor investments, and stay aligned with your financial goals — all in one place.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button size="lg" asChild>
                 <Link to="/signup">Start free <ArrowRight className="ml-1 h-4 w-4" /></Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
+                <a href={DEMO_MAILTO}><Calendar className="mr-1 h-4 w-4" /> Book a free demo</a>
+              </Button>
+              <Button size="lg" variant="ghost" asChild>
                 <Link to="/how-it-works">See how it works</Link>
               </Button>
             </div>
@@ -48,42 +58,58 @@ function Home() {
               <span>✓ AI advisor & chatbot</span>
             </div>
           </div>
-          <div className="relative">
-            {/* Decorative floating graphics */}
-            <div aria-hidden className="pointer-events-none absolute -left-6 -top-6 h-24 w-24 rounded-3xl bg-gradient-primary opacity-20 blur-2xl animate-pulse" />
-            <div aria-hidden className="pointer-events-none absolute -right-8 top-12 h-28 w-28 rounded-full bg-[oklch(0.72_0.14_175)] opacity-25 blur-3xl animate-pulse [animation-delay:600ms]" />
-            <div aria-hidden className="pointer-events-none absolute -bottom-6 right-10 h-32 w-32 rounded-3xl bg-[oklch(0.78_0.15_75)] opacity-20 blur-3xl animate-pulse [animation-delay:1200ms]" />
 
-            {/* Floating finance stat chips */}
-            <div className="pointer-events-none absolute left-2 top-10 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur duration-700 animate-in fade-in slide-in-from-left-4 md:block">
+          <div className="relative">
+            <div aria-hidden className="pointer-events-none absolute -left-8 -top-8 h-24 w-24 rounded-3xl bg-gradient-primary opacity-25 blur-2xl animate-pulse" />
+            <div aria-hidden className="pointer-events-none absolute -right-6 top-16 h-28 w-28 rounded-full bg-[oklch(0.72_0.14_175)] opacity-30 blur-3xl animate-pulse [animation-delay:600ms]" />
+            <div aria-hidden className="pointer-events-none absolute -bottom-6 right-12 h-32 w-32 rounded-3xl bg-[oklch(0.78_0.15_75)] opacity-25 blur-3xl animate-pulse [animation-delay:1200ms]" />
+
+            {/* Floating chips */}
+            <div className="pointer-events-none absolute -left-3 top-8 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur duration-700 animate-in fade-in slide-in-from-left-4 md:block">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Tithe</div>
               <div className="text-sm font-semibold tabular-nums text-primary">10% set aside</div>
             </div>
-            <div className="pointer-events-none absolute right-2 top-32 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-200 duration-700 animate-in fade-in slide-in-from-right-4 md:block">
+            <div className="pointer-events-none absolute -right-3 top-28 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-200 duration-700 animate-in fade-in slide-in-from-right-4 md:block">
               <div className="flex items-center gap-1.5"><TrendingUp className="h-3 w-3 text-success" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Net worth</span></div>
               <div className="text-sm font-semibold tabular-nums">+12.4%</div>
             </div>
-            <div className="pointer-events-none absolute -left-2 bottom-14 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-500 duration-700 animate-in fade-in slide-in-from-bottom-4 md:block">
+            <div className="pointer-events-none absolute -left-2 bottom-12 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-500 duration-700 animate-in fade-in slide-in-from-bottom-4 md:block">
               <div className="flex items-center gap-1.5"><PiggyBank className="h-3 w-3 text-primary" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Goals</span></div>
               <div className="text-sm font-semibold tabular-nums">3 on track</div>
             </div>
 
-            {/* Photo frame on white */}
-            <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
-              <img
-                src={heroImg}
-                alt="Brian Kidenda, founder of Nuru Steward"
-                width={1080}
-                height={1440}
-                className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
-              />
+            <div className="relative mx-auto max-w-md overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
+              <img src={heroImg} alt="Nuru Steward founder showing the personal finance dashboard on a tablet" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]" />
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-primary/5" />
             </div>
           </div>
         </div>
       </section>
 
+      {/* WHY NURU */}
       <section className="mx-auto max-w-7xl px-6 py-16">
+        <div className="text-center">
+          <p className="text-sm font-medium text-primary">Why Nuru Steward?</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Finance that serves your purpose.</h2>
+        </div>
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            { i: Eye, t: "Financial Clarity", d: "Know exactly where your money comes from, where it goes, and how every decision impacts your future." },
+            { i: HandHeart, t: "Faithful Stewardship", d: "Prioritize tithes, offerings, generosity, and purpose-driven financial planning before allocating the rest of your income." },
+            { i: Bot, t: "Automated Planning", d: "Create realistic budgets automatically based on your income, commitments, and financial priorities." },
+            { i: Target, t: "Wealth Building", d: "Track savings, investments, emergency funds, and long-term financial goals from a single dashboard." },
+          ].map((f) => (
+            <div key={f.t} className="rounded-2xl border bg-card p-6 shadow-card transition hover:shadow-elevated">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-primary"><f.i className="h-5 w-5" /></div>
+              <h3 className="mt-4 font-semibold">{f.t}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{f.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* MODULES */}
+      <section className="mx-auto max-w-7xl px-6 py-12">
         <div className="text-center">
           <h2 className="text-3xl font-semibold tracking-tight">Built for disciplined stewards</h2>
           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">Everything you need to see, govern, and grow your finances — without spreadsheets.</p>
@@ -106,7 +132,7 @@ function Home() {
         </div>
       </section>
 
-      {/* About / founder section (merged from former /about page) */}
+      {/* About */}
       <section className="mx-auto max-w-5xl px-6 py-16">
         <div className="rounded-3xl border bg-card p-10 shadow-card">
           <p className="text-sm font-medium text-primary">About</p>
@@ -123,9 +149,14 @@ function Home() {
         <div className="rounded-3xl border bg-gradient-hero p-10 text-center text-primary-foreground shadow-elevated">
           <h2 className="text-3xl font-semibold tracking-tight">Ready to take stewardship seriously?</h2>
           <p className="mx-auto mt-3 max-w-xl opacity-90">Create your free account and bring every shilling into the light.</p>
-          <Button size="lg" variant="secondary" asChild className="mt-6">
-            <Link to="/signup">Get started — it's free <ArrowRight className="ml-1 h-4 w-4" /></Link>
-          </Button>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Button size="lg" variant="secondary" asChild>
+              <Link to="/signup">Get started — it's free <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild className="border-white/40 bg-transparent text-primary-foreground hover:bg-white/15">
+              <a href={DEMO_MAILTO}><Calendar className="mr-1 h-4 w-4" /> Book a free demo</a>
+            </Button>
+          </div>
         </div>
       </section>
     </PublicLayout>

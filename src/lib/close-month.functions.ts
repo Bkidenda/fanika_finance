@@ -4,15 +4,22 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Input = z.object({ period: z.string().regex(/^\d{4}-\d{2}$/) });
 
+function nextMonthFromPeriod(period: string): { firstDay: string; key: string } {
+  const [y, m] = period.split("-").map(Number);
+  const d = new Date(Date.UTC(y, m, 1)); // m is 0-based for next month
+  const ny = d.getUTCFullYear();
+  const nm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  return { firstDay: `${ny}-${nm}-01`, key: `${ny}-${nm}` };
+}
+
 export const closeMonth = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const start = `${data.period}-01`;
-    const d = new Date(start);
-    d.setMonth(d.getMonth() + 1);
-    const end = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+    const next = nextMonthFromPeriod(data.period);
+    const end = next.firstDay;
 
     const [exp, inc, dp, bud, sub, deb, acc, inv] = await Promise.all([
       supabase.from("expenses").select("amount,category,is_emergency").gte("date", start).lt("date", end),
@@ -46,6 +53,7 @@ export const closeMonth = createServerFn({ method: "POST" })
       subsMonthly, debtsTotal, assets, netWorth: assets - debtsTotal,
       netCashflow, savingsRate: totalIncome > 0 ? netCashflow / totalIncome : 0,
       budgetVariance: totalExpenses - budgetTotal, topCategories,
+      nextMonth: next.key,
     };
 
     const { data: row, error } = await supabase
@@ -53,7 +61,23 @@ export const closeMonth = createServerFn({ method: "POST" })
       .upsert({ user_id: userId, period: data.period, closed_at: new Date().toISOString(), snapshot }, { onConflict: "user_id,period" })
       .select().single();
     if (error) throw new Error(error.message);
-    return row;
+
+    // Auto-open next month: copy this month's budgets forward if next month has none yet.
+    const { data: existingNext } = await supabase
+      .from("budgets").select("id").eq("month", next.firstDay).limit(1);
+    if (!existingNext || existingNext.length === 0) {
+      const rows = (bud.data ?? []).map((b) => ({
+        user_id: userId,
+        category: b.category,
+        month: next.firstDay,
+        limit_amount: Number(b.limit_amount),
+      }));
+      if (rows.length > 0) {
+        await supabase.from("budgets").insert(rows);
+      }
+    }
+
+    return { ...row, nextMonth: next.key };
   });
 
 export const reopenMonth = createServerFn({ method: "POST" })

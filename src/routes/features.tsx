@@ -1,32 +1,34 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout } from "@/components/public-layout";
-import { Wallet, Calculator, Landmark, Receipt, TrendingUp, Target, CreditCard, Repeat, BookOpen, Bot, Sparkles, History } from "lucide-react";
+import { Wallet, Landmark, Receipt, TrendingUp, Target, CreditCard, Repeat, BookOpen, Bot, Sparkles, History, Calendar, Coins, HandHeart, Scale } from "lucide-react";
 
 export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
       { title: "Features — Nuru Steward" },
-      { name: "description", content: "Salary breakdown, budgets, multi-account net worth, debt planner, AI advisor, monthly close, devotionals — every module in Nuru Steward." },
+      { name: "description", content: "Net-income budgeting, multi-account net worth, debt planner, AI advisor, financial calendar, monthly close, devotionals — every module in Nuru Steward." },
       { property: "og:title", content: "Features — Nuru Steward" },
-      { property: "og:description", content: "Every module in Nuru Steward, from salary breakdown to monthly reconciliation." },
+      { property: "og:description", content: "Every module in Nuru Steward, from net-income budgeting to monthly reconciliation." },
     ],
   }),
   component: Features,
 });
 
 const MODULES = [
-  { i: Calculator, t: "Salary breakdown", d: "Watch your gross flow through NSSF (tiered or simple), SHIF, AHL, PAYE bands, and personal relief into net statutory pay." },
-  { i: Wallet, t: "Budgets by category", d: "Group budgets across Essentials, Family, Lifestyle, Financial — with overspend alerts and progress bars." },
+  { i: Coins, t: "Net-income first", d: "Start from your take-home pay in any currency. No country-specific payroll math — Nuru works wherever you live." },
+  { i: HandHeart, t: "Automated tithes & giving", d: "10% of every income entry is set aside automatically. Track giving alongside everything else." },
+  { i: Wallet, t: "Budgets by category", d: "Group budgets across Essentials, Family, Lifestyle and Financial — with overspend alerts and progress bars. Budget the current month or plan ahead." },
   { i: Receipt, t: "Expenses inside budgets", d: "Every expense lands inside an active budget category. Out-of-plan spending is flagged as an emergency." },
   { i: Landmark, t: "Unified accounts", d: "Bank, M-Pesa, SACCO, cash, investment. Balances auto-update with every recorded expense, payment or income receipt." },
-  { i: TrendingUp, t: "Net worth tracking", d: "Assets minus liabilities, refreshed live. Cash + investments − debts, with full audit history." },
+  { i: Scale, t: "Net worth tracking", d: "Assets minus liabilities, refreshed live. Cash + investments − debts, with full audit history." },
   { i: CreditCard, t: "Debt planner", d: "Formal loans (rate, monthly, due date) and informal lending from family & friends — track both, schedule payments." },
   { i: Repeat, t: "Subscriptions watchdog", d: "Catch silent recurring drains. Monthly cost, annual projection, pause/resume any time." },
   { i: Target, t: "Savings goals", d: "Visual progress bars for every goal, with target date and current balance." },
-  { i: History, t: "Monthly close & history", d: "Close each month with a reconciliation snapshot. Review historical payroll, budgets, balances and AI insights." },
+  { i: Calendar, t: "Financial calendar", d: "Mark dates with financial implications — bill due dates, expected income, debt deadlines, family obligations, planned giving." },
+  { i: History, t: "Monthly close & next-month auto-open", d: "Close each month with a reconciliation snapshot. The next month opens automatically and last month's budgets are copied forward as a starting point." },
   { i: Bot, t: "AI financial advisor", d: "A grounded advisor that reads your snapshot and returns a 0-100 health score plus practical recommendations." },
   { i: Sparkles, t: "Smart insights", d: "Overspend, low-savings, high-debt, family-support ratio — surfaced when they matter." },
-  { i: BookOpen, t: "Devotional layer", d: "Scripture & Ellen G. White reflections tied to your stewardship rhythm." },
+  { i: BookOpen, t: "Devotional layer", d: "Scripture and verified Ellen G. White reflections tied to your stewardship rhythm." },
 ];
 
 function Features() {

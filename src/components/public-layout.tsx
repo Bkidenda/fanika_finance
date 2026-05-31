@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Sprout, Menu, X, Mail, Phone, MessageCircle } from "lucide-react";
+import { Sprout, Menu, X, Mail, Phone, MessageCircle, Calendar } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -17,6 +17,7 @@ const EMAIL = "bkidenda@gmail.com";
 const PHONE_DISPLAY = "+254 708 096 833";
 const PHONE_TEL = "+254708096833";
 const WHATSAPP_URL = "https://wa.me/254708096833";
+const DEMO_MAILTO = `mailto:${EMAIL}?subject=Book%20a%20free%20Nuru%20Steward%20demo&body=Hi%20Brian%2C%0D%0A%0D%0AI'd%20like%20to%20book%20a%20free%20demo%20of%20Nuru%20Steward.%0D%0A%0D%0AName%3A%0D%0APreferred%20date%2Ftime%3A%0D%0A`;
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -25,27 +26,31 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gradient-surface">
-      <header className="sticky top-0 z-40 border-b border-primary/20 bg-gradient-to-r from-[oklch(0.45_0.12_180)] via-[oklch(0.52_0.12_175)] to-[oklch(0.58_0.13_185)] text-primary-foreground shadow-card backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+      {/* Floating navbar */}
+      <header className="fixed inset-x-0 top-4 z-50 px-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border border-white/20 bg-gradient-to-r from-[oklch(0.45_0.12_180)]/95 via-[oklch(0.52_0.12_175)]/95 to-[oklch(0.58_0.13_185)]/95 px-4 py-2.5 text-primary-foreground shadow-elevated backdrop-blur-xl">
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 backdrop-blur">
-              <Sprout className="h-5 w-5 text-primary-foreground" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25">
+              <Sprout className="h-5 w-5" />
             </div>
-            <span className="font-semibold tracking-tight text-primary-foreground">Nuru Steward</span>
+            <span className="font-semibold tracking-tight">Nuru Steward</span>
           </Link>
-          <div className="ml-auto hidden items-center gap-6 lg:flex">
+          <div className="ml-auto hidden items-center gap-1.5 lg:flex">
             <nav className="flex items-center gap-1">
               {NAV.map((n) => (
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`rounded-md px-3 py-1.5 text-sm transition ${path === n.to ? "bg-white/20 font-medium text-primary-foreground" : "text-primary-foreground/80 hover:bg-white/10 hover:text-primary-foreground"}`}
+                  className={`rounded-full px-3 py-1.5 text-sm transition ${path === n.to ? "bg-white/20 font-medium" : "text-primary-foreground/85 hover:bg-white/10"}`}
                 >
                   {n.label}
                 </Link>
               ))}
             </nav>
-            <div className="flex items-center gap-2">
+            <div className="ml-2 flex items-center gap-2">
+              <Button asChild size="sm" variant="ghost" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground">
+                <a href={DEMO_MAILTO}><Calendar className="mr-1 h-3.5 w-3.5" /> Book demo</a>
+              </Button>
               {user ? (
                 <Button asChild size="sm" variant="secondary"><Link to="/dashboard">Open app</Link></Button>
               ) : (
@@ -61,13 +66,14 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </button>
         </div>
         {open && (
-          <div className="border-t bg-background lg:hidden">
-            <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-3">
+          <div className="mx-auto mt-2 max-w-6xl rounded-2xl border bg-card p-3 shadow-elevated lg:hidden">
+            <nav className="flex flex-col gap-1">
               {NAV.map((n) => (
                 <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className={`rounded-md px-3 py-2 text-sm ${path === n.to ? "bg-secondary font-medium text-primary" : "text-muted-foreground"}`}>
                   {n.label}
                 </Link>
               ))}
+              <a href={DEMO_MAILTO} className="rounded-md px-3 py-2 text-sm text-muted-foreground">Book a free demo</a>
               <div className="mt-2 flex gap-2 border-t pt-3">
                 {user ? (
                   <Button asChild className="flex-1"><Link to="/dashboard">Open app</Link></Button>
@@ -82,7 +88,12 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </div>
         )}
       </header>
+
+      {/* Spacer for floating nav */}
+      <div className="h-20" />
+
       <main>{children}</main>
+
       <footer id="contact" className="mt-24 border-t bg-card">
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-4">
           <div>
@@ -106,26 +117,15 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li><Link to="/signup" className="hover:text-foreground">Create account</Link></li>
               <li><Link to="/login" className="hover:text-foreground">Sign in</Link></li>
+              <li><a href={DEMO_MAILTO} className="hover:text-foreground">Book a free demo</a></li>
             </ul>
           </div>
           <div>
             <div className="text-sm font-semibold">Contact</div>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <li>
-                <a href={`mailto:${EMAIL}`} className="flex items-center gap-2 hover:text-foreground">
-                  <Mail className="h-3.5 w-3.5" /> {EMAIL}
-                </a>
-              </li>
-              <li>
-                <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 hover:text-foreground">
-                  <Phone className="h-3.5 w-3.5" /> {PHONE_DISPLAY}
-                </a>
-              </li>
-              <li>
-                <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-foreground">
-                  <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
-                </a>
-              </li>
+              <li><a href={`mailto:${EMAIL}`} className="flex items-center gap-2 hover:text-foreground"><Mail className="h-3.5 w-3.5" /> {EMAIL}</a></li>
+              <li><a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 hover:text-foreground"><Phone className="h-3.5 w-3.5" /> {PHONE_DISPLAY}</a></li>
+              <li><a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-foreground"><MessageCircle className="h-3.5 w-3.5" /> WhatsApp</a></li>
             </ul>
             <ContactForm />
           </div>
@@ -147,22 +147,9 @@ function ContactForm() {
   }
   return (
     <form onSubmit={submit} className="mt-4 space-y-2">
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Your name"
-        className="w-full rounded-md border bg-background px-2 py-1.5 text-xs"
-      />
-      <textarea
-        value={msg}
-        onChange={(e) => setMsg(e.target.value)}
-        placeholder="Ask a question…"
-        rows={3}
-        className="w-full rounded-md border bg-background px-2 py-1.5 text-xs"
-      />
-      <button type="submit" className="w-full rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90">
-        Send
-      </button>
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="w-full rounded-md border bg-background px-2 py-1.5 text-xs" />
+      <textarea value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Ask a question…" rows={3} className="w-full rounded-md border bg-background px-2 py-1.5 text-xs" />
+      <button type="submit" className="w-full rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90">Send</button>
     </form>
   );
 }
