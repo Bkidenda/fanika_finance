@@ -332,6 +332,39 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_events: {
+        Row: {
+          amount: number
+          created_at: string
+          date: string
+          id: string
+          kind: string
+          notes: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          date: string
+          id?: string
+          kind?: string
+          notes?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          date?: string
+          id?: string
+          kind?: string
+          notes?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       income_entries: {
         Row: {
           account_id: string | null
