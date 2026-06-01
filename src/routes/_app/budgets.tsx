@@ -3,16 +3,17 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useBudgets, useExpenses, useProfile } from "@/lib/queries";
+import { useBudgets, useExpenses, useProfile, useRecurringBudgets } from "@/lib/queries";
 import { DEFAULT_BUDGET_CATEGORIES } from "@/lib/finance";
 import { formatCurrency, monthKey, monthLabel } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Repeat } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/budgets")({ component: Budgets });
@@ -24,6 +25,7 @@ function Budgets() {
   const profile = useProfile();
   const budgets = useBudgets(month);
   const expenses = useExpenses(month);
+  const recurring = useRecurringBudgets();
   const currency = profile.data?.currency ?? "KES";
 
   const [open, setOpen] = useState(false);
@@ -31,10 +33,14 @@ function Budgets() {
   const [customCat, setCustomCat] = useState("");
   const [limit, setLimit] = useState("");
 
+  const [recOpen, setRecOpen] = useState(false);
+  const [recCat, setRecCat] = useState(DEFAULT_BUDGET_CATEGORIES[0]);
+  const [recAmt, setRecAmt] = useState("");
+  const [recStart, setRecStart] = useState(month);
+  const [recEnd, setRecEnd] = useState("");
+
   const spendByCat = new Map<string, number>();
-  (expenses.data ?? []).forEach((e) => {
-    spendByCat.set(e.category, (spendByCat.get(e.category) ?? 0) + Number(e.amount));
-  });
+  (expenses.data ?? []).forEach((e) => spendByCat.set(e.category, (spendByCat.get(e.category) ?? 0) + Number(e.amount)));
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -46,9 +52,7 @@ function Budgets() {
     );
     if (error) return toast.error(error.message);
     toast.success("Budget saved");
-    setOpen(false);
-    setLimit("");
-    setCustomCat("");
+    setOpen(false); setLimit(""); setCustomCat("");
     qc.invalidateQueries({ queryKey: ["budgets"] });
   }
 
@@ -56,6 +60,28 @@ function Budgets() {
     const { error } = await supabase.from("budgets").delete().eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["budgets"] });
+  }
+
+  async function saveRecurring(e: React.FormEvent) {
+    e.preventDefault();
+    if (!recAmt) return;
+    const { error } = await supabase.from("recurring_budgets").insert({
+      user_id: user!.id, category: recCat, amount: Number(recAmt),
+      start_month: recStart, end_month: recEnd || null, active: true,
+    });
+    if (error) return toast.error(error.message);
+    toast.success("Recurring line added — auto-seeds next month");
+    setRecOpen(false); setRecAmt(""); setRecEnd("");
+    qc.invalidateQueries({ queryKey: ["recurring-budgets"] });
+  }
+
+  async function toggleRec(id: string, next: boolean) {
+    await supabase.from("recurring_budgets").update({ active: next }).eq("id", id);
+    qc.invalidateQueries({ queryKey: ["recurring-budgets"] });
+  }
+  async function deleteRec(id: string) {
+    await supabase.from("recurring_budgets").delete().eq("id", id);
+    qc.invalidateQueries({ queryKey: ["recurring-budgets"] });
   }
 
   const total = (budgets.data ?? []).reduce((s, b) => s + Number(b.limit_amount), 0);
@@ -143,6 +169,63 @@ function Budgets() {
           </div>
         ) : (
           <p className="py-8 text-center text-sm text-muted-foreground">No budgets yet. Add your first one.</p>
+        )}
+      </div>
+
+      {/* Recurring budget lines */}
+      <div className="rounded-2xl border bg-card p-6 shadow-card">
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <Repeat className="h-4 w-4 text-primary" />
+              <h3 className="font-semibold">Recurring budget lines</h3>
+            </div>
+            <p className="text-xs text-muted-foreground">Standing budgets like rent or insurance. Active lines auto-seed every new month when you close the current one.</p>
+          </div>
+          <Dialog open={recOpen} onOpenChange={setRecOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline"><Plus className="mr-1 h-3.5 w-3.5" /> Add recurring line</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>New recurring budget</DialogTitle></DialogHeader>
+              <form onSubmit={saveRecurring} className="space-y-3">
+                <div className="space-y-1.5"><Label>Category</Label>
+                  <Select value={recCat} onValueChange={setRecCat}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{DEFAULT_BUDGET_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5"><Label>Monthly amount ({currency})</Label>
+                  <Input type="number" min="0" step="100" required value={recAmt} onChange={(e) => setRecAmt(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5"><Label>Start month</Label><Input type="date" value={recStart} onChange={(e) => setRecStart(e.target.value)} /></div>
+                  <div className="space-y-1.5"><Label>End month (optional)</Label><Input type="date" value={recEnd} onChange={(e) => setRecEnd(e.target.value)} /></div>
+                </div>
+                <Button type="submit" className="w-full">Save recurring line</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {recurring.data?.length ? (
+          <div className="mt-4 divide-y">
+            {recurring.data.map((r) => (
+              <div key={r.id} className="flex items-center justify-between py-3 text-sm">
+                <div>
+                  <div className="font-medium">{r.category}</div>
+                  <div className="text-xs text-muted-foreground">From {r.start_month}{r.end_month ? ` to ${r.end_month}` : " · ongoing"}</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="tabular-nums font-medium">{formatCurrency(Number(r.amount), currency)}/mo</span>
+                  <Switch checked={r.active} onCheckedChange={(v) => toggleRec(r.id, v)} />
+                  <button onClick={() => deleteRec(r.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-4 text-sm text-muted-foreground">No recurring lines yet. Add rent, insurance or any standing budget.</p>
         )}
       </div>
     </div>

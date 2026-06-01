@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, Globe, CalendarDays,
+  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, Globe, CalendarDays, FileText,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -14,6 +14,7 @@ const overview = [
   { title: "Insights", url: "/insights", icon: Sparkles },
   { title: "AI Advisor", url: "/advisor", icon: Bot },
   { title: "History", url: "/history", icon: History },
+  { title: "Statements", url: "/statements", icon: FileText },
 ] as const;
 
 const money = [

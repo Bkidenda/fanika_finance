@@ -1,14 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicLayout } from "@/components/public-layout";
-import { Wallet, Landmark, Receipt, TrendingUp, Target, CreditCard, Repeat, BookOpen, Bot, Sparkles, History, Calendar, Coins, HandHeart, Scale } from "lucide-react";
+import { Wallet, Landmark, Receipt, TrendingUp, Target, CreditCard, Repeat, BookOpen, Bot, Sparkles, History, Calendar, Coins, HandHeart, Scale, FileText, Eraser } from "lucide-react";
 
 export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
       { title: "Features — Nuru Steward" },
-      { name: "description", content: "Net-income budgeting, multi-account net worth, debt planner, AI advisor, financial calendar, monthly close, devotionals — every module in Nuru Steward." },
+      { name: "description", content: "Net-income budgeting, optional automated tithe, recurring budget lines, multi-account net worth, debt planner, AI advisor with monthly history, financial calendar, monthly close, printable statements, devotionals." },
       { property: "og:title", content: "Features — Nuru Steward" },
-      { property: "og:description", content: "Every module in Nuru Steward, from net-income budgeting to monthly reconciliation." },
+      { property: "og:description", content: "Every module in Nuru Steward, from net-income budgeting to printable statements." },
     ],
   }),
   component: Features,
@@ -16,19 +16,22 @@ export const Route = createFileRoute("/features")({
 
 const MODULES = [
   { i: Coins, t: "Net-income first", d: "Start from your take-home pay in any currency. No country-specific payroll math — Nuru works wherever you live." },
-  { i: HandHeart, t: "Automated tithes & giving", d: "10% of every income entry is set aside automatically. Track giving alongside everything else." },
-  { i: Wallet, t: "Budgets by category", d: "Group budgets across Essentials, Family, Lifestyle and Financial — with overspend alerts and progress bars. Budget the current month or plan ahead." },
-  { i: Receipt, t: "Expenses inside budgets", d: "Every expense lands inside an active budget category. Out-of-plan spending is flagged as an emergency." },
+  { i: HandHeart, t: "Optional automatic tithe", d: "Turn tithe on if you want — pick the rate. Tithe is set aside before disposable income is calculated. Off by default; entirely your call." },
+  { i: Wallet, t: "Budgets entered each month", d: "Income and budgets are entered fresh each month because life isn't standard. Standing categories (rent, insurance) are added once as recurring lines." },
+  { i: Repeat, t: "Recurring budget lines", d: "Rent, insurance, school fees — set them once and they auto-seed every new month when you close the previous one." },
+  { i: Receipt, t: "Expenses inside budgets", d: "Every expense lands inside an active budget category. Out-of-plan spending is flagged as an emergency, not silently absorbed." },
   { i: Landmark, t: "Unified accounts", d: "Bank, M-Pesa, SACCO, cash, investment. Balances auto-update with every recorded expense, payment or income receipt." },
   { i: Scale, t: "Net worth tracking", d: "Assets minus liabilities, refreshed live. Cash + investments − debts, with full audit history." },
   { i: CreditCard, t: "Debt planner", d: "Formal loans (rate, monthly, due date) and informal lending from family & friends — track both, schedule payments." },
   { i: Repeat, t: "Subscriptions watchdog", d: "Catch silent recurring drains. Monthly cost, annual projection, pause/resume any time." },
   { i: Target, t: "Savings goals", d: "Visual progress bars for every goal, with target date and current balance." },
   { i: Calendar, t: "Financial calendar", d: "Mark dates with financial implications — bill due dates, expected income, debt deadlines, family obligations, planned giving." },
-  { i: History, t: "Monthly close & next-month auto-open", d: "Close each month with a reconciliation snapshot. The next month opens automatically and last month's budgets are copied forward as a starting point." },
-  { i: Bot, t: "AI financial advisor", d: "A grounded advisor that reads your snapshot and returns a 0-100 health score plus practical recommendations." },
-  { i: Sparkles, t: "Smart insights", d: "Overspend, low-savings, high-debt, family-support ratio — surfaced when they matter." },
+  { i: History, t: "Monthly close & next-month auto-open", d: "Close each month with a reconciliation snapshot. Next month auto-opens with only your recurring lines pre-filled, so fresh income and budgets stay deliberate." },
+  { i: Bot, t: "AI advisor with history", d: "A grounded advisor that reads your current month plus the last three closed months and returns a 0-100 health score, trend commentary, and practical recommendations." },
+  { i: Sparkles, t: "Always-on AI assistant", d: "Floating chatbot that answers stewardship and finance questions anywhere in the app." },
+  { i: FileText, t: "Printable PDF statements", d: "Generate a monthly or quarterly account statement for your records — income, spend, top categories, accounts, debts, net worth, all on one page." },
   { i: BookOpen, t: "Devotional layer", d: "Scripture and verified Ellen G. White reflections tied to your stewardship rhythm." },
+  { i: Eraser, t: "Account control", d: "Clear your data, deactivate your account, or delete it permanently — your data, your call, no hoops." },
 ];
 
 function Features() {
@@ -38,7 +41,7 @@ function Features() {
         <div className="max-w-3xl">
           <p className="text-sm font-medium text-primary">Features</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">Every module you need to run a household.</h1>
-          <p className="mt-4 text-lg text-muted-foreground">Nuru Steward is a personal finance OS, not a tracker. Each module connects to the next so your numbers always reconcile.</p>
+          <p className="mt-4 text-lg text-muted-foreground">Nuru Steward is a personal finance OS, not a tracker. Each module connects to the next so your numbers always reconcile — fresh income each month, standing lines carried forward, accounts live, statements printable.</p>
         </div>
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {MODULES.map((m) => (
