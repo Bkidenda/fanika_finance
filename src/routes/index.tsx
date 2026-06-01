@@ -78,8 +78,16 @@ function Home() {
               <div className="text-sm font-semibold tabular-nums">3 on track</div>
             </div>
 
-            <div className="relative mx-auto max-w-md overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
-              <img src={heroImg} alt="Nuru Steward founder showing the personal finance dashboard on a tablet" className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]" />
+            <div className="relative mx-auto max-w-lg overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
+              <img
+                src={heroImg}
+                alt="Nuru Steward founder showing the personal finance dashboard"
+                width={960}
+                height={1200}
+                loading="eager"
+                decoding="async"
+                className="block h-auto w-full object-cover [image-rendering:auto] transition-transform duration-700 hover:scale-[1.02]"
+              />
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-primary/5" />
             </div>
           </div>

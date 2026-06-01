@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AppSubscriptionsRouteImport } from './routes/_app/subscriptions'
 import { Route as AppStewardshipRouteImport } from './routes/_app/stewardship'
+import { Route as AppStatementsRouteImport } from './routes/_app/statements'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppInvestmentsRouteImport } from './routes/_app/investments'
 import { Route as AppInsightsRouteImport } from './routes/_app/insights'
@@ -87,6 +88,11 @@ const AppSubscriptionsRoute = AppSubscriptionsRouteImport.update({
 const AppStewardshipRoute = AppStewardshipRouteImport.update({
   id: '/stewardship',
   path: '/stewardship',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppStatementsRoute = AppStatementsRouteImport.update({
+  id: '/statements',
+  path: '/statements',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
   '/settings': typeof AppSettingsRoute
+  '/statements': typeof AppStatementsRoute
   '/stewardship': typeof AppStewardshipRoute
   '/subscriptions': typeof AppSubscriptionsRoute
   '/api/chat': typeof ApiChatRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
   '/settings': typeof AppSettingsRoute
+  '/statements': typeof AppStatementsRoute
   '/stewardship': typeof AppStewardshipRoute
   '/subscriptions': typeof AppSubscriptionsRoute
   '/api/chat': typeof ApiChatRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/_app/insights': typeof AppInsightsRoute
   '/_app/investments': typeof AppInvestmentsRoute
   '/_app/settings': typeof AppSettingsRoute
+  '/_app/statements': typeof AppStatementsRoute
   '/_app/stewardship': typeof AppStewardshipRoute
   '/_app/subscriptions': typeof AppSubscriptionsRoute
   '/api/chat': typeof ApiChatRoute
@@ -264,6 +273,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/investments'
     | '/settings'
+    | '/statements'
     | '/stewardship'
     | '/subscriptions'
     | '/api/chat'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/investments'
     | '/settings'
+    | '/statements'
     | '/stewardship'
     | '/subscriptions'
     | '/api/chat'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/_app/insights'
     | '/_app/investments'
     | '/_app/settings'
+    | '/_app/statements'
     | '/_app/stewardship'
     | '/_app/subscriptions'
     | '/api/chat'
@@ -411,6 +423,13 @@ declare module '@tanstack/react-router' {
       path: '/stewardship'
       fullPath: '/stewardship'
       preLoaderRoute: typeof AppStewardshipRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/statements': {
+      id: '/_app/statements'
+      path: '/statements'
+      fullPath: '/statements'
+      preLoaderRoute: typeof AppStatementsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/settings': {
@@ -529,6 +548,7 @@ interface AppRouteChildren {
   AppInsightsRoute: typeof AppInsightsRoute
   AppInvestmentsRoute: typeof AppInvestmentsRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppStatementsRoute: typeof AppStatementsRoute
   AppStewardshipRoute: typeof AppStewardshipRoute
   AppSubscriptionsRoute: typeof AppSubscriptionsRoute
 }
@@ -548,6 +568,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppInsightsRoute: AppInsightsRoute,
   AppInvestmentsRoute: AppInvestmentsRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppStatementsRoute: AppStatementsRoute,
   AppStewardshipRoute: AppStewardshipRoute,
   AppSubscriptionsRoute: AppSubscriptionsRoute,
 }
