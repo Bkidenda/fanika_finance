@@ -6,6 +6,7 @@ const AdvisorInput = z.object({
   period: z.string().min(1).max(20),
   context: z.object({
     currency: z.string(),
+    titheEnabled: z.boolean().optional(),
     net: z.number(),
     disposable: z.number(),
     tithe: z.number(),
@@ -30,12 +31,38 @@ export const runAdvisor = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI gateway not configured");
 
+    const { supabase, userId } = context;
+
+    // Pull last 3 closed-month snapshots for trend analysis.
+    const { data: closures } = await supabase
+      .from("month_closures")
+      .select("period, snapshot")
+      .eq("user_id", userId)
+      .order("period", { ascending: false })
+      .limit(3);
+
+    const history = (closures ?? []).map((c) => ({ period: c.period, snapshot: c.snapshot }));
+
+    const titheNote = data.context.titheEnabled
+      ? `Tithe is enabled at ~${((data.context.tithe / Math.max(1, data.context.net)) * 100).toFixed(1)}% of net.`
+      : `Tithe is NOT enabled — do not assume any giving allocation unless it appears in topCategories.`;
+
     const system = `You are Nuru Steward — a calm, practical personal finance advisor.
-You analyze the user's monthly snapshot (which starts from NET take-home income, in their local currency) and return: (1) a 0-100 financial health score, (2) a 2-3 sentence narrative summary, (3) 4-7 specific, actionable recommendations.
-Consider: family support obligations, subscription waste, debt risk, savings discipline, stewardship/tithing.
+You analyze the user's CURRENT month snapshot plus their last 3 closed-month snapshots and return:
+(1) a 0-100 financial health score,
+(2) a 2-3 sentence narrative summary that references TRENDS (e.g. "spending up vs prior 3-month average"),
+(3) 4-7 specific, actionable recommendations.
+Consider: family support obligations, subscription waste, debt risk, savings discipline, stewardship/giving.
+${titheNote}
 Tone: warm, direct, never preachy. Currency: ${data.context.currency}.`;
 
-    const userMsg = `Period: ${data.period}\n\nSnapshot:\n${JSON.stringify(data.context, null, 2)}`;
+    const userMsg = `Period: ${data.period}
+
+Current snapshot:
+${JSON.stringify(data.context, null, 2)}
+
+History (most recent first, up to 3 closed months):
+${JSON.stringify(history, null, 2)}`;
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -93,7 +120,6 @@ Tone: warm, direct, never preachy. Currency: ${data.context.currency}.`;
       recommendations: Array<{ kind: string; text: string }>;
     };
 
-    const { supabase, userId } = context;
     const { data: row, error } = await supabase
       .from("ai_insights")
       .insert({

@@ -17,7 +17,7 @@ const EMAIL = "bkidenda@gmail.com";
 const PHONE_DISPLAY = "+254 708 096 833";
 const PHONE_TEL = "+254708096833";
 const WHATSAPP_URL = "https://wa.me/254708096833";
-const DEMO_MAILTO = `mailto:${EMAIL}?subject=Book%20a%20free%20Nuru%20Steward%20demo&body=Hi%20Brian%2C%0D%0A%0D%0AI'd%20like%20to%20book%20a%20free%20demo%20of%20Nuru%20Steward.%0D%0A%0D%0AName%3A%0D%0APreferred%20date%2Ftime%3A%0D%0A`;
+const DEMO_MAILTO = `mailto:${EMAIL}?subject=Book%20a%20free%20Nuru%20Steward%20demo&body=Hi%20Brian%2C%0D%0A%0D%0AI'd%20like%20to%20book%20a%20free%20demo%20of%20Nuru%20Steward.%0D%0A`;
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -26,16 +26,20 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gradient-surface">
-      {/* Floating navbar */}
-      <header className="fixed inset-x-0 top-4 z-50 px-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border border-white/20 bg-gradient-to-r from-[oklch(0.45_0.12_180)]/95 via-[oklch(0.52_0.12_175)]/95 to-[oklch(0.58_0.13_185)]/95 px-4 py-2.5 text-primary-foreground shadow-elevated backdrop-blur-xl">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25">
-              <Sprout className="h-5 w-5" />
-            </div>
-            <span className="font-semibold tracking-tight">Nuru Steward</span>
-          </Link>
-          <div className="ml-auto hidden items-center gap-1.5 lg:flex">
+      {/* Fixed wordmark, top-left, NOT part of floating pill */}
+      <div className="fixed left-6 top-5 z-50">
+        <Link to="/" className="flex items-center gap-2 rounded-2xl bg-card/95 px-3 py-2 shadow-card ring-1 ring-border backdrop-blur">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary text-primary-foreground">
+            <Sprout className="h-4 w-4" />
+          </div>
+          <span className="font-semibold tracking-tight">Nuru Steward</span>
+        </Link>
+      </div>
+
+      {/* Floating navbar — page links only */}
+      <header className="fixed inset-x-0 top-4 z-40 px-4">
+        <div className="mx-auto flex max-w-3xl items-center justify-center rounded-full border border-white/20 bg-gradient-to-r from-[oklch(0.45_0.12_180)]/95 via-[oklch(0.52_0.12_175)]/95 to-[oklch(0.58_0.13_185)]/95 px-3 py-2 text-primary-foreground shadow-elevated backdrop-blur-xl">
+          <div className="hidden items-center gap-1 lg:flex">
             <nav className="flex items-center gap-1">
               {NAV.map((n) => (
                 <Link
@@ -47,26 +51,23 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 </Link>
               ))}
             </nav>
-            <div className="ml-2 flex items-center gap-2">
+            <div className="ml-2 flex items-center gap-1.5 border-l border-white/20 pl-2">
               <Button asChild size="sm" variant="ghost" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground">
                 <a href={DEMO_MAILTO}><Calendar className="mr-1 h-3.5 w-3.5" /> Book demo</a>
               </Button>
               {user ? (
                 <Button asChild size="sm" variant="secondary"><Link to="/dashboard">Open app</Link></Button>
               ) : (
-                <>
-                  <Button asChild variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"><Link to="/login">Sign in</Link></Button>
-                  <Button asChild size="sm" variant="secondary"><Link to="/signup">Get started</Link></Button>
-                </>
+                <Button asChild size="sm" variant="secondary"><Link to="/signup">Get started</Link></Button>
               )}
             </div>
           </div>
-          <button className="lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
+          <button className="rounded-full px-3 py-1.5 lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
         {open && (
-          <div className="mx-auto mt-2 max-w-6xl rounded-2xl border bg-card p-3 shadow-elevated lg:hidden">
+          <div className="mx-auto mt-2 max-w-3xl rounded-2xl border bg-card p-3 shadow-elevated lg:hidden">
             <nav className="flex flex-col gap-1">
               {NAV.map((n) => (
                 <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className={`rounded-md px-3 py-2 text-sm ${path === n.to ? "bg-secondary font-medium text-primary" : "text-muted-foreground"}`}>
@@ -89,8 +90,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         )}
       </header>
 
-      {/* Spacer for floating nav */}
-      <div className="h-20" />
+      <div className="h-24" />
 
       <main>{children}</main>
 
