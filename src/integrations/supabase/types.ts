@@ -374,6 +374,7 @@ export type Database = {
           id: string
           notes: string | null
           source: string
+          tithe_on: boolean | null
           user_id: string
         }
         Insert: {
@@ -384,6 +385,7 @@ export type Database = {
           id?: string
           notes?: string | null
           source: string
+          tithe_on?: boolean | null
           user_id: string
         }
         Update: {
@@ -394,6 +396,7 @@ export type Database = {
           id?: string
           notes?: string | null
           source?: string
+          tithe_on?: boolean | null
           user_id?: string
         }
         Relationships: []
@@ -495,7 +498,10 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          is_active: boolean
           net_income: number
+          tithe_enabled: boolean
+          tithe_rate: number
           updated_at: string
         }
         Insert: {
@@ -504,7 +510,10 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          is_active?: boolean
           net_income?: number
+          tithe_enabled?: boolean
+          tithe_rate?: number
           updated_at?: string
         }
         Update: {
@@ -513,8 +522,47 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_active?: boolean
           net_income?: number
+          tithe_enabled?: boolean
+          tithe_rate?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      recurring_budgets: {
+        Row: {
+          active: boolean
+          amount: number
+          category: string
+          created_at: string
+          end_month: string | null
+          id: string
+          notes: string | null
+          start_month: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          amount?: number
+          category: string
+          created_at?: string
+          end_month?: string | null
+          id?: string
+          notes?: string | null
+          start_month: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          amount?: number
+          category?: string
+          created_at?: string
+          end_month?: string | null
+          id?: string
+          notes?: string | null
+          start_month?: string
+          user_id?: string
         }
         Relationships: []
       }

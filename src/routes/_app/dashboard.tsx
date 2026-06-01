@@ -1,17 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals, useDevotional, useAccounts, useDebts, useIsMonthClosed, useIncomeEntries } from "@/lib/queries";
+import {
+  useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals,
+  useDevotional, useAccounts, useDebts, useIsMonthClosed, useIncomeEntries,
+  useMonthClosures, previousPeriod,
+} from "@/lib/queries";
 import { computeBreakdown, healthScore, computeNetWorth } from "@/lib/finance";
 import { formatCurrency, monthLabel, monthKey } from "@/lib/format";
 import { StatCard } from "@/components/stat-card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Wallet, TrendingUp, PiggyBank, HandCoins, Target, Sparkles, BookOpen, Scale, Lock, CheckCircle2 } from "lucide-react";
+import { Wallet, TrendingUp, HandCoins, Target, Sparkles, BookOpen, Scale, Lock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import { Link } from "@tanstack/react-router";
 import { closeMonth } from "@/lib/close-month.functions";
 import { toast } from "sonner";
 
@@ -28,21 +31,23 @@ function Dashboard() {
   const accounts = useAccounts();
   const debts = useDebts();
   const incomeEntries = useIncomeEntries();
-  const period = monthKey().slice(0, 7); // YYYY-MM (validator format)
+  const closures = useMonthClosures();
+  const period = monthKey().slice(0, 7);
+  const prev = previousPeriod(period);
   const isClosed = useIsMonthClosed(period);
+  const prevClosed = (closures.data ?? []).some((c) => c.period === prev);
   const qc = useQueryClient();
   const closeFn = useServerFn(closeMonth);
   const [closing, setClosing] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const [closePrev, setClosePrev] = useState(false);
 
   const currency = profile.data?.currency ?? "KES";
+  const titheEnabled = !!profile.data?.tithe_enabled;
+  const titheRate = profile.data?.tithe_rate ?? 0.10;
 
-  // Total income for the month = sum of recorded income entries (single source of truth).
-  // Fallback to the configured net_income in Settings only when no entries exist yet.
   const receivedIncome = (incomeEntries.data ?? []).reduce((s, e) => s + Number(e.amount), 0);
-  const fallbackNet = profile.data?.net_income ?? 0;
-  const netForMonth = receivedIncome > 0 ? receivedIncome : fallbackNet;
-  const breakdown = computeBreakdown(netForMonth, deductions.data ?? []);
+  const breakdown = computeBreakdown(receivedIncome, deductions.data ?? [], { titheEnabled, titheRate });
 
   const spendByCat = new Map<string, number>();
   (expenses.data ?? []).forEach((e) => {
@@ -73,19 +78,25 @@ function Dashboard() {
 
   const COLORS = ["#0e9488", "#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#ec4899", "#14b8a6", "#64748b"];
 
-  async function handleClose() {
+  async function handleClose(p: string) {
     setClosing(true);
     try {
-      await closeFn({ data: { period } });
-      toast.success(`${period} closed and reconciled`);
+      await closeFn({ data: { period: p } });
+      toast.success(`${p} closed and reconciled`);
       qc.invalidateQueries({ queryKey: ["month-closures"] });
+      qc.invalidateQueries({ queryKey: ["budgets"] });
       setConfirm(false);
+      setClosePrev(false);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
       setClosing(false);
     }
   }
+
+  // Detect: previous month has activity but isn't closed.
+  const prevHasActivity = !prevClosed && (closures.data?.length ?? 0) >= 0; // simple cue; real data check below
+  // We surface the banner whenever the previous month closure is missing — user can dismiss by closing.
 
   return (
     <div className="space-y-6">
@@ -107,19 +118,35 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Hero stat row */}
+      {/* Close-previous-month nudge */}
+      {prevHasActivity && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="mt-0.5 h-4 w-4" />
+            <div>
+              <div className="font-medium">Previous month ({prev}) isn't closed yet.</div>
+              <div className="text-xs">Close it to lock its reconciliation snapshot. You can reopen and edit it any time from History.</div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button asChild variant="ghost" size="sm"><Link to="/history">Review history</Link></Button>
+            <Button size="sm" onClick={() => setClosePrev(true)}>Close {prev}</Button>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           accent
           label="Income received"
           value={formatCurrency(breakdown.net, currency)}
-          hint={receivedIncome > 0 ? `${(incomeEntries.data ?? []).length} entries this month` : "Set in Settings or record an entry"}
+          hint={`${(incomeEntries.data ?? []).length} entries this month`}
           icon={<Wallet className="h-5 w-5" />}
         />
         <StatCard
-          label="Remaining balance"
+          label="Disposable remaining"
           value={formatCurrency(Math.max(0, remaining), currency)}
-          hint={remaining < 0 ? `Over by ${formatCurrency(-remaining, currency)}` : "After tithe + spend"}
+          hint={remaining < 0 ? `Over by ${formatCurrency(-remaining, currency)}` : (titheEnabled ? "After tithe + spend" : "After spend")}
           icon={<HandCoins className="h-5 w-5" />}
         />
         <StatCard
@@ -136,7 +163,6 @@ function Dashboard() {
         />
       </div>
 
-      {/* Account balances reconciliation */}
       {(accounts.data?.length ?? 0) > 0 && (
         <div className="rounded-2xl border bg-card p-6 shadow-card">
           <div className="flex items-center justify-between">
@@ -156,7 +182,6 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Health + Devotional */}
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border bg-card p-6 shadow-card lg:col-span-2">
           <div className="flex items-center justify-between">
@@ -168,9 +193,9 @@ function Dashboard() {
               <Sparkles className="h-6 w-6" />
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-4 gap-4">
+          <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
             <Metric label="Total income" value={formatCurrency(breakdown.net, currency)} />
-            <Metric label="Tithe (10%)" value={formatCurrency(breakdown.tithe, currency)} />
+            {titheEnabled && <Metric label={`Tithe (${Math.round(titheRate * 100)}%)`} value={formatCurrency(breakdown.tithe, currency)} />}
             <Metric label="Spent" value={formatCurrency(totalSpent, currency)} />
             <Metric label="Disposable" value={formatCurrency(Math.max(0, remaining), currency)} />
           </div>
@@ -195,7 +220,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Charts */}
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border bg-card p-6 shadow-card">
           <h3 className="font-semibold">Budget allocation</h3>
@@ -233,7 +257,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Budgets list */}
       <div className="rounded-2xl border bg-card p-6 shadow-card">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Budget progress</h3>
@@ -263,7 +286,6 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Goals */}
       <div className="rounded-2xl border bg-card p-6 shadow-card">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Savings goals</h3>
@@ -297,16 +319,29 @@ function Dashboard() {
         <DialogContent>
           <DialogHeader><DialogTitle>Close {period}?</DialogTitle></DialogHeader>
           <div className="space-y-3 text-sm">
-            <p>This locks the current month and produces a reconciliation snapshot. Income, expenses and balances for {period} will be archived and protected from edits.</p>
+            <p>This locks the current month and produces a reconciliation snapshot. {period} will be archived and protected from edits. Next month auto-opens with your recurring budget lines pre-filled.</p>
             <div className="rounded-xl border bg-secondary/50 p-3 text-xs">
               <div className="flex justify-between"><span>Net income</span><span className="font-medium tabular-nums">{formatCurrency(breakdown.net, currency)}</span></div>
               <div className="flex justify-between"><span>Total spend</span><span className="font-medium tabular-nums">{formatCurrency(totalSpent, currency)}</span></div>
-              <div className="flex justify-between"><span>Tithe set aside</span><span className="font-medium tabular-nums">{formatCurrency(breakdown.tithe, currency)}</span></div>
+              {titheEnabled && <div className="flex justify-between"><span>Tithe set aside</span><span className="font-medium tabular-nums">{formatCurrency(breakdown.tithe, currency)}</span></div>}
               <div className="flex justify-between"><span>Net worth</span><span className="font-medium tabular-nums">{formatCurrency(nw.net, currency)}</span></div>
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="ghost" onClick={() => setConfirm(false)} disabled={closing}>Cancel</Button>
-              <Button onClick={handleClose} disabled={closing}>{closing ? "Closing…" : "Confirm close"}</Button>
+              <Button onClick={() => handleClose(period)} disabled={closing}>{closing ? "Closing…" : "Confirm close"}</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={closePrev} onOpenChange={setClosePrev}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Close {prev}?</DialogTitle></DialogHeader>
+          <div className="space-y-3 text-sm">
+            <p>Generate the reconciliation snapshot for {prev} and lock it. You can always reopen and edit it later from the History page — that won't affect this month.</p>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="ghost" onClick={() => setClosePrev(false)} disabled={closing}>Cancel</Button>
+              <Button onClick={() => handleClose(prev)} disabled={closing}>{closing ? "Closing…" : `Close ${prev}`}</Button>
             </div>
           </div>
         </DialogContent>

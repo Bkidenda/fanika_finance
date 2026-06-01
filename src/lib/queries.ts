@@ -9,6 +9,9 @@ export type Profile = {
   email: string | null;
   currency: string;
   net_income: number;
+  tithe_enabled: boolean;
+  tithe_rate: number;
+  is_active: boolean;
 };
 
 export type Deduction = {
@@ -23,6 +26,16 @@ export type Deduction = {
 
 export type Budget = { id: string; category: string; month: string; limit_amount: number };
 
+export type RecurringBudget = {
+  id: string;
+  category: string;
+  amount: number;
+  start_month: string;
+  end_month: string | null;
+  active: boolean;
+  notes: string | null;
+};
+
 export type Expense = {
   id: string;
   date: string;
@@ -35,93 +48,46 @@ export type Expense = {
   account_id: string | null;
 };
 
-export type Income = {
-  id: string;
-  source: string;
-  amount: number;
-  frequency: "monthly" | "annual" | "one_time";
-};
+export type Income = { id: string; source: string; amount: number; frequency: "monthly" | "annual" | "one_time" };
 
 export type Investment = {
-  id: string;
-  name: string;
-  type: string;
-  institution: string | null;
-  amount_invested: number;
-  current_value: number;
-  start_date: string | null;
-  notes: string | null;
+  id: string; name: string; type: string; institution: string | null;
+  amount_invested: number; current_value: number; start_date: string | null; notes: string | null;
 };
 
-export type Goal = {
-  id: string;
-  name: string;
-  target_amount: number;
-  current_amount: number;
-  deadline: string | null;
-};
+export type Goal = { id: string; name: string; target_amount: number; current_amount: number; deadline: string | null };
 
 export type Account = {
-  id: string;
-  name: string;
+  id: string; name: string;
   type: "bank" | "mpesa" | "cash" | "sacco" | "investment" | "other";
-  institution: string | null;
-  balance: number;
-  currency: string;
+  institution: string | null; balance: number; currency: string;
 };
 
 export type Subscription = {
-  id: string;
-  name: string;
-  category: string;
-  amount: number;
+  id: string; name: string; category: string; amount: number;
   cycle: "weekly" | "monthly" | "quarterly" | "annual";
-  next_charge: string | null;
-  active: boolean;
-  notes: string | null;
+  next_charge: string | null; active: boolean; notes: string | null;
 };
 
 export type Debt = {
-  id: string;
-  name: string;
-  creditor: string | null;
-  principal: number;
-  balance: number;
-  interest_rate: number;
-  monthly_payment: number;
-  start_date: string | null;
-  due_date: string | null;
-  notes: string | null;
-  kind: "formal" | "informal";
+  id: string; name: string; creditor: string | null; principal: number; balance: number;
+  interest_rate: number; monthly_payment: number; start_date: string | null;
+  due_date: string | null; notes: string | null; kind: "formal" | "informal";
 };
 
 export type AIInsight = {
-  id: string;
-  kind: string;
-  period: string;
-  score: number | null;
-  summary: string;
-  recommendations: Array<{ kind: string; text: string }>;
-  created_at: string;
+  id: string; kind: string; period: string; score: number | null;
+  summary: string; recommendations: Array<{ kind: string; text: string }>; created_at: string;
 };
 
 export type IncomeEntry = {
-  id: string;
-  date: string;
-  source: string;
-  amount: number;
-  account_id: string | null;
-  notes: string | null;
+  id: string; date: string; source: string; amount: number;
+  account_id: string | null; notes: string | null; tithe_on: boolean | null;
 };
 
 export type MonthClosure = {
-  id: string;
-  period: string;
-  closed_at: string;
-  snapshot: Record<string, unknown>;
+  id: string; period: string; closed_at: string; snapshot: Record<string, unknown>;
 };
-
-// ---------- Existing ----------
 
 export function useProfile() {
   const { user } = useAuth();
@@ -139,8 +105,7 @@ export function useProfile() {
 export function useDeductions() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["deductions", user?.id],
-    enabled: !!user,
+    queryKey: ["deductions", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("deductions").select("*").order("created_at");
       if (error) throw error;
@@ -152,12 +117,23 @@ export function useDeductions() {
 export function useBudgets(month = monthKey()) {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["budgets", user?.id, month],
-    enabled: !!user,
+    queryKey: ["budgets", user?.id, month], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("budgets").select("*").eq("month", month).order("category");
       if (error) throw error;
       return (data ?? []) as Budget[];
+    },
+  });
+}
+
+export function useRecurringBudgets() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["recurring-budgets", user?.id], enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("recurring_budgets").select("*").order("created_at");
+      if (error) throw error;
+      return (data ?? []) as RecurringBudget[];
     },
   });
 }
@@ -169,8 +145,7 @@ export function useExpenses(month?: string) {
   d.setMonth(d.getMonth() + 1);
   const end = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
   return useQuery({
-    queryKey: ["expenses", user?.id, m],
-    enabled: !!user,
+    queryKey: ["expenses", user?.id, m], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("expenses").select("*").gte("date", m).lt("date", end).order("date", { ascending: false });
@@ -183,8 +158,7 @@ export function useExpenses(month?: string) {
 export function useAllExpenses() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["expenses-all", user?.id],
-    enabled: !!user,
+    queryKey: ["expenses-all", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("expenses").select("*").order("date", { ascending: false }).limit(1000);
       if (error) throw error;
@@ -196,8 +170,7 @@ export function useAllExpenses() {
 export function useInvestments() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["investments", user?.id],
-    enabled: !!user,
+    queryKey: ["investments", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("investments").select("*").order("created_at", { ascending: false });
       if (error) throw error;
@@ -209,8 +182,7 @@ export function useInvestments() {
 export function useGoals() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["goals", user?.id],
-    enabled: !!user,
+    queryKey: ["goals", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("savings_goals").select("*").order("created_at", { ascending: false });
       if (error) throw error;
@@ -231,13 +203,10 @@ export function useDevotional() {
   });
 }
 
-// ---------- New entities ----------
-
 export function useIncomes() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["incomes", user?.id],
-    enabled: !!user,
+    queryKey: ["incomes", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("incomes").select("*").order("created_at");
       if (error) throw error;
@@ -249,8 +218,7 @@ export function useIncomes() {
 export function useAccounts() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["accounts", user?.id],
-    enabled: !!user,
+    queryKey: ["accounts", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("accounts").select("*").order("created_at");
       if (error) throw error;
@@ -262,8 +230,7 @@ export function useAccounts() {
 export function useSubscriptions() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["subscriptions", user?.id],
-    enabled: !!user,
+    queryKey: ["subscriptions", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("subscriptions").select("*").order("created_at", { ascending: false });
       if (error) throw error;
@@ -275,8 +242,7 @@ export function useSubscriptions() {
 export function useDebts() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["debts", user?.id],
-    enabled: !!user,
+    queryKey: ["debts", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("debts").select("*").order("created_at", { ascending: false });
       if (error) throw error;
@@ -288,8 +254,7 @@ export function useDebts() {
 export function useAIInsights() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["ai-insights", user?.id],
-    enabled: !!user,
+    queryKey: ["ai-insights", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("ai_insights").select("*").order("created_at", { ascending: false }).limit(10);
       if (error) throw error;
@@ -305,8 +270,7 @@ export function useIncomeEntries(month?: string) {
   d.setMonth(d.getMonth() + 1);
   const end = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
   return useQuery({
-    queryKey: ["income-entries", user?.id, m],
-    enabled: !!user,
+    queryKey: ["income-entries", user?.id, m], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("income_entries").select("*").gte("date", m).lt("date", end).order("date", { ascending: false });
       if (error) throw error;
@@ -318,8 +282,7 @@ export function useIncomeEntries(month?: string) {
 export function useMonthClosures() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["month-closures", user?.id],
-    enabled: !!user,
+    queryKey: ["month-closures", user?.id], enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase.from("month_closures").select("*").order("period", { ascending: false });
       if (error) throw error;
@@ -331,4 +294,11 @@ export function useMonthClosures() {
 export function useIsMonthClosed(period: string) {
   const closures = useMonthClosures();
   return (closures.data ?? []).some((c) => c.period === period);
+}
+
+// Helper: previous month period in YYYY-MM form
+export function previousPeriod(period: string): string {
+  const [y, m] = period.split("-").map(Number);
+  const d = new Date(Date.UTC(y, m - 2, 1));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }

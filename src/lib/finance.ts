@@ -1,6 +1,5 @@
 // Nuru Steward — multi-country, net-salary based finance engine.
-// We deliberately do NOT model gross/PAYE/statutory deductions: the system
-// starts from the user's NET take-home (in any currency) so it works anywhere.
+// Starts from NET take-home in any currency. Tithe is OPTIONAL per user.
 
 export type Deduction = {
   id: string;
@@ -11,7 +10,7 @@ export type Deduction = {
   frequency: "monthly" | "annual" | "one_time";
 };
 
-export const TITHE_RATE = 0.1;
+export const DEFAULT_TITHE_RATE = 0.10;
 
 export function computeDeductionAmount(d: Deduction, base: number): number {
   if (d.rule === "percentage") return (base * d.value) / 100;
@@ -19,26 +18,26 @@ export function computeDeductionAmount(d: Deduction, base: number): number {
 }
 
 export type Breakdown = {
-  net: number;            // raw take-home before any further allocations
-  tithe: number;          // 10% of net
-  custom: number;         // user-defined recurring deductions
-  disposable: number;     // net - tithe - custom
+  net: number;
+  tithe: number;
+  custom: number;
+  disposable: number;
 };
 
 export function computeBreakdown(
   netMonthly: number,
   deductions: Deduction[] = [],
+  opts: { titheEnabled?: boolean; titheRate?: number } = {},
 ): Breakdown {
   const net = Math.max(0, netMonthly || 0);
-  const tithe = net * TITHE_RATE;
+  const rate = opts.titheEnabled ? (opts.titheRate ?? DEFAULT_TITHE_RATE) : 0;
+  const tithe = net * rate;
   const custom = deductions
     .filter((d) => d.type === "custom")
     .reduce((s, d) => s + computeDeductionAmount(d, net), 0);
   const disposable = Math.max(0, net - tithe - custom);
   return { net, tithe, custom, disposable };
 }
-
-// ---------- Net worth ----------
 
 export function computeNetWorth(opts: {
   accounts: { balance: number }[];
@@ -52,13 +51,11 @@ export function computeNetWorth(opts: {
   return { assets, liabilities: debt, net: assets - debt };
 }
 
-// ---------- Categories ----------
-
 export const BUDGET_CATEGORY_GROUPS = {
   Essentials: ["Rent", "Food & Groceries", "Transport", "Utilities", "Medical"],
   Family: [
     "Parents support", "Siblings support", "Extended family support",
-    "Girlfriend allowance", "Wife allowance", "Children allowance",
+    "Spouse / partner allowance", "Children allowance",
     "School fees", "Emergency family support",
   ],
   Lifestyle: ["Subscriptions", "Personal care", "Entertainment", "Dining out", "Clothing"],
@@ -89,3 +86,6 @@ export function diversificationScore(streams: { amount: number }[]): number {
   const hhi = streams.reduce((s, x) => s + Math.pow(Math.max(0, x.amount) / total, 2), 0);
   return Math.round((1 - hhi) * 100);
 }
+
+// Back-compat for any leftover imports
+export const TITHE_RATE = DEFAULT_TITHE_RATE;
