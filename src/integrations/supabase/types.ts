@@ -24,6 +24,7 @@ export type Database = {
           id: string
           kind: string
           to_account_id: string | null
+          transaction_fee: number
           user_id: string
         }
         Insert: {
@@ -35,6 +36,7 @@ export type Database = {
           id?: string
           kind: string
           to_account_id?: string | null
+          transaction_fee?: number
           user_id: string
         }
         Update: {
@@ -46,6 +48,7 @@ export type Database = {
           id?: string
           kind?: string
           to_account_id?: string | null
+          transaction_fee?: number
           user_id?: string
         }
         Relationships: []
@@ -178,6 +181,7 @@ export type Database = {
       }
       debts: {
         Row: {
+          archived_at: string | null
           balance: number
           created_at: string
           creditor: string | null
@@ -193,6 +197,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived_at?: string | null
           balance?: number
           created_at?: string
           creditor?: string | null
@@ -208,6 +213,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived_at?: string | null
           balance?: number
           created_at?: string
           creditor?: string | null
@@ -301,7 +307,9 @@ export type Database = {
           id: string
           is_emergency: boolean
           payment_method: string | null
+          source_debt_payment_id: string | null
           tags: string[] | null
+          transaction_fee: number
           user_id: string
         }
         Insert: {
@@ -314,7 +322,9 @@ export type Database = {
           id?: string
           is_emergency?: boolean
           payment_method?: string | null
+          source_debt_payment_id?: string | null
           tags?: string[] | null
+          transaction_fee?: number
           user_id: string
         }
         Update: {
@@ -327,7 +337,9 @@ export type Database = {
           id?: string
           is_emergency?: boolean
           payment_method?: string | null
+          source_debt_payment_id?: string | null
           tags?: string[] | null
+          transaction_fee?: number
           user_id?: string
         }
         Relationships: []
@@ -495,6 +507,7 @@ export type Database = {
         Row: {
           created_at: string
           currency: string
+          display_currency: string
           email: string | null
           full_name: string | null
           id: string
@@ -507,6 +520,7 @@ export type Database = {
         Insert: {
           created_at?: string
           currency?: string
+          display_currency?: string
           email?: string | null
           full_name?: string | null
           id: string
@@ -519,6 +533,7 @@ export type Database = {
         Update: {
           created_at?: string
           currency?: string
+          display_currency?: string
           email?: string | null
           full_name?: string | null
           id?: string
