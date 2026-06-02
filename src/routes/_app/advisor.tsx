@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { runAdvisor } from "@/lib/advisor.functions";
-import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useIncomes, useSubscriptions, useDebts, useAIInsights } from "@/lib/queries";
+import { useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useIncomeEntries, useSubscriptions, useDebts, useAIInsights } from "@/lib/queries";
 import { computeBreakdown } from "@/lib/finance";
 import { formatCurrency, monthKey } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ function Advisor() {
   const budgets = useBudgets();
   const expenses = useExpenses();
   const investments = useInvestments();
-  const incomes = useIncomes();
+  const incomeEntries = useIncomeEntries();
   const subs = useSubscriptions();
   const debts = useDebts();
   const insights = useAIInsights();
@@ -30,18 +30,20 @@ function Advisor() {
   });
 
   const currency = profile.data?.currency ?? "KES";
-  const net = profile.data?.net_income ?? 0;
-  const b = computeBreakdown(net, deductions.data ?? []);
+  const titheEnabled = !!profile.data?.tithe_enabled;
+  const titheRate = profile.data?.tithe_rate ?? 0.10;
+  const receivedIncome = (incomeEntries.data ?? []).reduce((s, e) => s + Number(e.amount), 0);
+  const b = computeBreakdown(receivedIncome, deductions.data ?? [], { titheEnabled, titheRate });
 
   const spendByCat = new Map<string, number>();
   (expenses.data ?? []).forEach((e) => spendByCat.set(e.category, (spendByCat.get(e.category) ?? 0) + Number(e.amount)));
   const monthlySpend = Array.from(spendByCat.values()).reduce((s, v) => s + v, 0);
-  const familyKeys = ["Parents support", "Siblings support", "Extended family support", "Girlfriend allowance", "Wife allowance", "Children allowance", "School fees", "Emergency family support"];
+  const familyKeys = ["Parents support", "Siblings support", "Extended family support", "Spouse / partner allowance", "Children allowance", "School fees", "Emergency family support"];
   const familyTotal = familyKeys.reduce((s, k) => s + (spendByCat.get(k) ?? 0), 0);
   const subsMonthly = (subs.data ?? []).filter((x) => x.active).reduce((s, x) => {
     const a = Number(x.amount); return s + (x.cycle === "monthly" ? a : x.cycle === "annual" ? a / 12 : x.cycle === "quarterly" ? a / 3 : a * 4);
   }, 0);
-  const debtsTotal = (debts.data ?? []).reduce((s, d) => s + Number(d.balance), 0);
+  const debtsTotal = (debts.data ?? []).filter((d) => !d.archived_at).reduce((s, d) => s + Number(d.balance), 0);
   const portfolioValue = (investments.data ?? []).reduce((s, i) => s + Number(i.current_value), 0);
   const budgetTotal = (budgets.data ?? []).reduce((s, x) => s + Number(x.limit_amount), 0);
   const savingsRate = b.net > 0 ? Math.max(0, b.disposable - monthlySpend) / b.net : 0;
@@ -49,17 +51,17 @@ function Advisor() {
   const familySupportRatio = b.net > 0 ? familyTotal / b.net : 0;
 
   function runAnalysis() {
-    if (net === 0) { toast.error("Set your net monthly income in Settings first."); return; }
+    if (receivedIncome === 0) { toast.error("Record at least one income entry this month before running analysis."); return; }
     m.mutate({
       data: {
-        period: monthKey(),
+        period: monthKey().slice(0, 7),
         context: {
-          currency, net: b.net, disposable: b.disposable, tithe: b.tithe,
+          currency, titheEnabled, net: b.net, disposable: b.disposable, tithe: b.tithe,
           customDeductions: b.custom, monthlySpend, budgetTotal,
           savingsRate, debtRatio, familySupportRatio, subscriptionsMonthly: subsMonthly,
           debtsTotal, portfolioValue,
           topCategories: Array.from(spendByCat.entries()).map(([category, amount]) => ({ category, amount })).sort((a, b) => b.amount - a.amount).slice(0, 10),
-          incomeStreams: incomes.data?.length ?? 0,
+          incomeStreams: new Set((incomeEntries.data ?? []).map((e) => e.source)).size,
         },
       },
     });
