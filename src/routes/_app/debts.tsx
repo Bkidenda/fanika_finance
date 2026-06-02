@@ -53,20 +53,22 @@ function Debts() {
     if (!payOpen) return;
     const amt = Number(payAmt);
     if (!amt) return;
-    const newBal = Math.max(0, payOpen.balance - amt);
+    // DB trigger handles: reduces debts.balance, archives when settled, auto-creates expense which debits the account.
     const { error } = await supabase.from("debt_payments").insert({ user_id: user!.id, debt_id: payOpen.id, amount: amt, account_id: payAccount || null });
     if (error) return toast.error(error.message);
-    await supabase.from("debts").update({ balance: newBal }).eq("id", payOpen.id);
     qc.invalidateQueries({ queryKey: ["debts"] });
     qc.invalidateQueries({ queryKey: ["accounts"] });
+    qc.invalidateQueries({ queryKey: ["expenses"] });
+    qc.invalidateQueries({ queryKey: ["expenses-all"] });
     setPayOpen(null); setPayAmt(""); setPayAccount("");
-    toast.success("Payment recorded");
+    toast.success("Payment recorded — expense logged and account adjusted.");
   }
   async function remove(id: string) { await supabase.from("debts").delete().eq("id", id); qc.invalidateQueries({ queryKey: ["debts"] }); }
 
-  const formal = (debts.data ?? []).filter((d) => d.kind !== "informal");
-  const informal = (debts.data ?? []).filter((d) => d.kind === "informal");
-  const totalBalance = (debts.data ?? []).reduce((s, d) => s + Number(d.balance), 0);
+  const active = (debts.data ?? []).filter((d) => !d.archived_at && Number(d.balance) > 0);
+  const formal = active.filter((d) => d.kind !== "informal");
+  const informal = active.filter((d) => d.kind === "informal");
+  const totalBalance = active.reduce((s, d) => s + Number(d.balance), 0);
   const monthly = formal.reduce((s, d) => s + Number(d.monthly_payment), 0);
 
   const renderDebt = (d: typeof formal[number]) => {
@@ -143,7 +145,7 @@ function Debts() {
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border bg-card p-5 shadow-card"><div className="text-xs text-muted-foreground">Total outstanding</div><div className="mt-1 text-2xl font-semibold tabular-nums">{formatCurrency(totalBalance, currency)}</div></div>
         <div className="rounded-2xl border bg-card p-5 shadow-card"><div className="text-xs text-muted-foreground">Monthly (formal)</div><div className="mt-1 text-2xl font-semibold tabular-nums">{formatCurrency(monthly, currency)}</div></div>
-        <div className="rounded-2xl border bg-card p-5 shadow-card"><div className="text-xs text-muted-foreground">Active debts</div><div className="mt-1 text-2xl font-semibold tabular-nums">{debts.data?.length ?? 0}</div></div>
+        <div className="rounded-2xl border bg-card p-5 shadow-card"><div className="text-xs text-muted-foreground">Active debts</div><div className="mt-1 text-2xl font-semibold tabular-nums">{active.length}</div></div>
       </div>
 
       {formal.length > 0 && (
@@ -158,7 +160,7 @@ function Debts() {
           {informal.map(renderDebt)}
         </div>
       )}
-      {!debts.data?.length && <p className="rounded-xl border border-dashed py-10 text-center text-sm text-muted-foreground">No debts tracked.</p>}
+      {!active.length && <p className="rounded-xl border border-dashed py-10 text-center text-sm text-muted-foreground">No active debts. Settled debts are archived under History.</p>}
 
       <Dialog open={!!payOpen} onOpenChange={(o) => !o && setPayOpen(null)}>
         <DialogContent>
