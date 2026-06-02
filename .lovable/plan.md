@@ -1,70 +1,64 @@
 
-This is a large multi-area change. Grouping into 8 workstreams. I'll implement top-to-bottom unless you want to reorder.
+Grouped into workstreams. I'll ship top-to-bottom unless you reorder.
 
-## 1. Tithe becomes optional (per-user setting)
-- Add `tithe_enabled` (bool, default false) and `tithe_rate` (numeric, default 0.10) to `profiles`.
-- Settings ("My Profile") gains: "Enable automatic tithe set-aside" toggle + rate input.
-- Budget math unchanged in principle: when enabled, tithe is computed from monthly income FIRST, deducted before "disposable" is calculated. When disabled, tithe is 0 and not shown anywhere.
-- Each income entry gets an optional "Set tithe on this income" checkbox (defaults to the profile setting) so per-entry override is possible.
-- Dashboard, Advisor, Insights, History all respect the toggle.
+## A. Leftovers from previous turn
+1. **Per-income tithe override checkbox** on `/income-entries` form — defaults to profile `tithe_enabled`, writes to `income_entries.tithe_on` (column already exists). Dashboard tithe math sums only entries where `tithe_on = true` (or all when profile default is on and `tithe_on IS NULL`).
+2. **Inline close-prompt** on `/expenses` and `/income-entries` when the entered date falls in a future month while the current month is still open — non-blocking banner with [Close current month] [Continue anyway].
 
-## 2. Monthly cycle redesign (fresh income/budgets, carry-over for the rest)
-- "Open a new month" already happens when you close the previous one. Update `closeMonth` so it:
-  - Does NOT copy budgets forward by default (income+budgets are entered fresh).
-  - Copies forward only items flagged as recurring (see #3).
-  - Carries over: account balances, investments, debts, subscriptions (these are already global, not month-scoped).
-- If a user tries to add a budget/expense/income whose date falls in the next month while the current month is still open, show a non-blocking prompt: "Close <Month> first?" with buttons [Close & continue] [Continue without closing] [Cancel].
-- Reopening a past month from `/history` is allowed and does not touch the current month's data (already true — just make it explicit in the UI).
+## B. Navbar
+- Push CTAs (`Sign in`, `Get started`) to the far right of the floating pill in `public-layout.tsx`. Page links stay center-left.
 
-## 3. Recurring budget lines (like rent)
-- New table `recurring_budgets` (category, amount, start_month, end_month nullable, active).
-- New section in `/budgets` to manage them; on month open they are auto-inserted into that month's `budgets` table.
-- Mirrors the existing subscriptions flow but for budget envelopes rather than vendor charges.
+## C. Calendar timezone bug
+- Root cause: `new Date("2026-06-02")` is parsed as UTC midnight, then rendered in local TZ (UTC+3 KE) → shifts to next day in some pickers, and the grid cell math compares with local-midnight dates.
+- Fix: store as plain `YYYY-MM-DD` string, build day cells from `Date.UTC(y, m, d)`, compare with same UTC-anchored keys. No `toISOString().slice(0,10)` on local Date objects.
 
-## 4. Dashboard polish
-- Remove the explanatory subtitle under "Income received" (no more `income_streams` from settings).
-- Show: Income received this month, Tithe set aside (only if enabled), Total spent, Disposable remaining, Net worth, Where your money is.
+## D. Carry-over on month close
+- `closeMonth` already does NOT touch `subscriptions`, `debts`, `accounts`, `investments` (they are global, not month-scoped). Verify and document with a comment. Add explicit test snippet in the closure result. No data change needed — they already persist.
 
-## 5. Floating navbar split
-- Top bar: fixed "Nuru Steward" wordmark on the left (NOT floating, sits in normal page header).
-- Floating pill (center/right): only the page links — Home, Features, How it works, Stewardship, Pricing.
-- Mobile: wordmark stays, pill collapses to a sheet.
+## E. Edit budgets & expenses
+- `/budgets`: inline edit limit_amount (click amount → input → save).
+- `/expenses`: row "Edit" opens dialog with amount/category/date/account/description/is_emergency. Triggers `expenses_sync_account` correctly (UPDATE path already balances both deltas).
 
-## 6. Hero image quality
-- Re-export the founder photo at 1600×1200 (currently undersized → blurry). Use `imagegen.edit_image` to upscale + clean background to pure white. Animate the surrounding graphic chips slightly slower for a calmer feel.
+## F. Money tracker
+- New `/tracker` route (added to sidebar under "Insights"). Shows: running balance per account day-by-day, income vs expenses line chart for the current month, category split donut. Pure read-only; pulls from `income_entries`, `expenses`, `account_transactions`, `debt_payments`.
 
-## 7. AI advisor — current month + history
-- `generateAdvisory` server fn already reads current month; extend it to also pull the last 3 `month_closures` snapshots and pass them to the model so it can comment on trends (e.g. "spending on Food is up 22% vs your 3-month average").
+## G. AI advisor — drop settings dependency
+- Already updated to read snapshot from current month + history. Remove any stale reference to `incomes`/`profiles.net_income` in `src/lib/queries.ts` advisor context. Income for advisor = sum of `income_entries` in the period. Verify `runAdvisor` prompt + the advisor page UI no longer mentions "income from settings".
 
-## 8. Statements, account lifecycle, data wipe, content sync
+## H. Hero image + remove tithe from marketing
+- Landing hero: drop the "Tithe" chip + any tithe wording in copy. Use the originally uploaded founder photo at native res. Make the photo container span full right column height (`h-full object-cover` inside an aspect-free flex pane) so no whitespace remains.
+- Pricing/Features/How-it-works: keep "Optional tithe" as a feature note (it's a real toggle), but not in hero.
 
-### Printable statements
-- New `/statements` page. Pick month or quarter, click "Download PDF". Uses `@react-pdf/renderer` (already pure JS, Worker-safe is irrelevant — renders client-side). PDF includes: income summary, budgets vs actuals, top categories, accounts snapshot, debts, investments, net worth, tithe (if enabled).
+## I. Multi-currency + CBK converter
+- Add `profiles.display_currency` (already have `currency`; rename concept: `currency` = base currency, add `display_currency` for viewing). Each money-bearing row keeps its own `currency` (accounts already have it; add to `income_entries`, `expenses`, `debts`, `investments`).
+- New server fn `getRates` that fetches CBK indicative rates JSON daily and caches in a new `fx_rates` table (date, base, quote, rate). Source: `https://www.centralbank.go.ke/rates/forex-exchange-rates/` (HTML scrape) — fallback to `exchangerate.host` if CBK fails.
+- `formatCurrency(amount, from, to)` helper converts on-the-fly using the latest rate.
+- Profile setting: "Display all amounts in: [KES/USD/EUR/GBP/UGX/TZS]".
 
-### Account deactivate / delete
-- In My Profile, add a "Danger zone" card:
-  - **Deactivate**: sets `profiles.is_active = false`, signs out. Data preserved. Reactivates on next login.
-  - **Delete permanently**: typed-confirmation dialog → server fn (`requireSupabaseAuth`) that deletes all user-owned rows across every table, then calls `supabaseAdmin.auth.admin.deleteUser(userId)`. Signs out and redirects to `/`.
+## J. Transaction fees
+- New `transaction_fee` numeric column on `expenses` and `account_transactions`. Trigger `expenses_sync_account` updated: balance delta = `-(amount + fee)`. Trigger `account_transactions_sync` for transfers: source debited by `amount + fee`, destination credited by `amount`.
+- Forms gain optional "Transaction cost" field.
 
-### One-time data wipe for your account
-- I'll run a SQL migration that deletes all user-scoped rows (expenses, incomes, income_entries, budgets, recurring_budgets, debts, debt_payments, accounts, account_transactions, investments, subscriptions, savings_goals, ai_insights, month_closures, financial_events) for `email = 'bkidenda@gmail.com'`, and reset `profiles.net_income` to 0. Auth user stays. You'll log in on June 1 with a clean slate.
+## K. Debt payment ⇒ auto-expense + auto-archive
+- Trigger `debt_payments_after_insert`: reduces `debts.balance` by amount, AND inserts a row into `expenses` (category="Loans / Debt repayment", account_id=payment account, amount=payment, description=`Debt: <debt name>`, with a marker column `source_debt_payment_id` so the existing `expenses_sync_account` is the SOLE balance adjuster (we'll drop the current direct balance adjust in `debt_payments_sync_account` to avoid double-debit).
+- When `debts.balance <= 0`: set `debts.archived_at = now()`. UI: archived debts hidden from `/debts` main list, shown under `/history` "Settled debts".
 
-### Content sync
-- Rewrite `/features` and `/how-it-works` to match the current capabilities (net-income model, optional tithe, monthly cycle, recurring lines, statements, advisor with history).
-- On `/pricing`, replace the hand-picked feature bullets with the **actual feature flags** each tier unlocks. Tier capabilities will be defined in `src/lib/plans.ts` and consumed by both `/pricing` and feature-gating in the app:
-  - **Free**: budgets, expenses, accounts (≤3), tithe toggle, monthly close, devotional, statements (monthly only).
-  - **Steward Pro (KSh 2,000)**: + unlimited accounts/investments, AI advisor + chatbot, debt planner, recurring budgets, quarterly statements, calendar.
-  - **Family Suite (KSh 4,000)**: + household members, shared budgets, family obligations, joint net-worth, priority support.
+## L. Cross-month entries (record May income in June)
+- Remove any "date must be in current month" guard on `/income-entries` and `/expenses`. Allow any date. The period an entry belongs to = its `date`'s month, period. So a 31-May income recorded after June opens still belongs to May's bucket. Already true at the DB level — just verify no UI filter blocks it. Add a small note: "Entries are grouped by transaction date, not entry date."
 
-## Technical notes (skip if not interested)
-- All DB changes in one migration with GRANTs + RLS.
-- Server fns: `generateAdvisory` (extend), `deleteAccount` (new), `deactivateAccount` (new), `wipeUserData` (new, called from migration as one-off).
-- PDF rendered client-side (`@react-pdf/renderer`) — added via `bun add`.
-- Floating navbar refactor stays in `public-layout.tsx`.
+## M. Mobile bank-app shell
+- When `useIsMobile()` and inside `_app`: render a bottom tab bar with 5 tabs — Home (Dashboard), Money (Tracker), Add (FAB → quick income/expense/transfer), Plan (Budgets), Profile (Settings). Hide the sidebar entirely on mobile. Header becomes a sticky compact bar with avatar + title only.
+- Public site mobile: hide footer.
 
-## Confirmations needed
-1. OK to **wipe all your data** (email `bkidenda@gmail.com`) right now so you start June clean? Auth account stays.
-2. PDF library: OK to use `@react-pdf/renderer` (client-side, no server load)?
-3. For recurring budgets, default behavior on month open = auto-insert at the saved amount; OK?
+## Technical notes
+- One migration: `display_currency`, `fx_rates` table + GRANTs + RLS (rates are public-read for authenticated users), `transaction_fee` columns, `debts.archived_at`, `expenses.source_debt_payment_id`, updated triggers.
+- Hero asset: re-use existing `src/assets/founder-white.jpg`, just remove the size constraint.
+- Money tracker uses existing `recharts`.
+- FX cache: 1 row per (date, base, quote). Refresh once a day on first request.
 
-Reply "go" (or with answers to the 3 above) and I'll ship it.
+## Confirmations
+1. OK to use CBK indicative rates with `exchangerate.host` fallback?
+2. For multi-currency: store each row's native currency, convert on display only — OK?
+3. Mobile bottom-nav tabs: **Home / Money / + / Plan / Profile** — confirm or swap.
+
+Reply "go" (or with answers) and I'll ship.
