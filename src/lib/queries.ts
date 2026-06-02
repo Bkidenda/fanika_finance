@@ -8,6 +8,7 @@ export type Profile = {
   full_name: string | null;
   email: string | null;
   currency: string;
+  display_currency: string;
   net_income: number;
   tithe_enabled: boolean;
   tithe_rate: number;
@@ -46,6 +47,8 @@ export type Expense = {
   tags: string[] | null;
   is_emergency: boolean;
   account_id: string | null;
+  transaction_fee: number;
+  source_debt_payment_id: string | null;
 };
 
 export type Income = { id: string; source: string; amount: number; frequency: "monthly" | "annual" | "one_time" };
@@ -73,6 +76,7 @@ export type Debt = {
   id: string; name: string; creditor: string | null; principal: number; balance: number;
   interest_rate: number; monthly_payment: number; start_date: string | null;
   due_date: string | null; notes: string | null; kind: "formal" | "informal";
+  archived_at: string | null;
 };
 
 export type AIInsight = {
