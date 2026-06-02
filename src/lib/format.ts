@@ -25,3 +25,11 @@ export function monthKey(d = new Date()) {
 export function monthLabel(d = new Date()) {
   return d.toLocaleString("en-US", { month: "long", year: "numeric" });
 }
+
+// Local-date YYYY-MM-DD (NEVER use toISOString().slice(0,10) — it shifts dates by TZ).
+export function isoLocalDate(d = new Date()) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
