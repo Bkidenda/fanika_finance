@@ -3,14 +3,15 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useIncomeEntries, useProfile, useAccounts, useIsMonthClosed } from "@/lib/queries";
-import { formatCurrency, monthKey } from "@/lib/format";
+import { useIncomeEntries, useProfile, useAccounts } from "@/lib/queries";
+import { formatCurrency, isoLocalDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, ArrowDownToLine } from "lucide-react";
+import { Plus, Trash2, ArrowDownToLine, HandHeart } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/income-entries")({ component: IncomeEntries });
@@ -24,21 +25,24 @@ function IncomeEntries() {
   const entries = useIncomeEntries();
   const accounts = useAccounts();
   const currency = profile.data?.currency ?? "KES";
-  const isClosed = useIsMonthClosed(monthKey().slice(0, 7));
+  const titheDefault = !!profile.data?.tithe_enabled;
 
   const [open, setOpen] = useState(false);
-  const [f, setF] = useState({ date: new Date().toISOString().slice(0, 10), source: "Salary", amount: "", account_id: "", notes: "" });
+  const [f, setF] = useState({
+    date: isoLocalDate(), source: "Salary", amount: "",
+    account_id: "", notes: "", tithe_on: titheDefault,
+  });
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
-    if (isClosed) return toast.error("This month is closed.");
     const { error } = await supabase.from("income_entries").insert({
       user_id: user!.id, date: f.date, source: f.source, amount: Number(f.amount),
       account_id: f.account_id || null, notes: f.notes || null,
+      tithe_on: f.tithe_on,
     });
     if (error) return toast.error(error.message);
     toast.success("Income received"); setOpen(false);
-    setF({ date: new Date().toISOString().slice(0, 10), source: "Salary", amount: "", account_id: "", notes: "" });
+    setF({ date: isoLocalDate(), source: "Salary", amount: "", account_id: "", notes: "", tithe_on: titheDefault });
     qc.invalidateQueries({ queryKey: ["income-entries"] });
     qc.invalidateQueries({ queryKey: ["accounts"] });
   }
@@ -47,15 +51,22 @@ function IncomeEntries() {
     qc.invalidateQueries({ queryKey: ["income-entries"] });
     qc.invalidateQueries({ queryKey: ["accounts"] });
   }
+  async function toggleTithe(id: string, next: boolean) {
+    await supabase.from("income_entries").update({ tithe_on: next }).eq("id", id);
+    qc.invalidateQueries({ queryKey: ["income-entries"] });
+  }
 
   const total = (entries.data ?? []).reduce((s, e) => s + Number(e.amount), 0);
 
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between">
-        <div><p className="text-sm text-muted-foreground">Money actually received — every entry updates the linked account balance and feeds the dashboard.</p><h2 className="text-2xl font-semibold tracking-tight">Income</h2></div>
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">Income</h2>
+          <p className="text-sm text-muted-foreground">Money actually received. Entries are grouped by transaction date — record May salary in May even if you log it in June.</p>
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button disabled={isClosed}><Plus className="mr-1 h-4 w-4" /> Record income</Button></DialogTrigger>
+          <DialogTrigger asChild><Button><Plus className="mr-1 h-4 w-4" /> Record income</Button></DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Record income received</DialogTitle></DialogHeader>
             <form onSubmit={add} className="space-y-3">
@@ -74,6 +85,10 @@ function IncomeEntries() {
                   <SelectTrigger><SelectValue placeholder="(none — won't update balances)" /></SelectTrigger>
                   <SelectContent>{(accounts.data ?? []).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
                 </Select>
+              </div>
+              <div className="flex items-center justify-between rounded-xl border p-3">
+                <div className="flex items-center gap-2"><HandHeart className="h-4 w-4 text-primary" /><Label className="cursor-pointer">Apply tithe / giving to this income</Label></div>
+                <Switch checked={f.tithe_on} onCheckedChange={(v) => setF({ ...f, tithe_on: v })} />
               </div>
               <div className="space-y-1.5"><Label>Notes</Label><Input value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} /></div>
               <Button type="submit" className="w-full">Record</Button>
@@ -99,7 +114,11 @@ function IncomeEntries() {
                     <div className="text-xs text-muted-foreground">{e.date}{e.notes ? ` · ${e.notes}` : ""}</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span>Tithe</span>
+                    <Switch checked={!!e.tithe_on} onCheckedChange={(v) => toggleTithe(e.id, v)} />
+                  </div>
                   <span className="tabular-nums font-medium">{formatCurrency(Number(e.amount), currency)}</span>
                   <button onClick={() => remove(e.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
                 </div>
