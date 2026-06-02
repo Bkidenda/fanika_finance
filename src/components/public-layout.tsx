@@ -36,31 +36,32 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         </Link>
       </div>
 
-      {/* Floating navbar — page links only */}
+      {/* Floating navbar — links left, CTAs far right */}
       <header className="fixed inset-x-0 top-4 z-40 px-4">
-        <div className="mx-auto flex max-w-3xl items-center justify-center rounded-full border border-white/20 bg-gradient-to-r from-[oklch(0.45_0.12_180)]/95 via-[oklch(0.52_0.12_175)]/95 to-[oklch(0.58_0.13_185)]/95 px-3 py-2 text-primary-foreground shadow-elevated backdrop-blur-xl">
-          <div className="hidden items-center gap-1 lg:flex">
-            <nav className="flex items-center gap-1">
-              {NAV.map((n) => (
-                <Link
-                  key={n.to}
-                  to={n.to}
-                  className={`rounded-full px-3 py-1.5 text-sm transition ${path === n.to ? "bg-white/20 font-medium" : "text-primary-foreground/85 hover:bg-white/10"}`}
-                >
-                  {n.label}
-                </Link>
-              ))}
-            </nav>
-            <div className="ml-2 flex items-center gap-1.5 border-l border-white/20 pl-2">
-              <Button asChild size="sm" variant="ghost" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground">
-                <a href={DEMO_MAILTO}><Calendar className="mr-1 h-3.5 w-3.5" /> Book demo</a>
-              </Button>
-              {user ? (
-                <Button asChild size="sm" variant="secondary"><Link to="/dashboard">Open app</Link></Button>
-              ) : (
+        <div className="mx-auto flex w-fit max-w-[min(96vw,72rem)] items-center justify-between gap-6 rounded-full border border-white/20 bg-gradient-to-r from-[oklch(0.45_0.12_180)]/95 via-[oklch(0.52_0.12_175)]/95 to-[oklch(0.58_0.13_185)]/95 px-3 py-2 text-primary-foreground shadow-elevated backdrop-blur-xl ml-auto lg:mr-6">
+          <nav className="hidden items-center gap-1 lg:flex">
+            {NAV.map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                className={`rounded-full px-3 py-1.5 text-sm transition ${path === n.to ? "bg-white/20 font-medium" : "text-primary-foreground/85 hover:bg-white/10"}`}
+              >
+                {n.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="hidden items-center gap-1.5 lg:flex">
+            <Button asChild size="sm" variant="ghost" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground">
+              <a href={DEMO_MAILTO}><Calendar className="mr-1 h-3.5 w-3.5" /> Book demo</a>
+            </Button>
+            {user ? (
+              <Button asChild size="sm" variant="secondary"><Link to="/dashboard">Open app</Link></Button>
+            ) : (
+              <>
+                <Button asChild size="sm" variant="ghost" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"><Link to="/login">Sign in</Link></Button>
                 <Button asChild size="sm" variant="secondary"><Link to="/signup">Get started</Link></Button>
-              )}
-            </div>
+              </>
+            )}
           </div>
           <button className="rounded-full px-3 py-1.5 lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -94,7 +95,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
       <main>{children}</main>
 
-      <footer id="contact" className="mt-24 border-t bg-card">
+      <footer id="contact" className="mt-24 hidden border-t bg-card md:block">
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">

@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/lib/queries";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, isoLocalDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,7 +60,7 @@ function CalendarPage() {
   const events = useFinancialEvents(cursor.getFullYear(), cursor.getMonth());
 
   const [open, setOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string>(today.toISOString().slice(0, 10));
+  const [selectedDate, setSelectedDate] = useState<string>(isoLocalDate(today));
   const [form, setForm] = useState<{ title: string; amount: string; kind: FinEvent["kind"]; notes: string }>({
     title: "", amount: "", kind: "reminder", notes: "",
   });
@@ -68,14 +68,16 @@ function CalendarPage() {
   const monthLabel = cursor.toLocaleString("en-US", { month: "long", year: "numeric" });
 
   const grid = useMemo(() => {
-    const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
-    const startWeekday = first.getDay(); // 0..6 Sun-Sat
-    const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
+    const y = cursor.getFullYear();
+    const mo = cursor.getMonth();
+    const first = new Date(y, mo, 1);
+    const startWeekday = first.getDay();
+    const daysInMonth = new Date(y, mo + 1, 0).getDate();
     const cells: { date: string | null; day: number | null }[] = [];
     for (let i = 0; i < startWeekday; i++) cells.push({ date: null, day: null });
     for (let d = 1; d <= daysInMonth; d++) {
-      const dt = new Date(cursor.getFullYear(), cursor.getMonth(), d);
-      cells.push({ date: dt.toISOString().slice(0, 10), day: d });
+      // Build YYYY-MM-DD directly — DO NOT use toISOString which shifts by TZ
+      cells.push({ date: `${y}-${String(mo + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`, day: d });
     }
     while (cells.length % 7 !== 0) cells.push({ date: null, day: null });
     return cells;
@@ -120,7 +122,7 @@ function CalendarPage() {
     qc.invalidateQueries({ queryKey: ["financial-events"] });
   }
 
-  const todayIso = today.toISOString().slice(0, 10);
+  const todayIso = isoLocalDate(today);
 
   return (
     <div className="space-y-6">
@@ -182,7 +184,7 @@ function CalendarPage() {
                   <span className={`rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${KIND_COLORS[e.kind]}`}>{e.kind}</span>
                   <div>
                     <div className="text-sm font-medium">{e.title}</div>
-                    <div className="text-xs text-muted-foreground">{new Date(e.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}{e.notes ? ` · ${e.notes}` : ""}</div>
+                    <div className="text-xs text-muted-foreground">{new Date(e.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}{e.notes ? ` · ${e.notes}` : ""}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -199,7 +201,7 @@ function CalendarPage() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add event — {new Date(selectedDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Add event — {new Date(selectedDate + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</DialogTitle></DialogHeader>
           <form onSubmit={add} className="space-y-3">
             <div className="space-y-1.5">
               <Label>Title</Label>

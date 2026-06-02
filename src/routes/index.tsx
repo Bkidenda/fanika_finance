@@ -65,11 +65,7 @@ function Home() {
             <div aria-hidden className="pointer-events-none absolute -bottom-6 right-12 h-32 w-32 rounded-3xl bg-[oklch(0.78_0.15_75)] opacity-25 blur-3xl animate-pulse [animation-delay:1200ms]" />
 
             {/* Floating chips */}
-            <div className="pointer-events-none absolute -left-3 top-8 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur duration-700 animate-in fade-in slide-in-from-left-4 md:block">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Tithe</div>
-              <div className="text-sm font-semibold tabular-nums text-primary">10% set aside</div>
-            </div>
-            <div className="pointer-events-none absolute -right-3 top-28 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-200 duration-700 animate-in fade-in slide-in-from-right-4 md:block">
+            <div className="pointer-events-none absolute -right-3 top-20 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-200 duration-700 animate-in fade-in slide-in-from-right-4 md:block">
               <div className="flex items-center gap-1.5"><TrendingUp className="h-3 w-3 text-success" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Net worth</span></div>
               <div className="text-sm font-semibold tabular-nums">+12.4%</div>
             </div>
@@ -78,15 +74,15 @@ function Home() {
               <div className="text-sm font-semibold tabular-nums">3 on track</div>
             </div>
 
-            <div className="relative mx-auto max-w-lg overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
+            <div className="relative w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
               <img
                 src={heroImg}
                 alt="Nuru Steward founder showing the personal finance dashboard"
-                width={960}
-                height={1200}
+                width={1200}
+                height={1500}
                 loading="eager"
                 decoding="async"
-                className="block h-auto w-full object-cover [image-rendering:auto] transition-transform duration-700 hover:scale-[1.02]"
+                className="block h-full w-full object-cover [image-rendering:auto] transition-transform duration-700 hover:scale-[1.02]"
               />
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-primary/5" />
             </div>
