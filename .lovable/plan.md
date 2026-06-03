@@ -1,64 +1,67 @@
 
-Grouped into workstreams. I'll ship top-to-bottom unless you reorder.
+Grouped by area. I will ship in this order.
 
-## A. Leftovers from previous turn
-1. **Per-income tithe override checkbox** on `/income-entries` form — defaults to profile `tithe_enabled`, writes to `income_entries.tithe_on` (column already exists). Dashboard tithe math sums only entries where `tithe_on = true` (or all when profile default is on and `tithe_on IS NULL`).
-2. **Inline close-prompt** on `/expenses` and `/income-entries` when the entered date falls in a future month while the current month is still open — non-blocking banner with [Close current month] [Continue anyway].
+## 1. Mobile shell
+- Keep sidebar as-is (do NOT hide on mobile).
+- Add a fixed bottom tab bar in `_app.tsx`, visible only on `md:hidden`: **Dashboard (default) · Income · Expenses · Budget · Accounts**. Active tab highlighted in teal.
+- Reduce mobile typography/padding in dashboard cards so figures fit like a bank app (smaller stat numbers, tighter card padding, 2-col grid on xs).
+- Auto-close sidebar (`Sheet` / `SidebarProvider` setOpenMobile(false)) when any sidebar nav link is clicked, on both mobile and desktop.
 
-## B. Navbar
-- Push CTAs (`Sign in`, `Get started`) to the far right of the floating pill in `public-layout.tsx`. Page links stay center-left.
+## 2. Auth — username at signup
+- Add `username` field to `profiles` (unique, citext-style via lowercase trigger, 3-30 chars, `[a-z0-9_]`).
+- `/signup` form: add Username input, validate uniqueness via a server fn `checkUsername`, write to profile after `signUp`.
+- Display name across the app pulls from `profiles.username` instead of email prefix. Sidebar footer + dashboard greeting updated.
 
-## C. Calendar timezone bug
-- Root cause: `new Date("2026-06-02")` is parsed as UTC midnight, then rendered in local TZ (UTC+3 KE) → shifts to next day in some pickers, and the grid cell math compares with local-midnight dates.
-- Fix: store as plain `YYYY-MM-DD` string, build day cells from `Date.UTC(y, m, d)`, compare with same UTC-anchored keys. No `toISOString().slice(0,10)` on local Date objects.
+## 3. Hero image redesign
+- Use the newly uploaded portrait at its native aspect (`IMG_2161-Edit~2`). Place on the existing hero-background pane, with the same animated graphics (gradient blobs, floating cards) framing the photo.
+- Add an SVG/animated "hand holding tablet with dashboard" graphic beside or behind the portrait — built from primitives (rounded rect tablet + small animated chart bars inside), not a stock image, so it's crisp.
+- Background of photo container stays white to blend with landing.
 
-## D. Carry-over on month close
-- `closeMonth` already does NOT touch `subscriptions`, `debts`, `accounts`, `investments` (they are global, not month-scoped). Verify and document with a comment. Add explicit test snippet in the closure result. No data change needed — they already persist.
+## 4. Settings — remove marketing site
+- In `/settings` ("My Profile"), remove any "View marketing site / View landing" links and the public-nav promo block. Keep profile, currency, tithe, danger zone.
 
-## E. Edit budgets & expenses
-- `/budgets`: inline edit limit_amount (click amount → input → save).
-- `/expenses`: row "Edit" opens dialog with amount/category/date/account/description/is_emergency. Triggers `expenses_sync_account` correctly (UPDATE path already balances both deltas).
+## 5. Budgets vs income guard
+- On `/budgets` and dashboard: compute `totalBudgeted = sum(limit_amount this month)` and `availableIncome = sum(income_entries this month) - tithe`.
+- If `totalBudgeted > availableIncome`: render a red alert banner "Budget exceeds available funds by KSh X" on dashboard + budgets page. Don't hard-block, just warn (some users plan ahead).
 
-## F. Money tracker
-- New `/tracker` route (added to sidebar under "Insights"). Shows: running balance per account day-by-day, income vs expenses line chart for the current month, category split donut. Pure read-only; pulls from `income_entries`, `expenses`, `account_transactions`, `debt_payments`.
+## 6. Tithe as a registered transaction (no balance impact)
+- New table `tithe_payments (id, user_id, amount, paid_on, account_id NULL, note, created_at)`. Account is optional/informational only — trigger does NOT modify `accounts.balance` (tithe is pre-disposable).
+- New page `/tithe` (or section on dashboard) with "Record tithe paid" dialog. Sums show on dashboard "Tithe paid this month vs Tithe budgeted".
+- Skip if `profile.tithe_enabled = false`.
 
-## G. AI advisor — drop settings dependency
-- Already updated to read snapshot from current month + history. Remove any stale reference to `incomes`/`profiles.net_income` in `src/lib/queries.ts` advisor context. Income for advisor = sum of `income_entries` in the period. Verify `runAdvisor` prompt + the advisor page UI no longer mentions "income from settings".
+## 7. Debt → credits an account
+- `/debts` "Add debt" dialog gains a required `account_id` selector ("Deposit into which account?").
+- Trigger `debts_after_insert_credit_account`: increments selected `accounts.balance` by debt amount, and writes an `account_transactions` row with type='debt_inflow' so it's traceable. Existing debt-payment trigger is untouched.
 
-## H. Hero image + remove tithe from marketing
-- Landing hero: drop the "Tithe" chip + any tithe wording in copy. Use the originally uploaded founder photo at native res. Make the photo container span full right column height (`h-full object-cover` inside an aspect-free flex pane) so no whitespace remains.
-- Pricing/Features/How-it-works: keep "Optional tithe" as a feature note (it's a real toggle), but not in hero.
+## 8. M-Pesa → Ziidi 5% auto-transfer
+- Profile setting: "Auto-save % of M-Pesa spend to Ziidi" (default 5, off if no Ziidi account exists).
+- When an expense is inserted with `account` whose name contains "M-Pesa" / "Mpesa", trigger calculates `fee = amount * rate / 100`, debits M-Pesa by that fee, credits the user's account named "Ziidi" (case-insensitive). Writes a paired `account_transactions` row tagged 'auto_ziidi'.
+- Expense form: when M-Pesa is selected, show inline note "+5% (KSh X) will move to Ziidi savings" with a checkbox to opt-out per-transaction.
 
-## I. Multi-currency + CBK converter
-- Add `profiles.display_currency` (already have `currency`; rename concept: `currency` = base currency, add `display_currency` for viewing). Each money-bearing row keeps its own `currency` (accounts already have it; add to `income_entries`, `expenses`, `debts`, `investments`).
-- New server fn `getRates` that fetches CBK indicative rates JSON daily and caches in a new `fx_rates` table (date, base, quote, rate). Source: `https://www.centralbank.go.ke/rates/forex-exchange-rates/` (HTML scrape) — fallback to `exchangerate.host` if CBK fails.
-- `formatCurrency(amount, from, to)` helper converts on-the-fly using the latest rate.
-- Profile setting: "Display all amounts in: [KES/USD/EUR/GBP/UGX/TZS]".
+## 9. Edit account balance
+- `/accounts`: inline-edit balance field per row → writes adjustment via a server fn that updates balance AND inserts an `account_transactions` row type='manual_adjustment' so audit history is preserved.
 
-## J. Transaction fees
-- New `transaction_fee` numeric column on `expenses` and `account_transactions`. Trigger `expenses_sync_account` updated: balance delta = `-(amount + fee)`. Trigger `account_transactions_sync` for transfers: source debited by `amount + fee`, destination credited by `amount`.
-- Forms gain optional "Transaction cost" field.
+## 10. Sidebar auto-collapse on nav
+- Wrap each sidebar `Link` in a handler that calls `setOpen(false)` / `setOpenMobile(false)` from `useSidebar()`.
 
-## K. Debt payment ⇒ auto-expense + auto-archive
-- Trigger `debt_payments_after_insert`: reduces `debts.balance` by amount, AND inserts a row into `expenses` (category="Loans / Debt repayment", account_id=payment account, amount=payment, description=`Debt: <debt name>`, with a marker column `source_debt_payment_id` so the existing `expenses_sync_account` is the SOLE balance adjuster (we'll drop the current direct balance adjust in `debt_payments_sync_account` to avoid double-debit).
-- When `debts.balance <= 0`: set `debts.archived_at = now()`. UI: archived debts hidden from `/debts` main list, shown under `/history` "Settled debts".
+## 11. Calendly link
+- Replace `DEMO_MAILTO` with `https://calendly.com/bkidenda/30min?back=1&month=2026-06` everywhere it's used in `public-layout.tsx`, pricing, features, how-it-works, hero CTA.
 
-## L. Cross-month entries (record May income in June)
-- Remove any "date must be in current month" guard on `/income-entries` and `/expenses`. Allow any date. The period an entry belongs to = its `date`'s month, period. So a 31-May income recorded after June opens still belongs to May's bucket. Already true at the DB level — just verify no UI filter blocks it. Add a small note: "Entries are grouped by transaction date, not entry date."
+## 12. Weekday spend analytics
+- `/insights` and statements: add "Spend by day of week" bar chart (Sun–Sat) computed from `expenses.date` for current month + quarterly view. Use `recharts` Bar.
 
-## M. Mobile bank-app shell
-- When `useIsMobile()` and inside `_app`: render a bottom tab bar with 5 tabs — Home (Dashboard), Money (Tracker), Add (FAB → quick income/expense/transfer), Plan (Budgets), Profile (Settings). Hide the sidebar entirely on mobile. Header becomes a sticky compact bar with avatar + title only.
-- Public site mobile: hide footer.
+## Migration
+- `profiles.username` (text unique), `profiles.mpesa_autosave_rate` (numeric default 5), `profiles.mpesa_autosave_enabled` (bool default true).
+- New table `tithe_payments` with RLS + grants.
+- `debts.deposit_account_id` (uuid nullable for legacy rows, required at insert via app).
+- Triggers: `debts_credit_account_on_insert`, `expenses_mpesa_autosave` (skips if no Ziidi account or rate=0 or opt-out flag set via new `expenses.skip_autosave` bool).
+- `account_transactions.kind` enum extended: 'debt_inflow', 'auto_ziidi', 'manual_adjustment' (text, not enum — keep flexible).
 
-## Technical notes
-- One migration: `display_currency`, `fx_rates` table + GRANTs + RLS (rates are public-read for authenticated users), `transaction_fee` columns, `debts.archived_at`, `expenses.source_debt_payment_id`, updated triggers.
-- Hero asset: re-use existing `src/assets/founder-white.jpg`, just remove the size constraint.
-- Money tracker uses existing `recharts`.
-- FX cache: 1 row per (date, base, quote). Refresh once a day on first request.
+## Code touchpoints
+- `src/components/app-sidebar.tsx`, `src/components/public-layout.tsx`, `src/components/mobile-tabbar.tsx` (new),
+- `src/routes/_app.tsx`, `src/routes/_app/dashboard.tsx`, `_app/budgets.tsx`, `_app/expenses.tsx`, `_app/accounts.tsx`, `_app/debts.tsx`, `_app/insights.tsx`, `_app/settings.tsx`, `_app/tithe.tsx` (new),
+- `src/routes/signup.tsx`, `src/routes/index.tsx`, `src/routes/features.tsx`, `src/routes/how-it-works.tsx`, `src/routes/pricing.tsx`,
+- `src/lib/account.functions.ts` (add `checkUsername`, `adjustBalance`, `recordTithe`),
+- `src/assets/founder-portrait.jpg` (new from upload).
 
-## Confirmations
-1. OK to use CBK indicative rates with `exchangerate.host` fallback?
-2. For multi-currency: store each row's native currency, convert on display only — OK?
-3. Mobile bottom-nav tabs: **Home / Money / + / Plan / Profile** — confirm or swap.
-
-Reply "go" (or with answers) and I'll ship.
+Reply "go" and I ship top-to-bottom.

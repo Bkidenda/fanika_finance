@@ -185,6 +185,7 @@ export type Database = {
           balance: number
           created_at: string
           creditor: string | null
+          deposit_account_id: string | null
           due_date: string | null
           id: string
           interest_rate: number
@@ -201,6 +202,7 @@ export type Database = {
           balance?: number
           created_at?: string
           creditor?: string | null
+          deposit_account_id?: string | null
           due_date?: string | null
           id?: string
           interest_rate?: number
@@ -217,6 +219,7 @@ export type Database = {
           balance?: number
           created_at?: string
           creditor?: string | null
+          deposit_account_id?: string | null
           due_date?: string | null
           id?: string
           interest_rate?: number
@@ -307,6 +310,7 @@ export type Database = {
           id: string
           is_emergency: boolean
           payment_method: string | null
+          skip_autosave: boolean
           source_debt_payment_id: string | null
           tags: string[] | null
           transaction_fee: number
@@ -322,6 +326,7 @@ export type Database = {
           id?: string
           is_emergency?: boolean
           payment_method?: string | null
+          skip_autosave?: boolean
           source_debt_payment_id?: string | null
           tags?: string[] | null
           transaction_fee?: number
@@ -337,6 +342,7 @@ export type Database = {
           id?: string
           is_emergency?: boolean
           payment_method?: string | null
+          skip_autosave?: boolean
           source_debt_payment_id?: string | null
           tags?: string[] | null
           transaction_fee?: number
@@ -512,10 +518,13 @@ export type Database = {
           full_name: string | null
           id: string
           is_active: boolean
+          mpesa_autosave_enabled: boolean
+          mpesa_autosave_rate: number
           net_income: number
           tithe_enabled: boolean
           tithe_rate: number
           updated_at: string
+          username: string | null
         }
         Insert: {
           created_at?: string
@@ -525,10 +534,13 @@ export type Database = {
           full_name?: string | null
           id: string
           is_active?: boolean
+          mpesa_autosave_enabled?: boolean
+          mpesa_autosave_rate?: number
           net_income?: number
           tithe_enabled?: boolean
           tithe_rate?: number
           updated_at?: string
+          username?: string | null
         }
         Update: {
           created_at?: string
@@ -538,10 +550,13 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_active?: boolean
+          mpesa_autosave_enabled?: boolean
+          mpesa_autosave_rate?: number
           net_income?: number
           tithe_enabled?: boolean
           tithe_rate?: number
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -649,6 +664,36 @@ export type Database = {
           name?: string
           next_charge?: string | null
           notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tithe_payments: {
+        Row: {
+          account_id: string | null
+          amount: number
+          created_at: string
+          id: string
+          note: string | null
+          paid_on: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          paid_on?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          paid_on?: string
           user_id?: string
         }
         Relationships: []
