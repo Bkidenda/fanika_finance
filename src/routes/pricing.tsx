@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Check, Calendar } from "lucide-react";
 import { PLANS } from "@/lib/plans";
 
-const DEMO_MAILTO = `mailto:bkidenda@gmail.com?subject=Book%20a%20free%20Nuru%20Steward%20demo`;
+const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({

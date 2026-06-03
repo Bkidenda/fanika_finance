@@ -4,7 +4,7 @@ import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landm
 import { PublicLayout } from "@/components/public-layout";
 import heroImg from "@/assets/hero-tablet.jpg";
 
-const DEMO_MAILTO = `mailto:bkidenda@gmail.com?subject=Book%20a%20free%20Nuru%20Steward%20demo&body=Hi%20Brian%2C%0D%0A%0D%0AI'd%20like%20to%20book%20a%20free%20demo%20of%20Nuru%20Steward.%0D%0A`;
+const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
 export const Route = createFileRoute("/")({
   head: () => ({
