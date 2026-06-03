@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark, Sparkles, Calendar, Eye, HandHeart, Bot, Target } from "lucide-react";
 import { PublicLayout } from "@/components/public-layout";
-import heroImg from "@/assets/hero-tablet.jpg";
+import heroImg from "@/assets/founder-portrait.jpg";
 
 const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
@@ -77,13 +77,27 @@ function Home() {
             <div className="relative w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
               <img
                 src={heroImg}
-                alt="Nuru Steward founder showing the personal finance dashboard"
-                width={1200}
-                height={1500}
+                alt="Nuru Steward founder"
                 loading="eager"
                 decoding="async"
-                className="block h-full w-full object-cover [image-rendering:auto] transition-transform duration-700 hover:scale-[1.02]"
+                className="block h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
               />
+              {/* Animated tablet graphic overlay */}
+              <div aria-hidden className="pointer-events-none absolute -bottom-2 -right-2 hidden h-44 w-56 rotate-[-8deg] rounded-2xl border-4 border-primary/30 bg-card/95 p-2 shadow-elevated backdrop-blur duration-700 animate-in fade-in slide-in-from-right-4 md:block">
+                <div className="flex h-2 items-center justify-center gap-1 pb-1"><span className="h-1 w-6 rounded-full bg-muted-foreground/30" /></div>
+                <div className="flex h-full flex-col gap-1.5 px-1 pb-3">
+                  <div className="flex items-end gap-1 rounded-md bg-secondary/60 p-1.5">
+                    <span className="block w-3 rounded-sm bg-primary animate-pulse" style={{ height: 18 }} />
+                    <span className="block w-3 rounded-sm bg-primary/70 animate-pulse [animation-delay:120ms]" style={{ height: 26 }} />
+                    <span className="block w-3 rounded-sm bg-primary/50 animate-pulse [animation-delay:240ms]" style={{ height: 14 }} />
+                    <span className="block w-3 rounded-sm bg-primary animate-pulse [animation-delay:360ms]" style={{ height: 30 }} />
+                    <span className="block w-3 rounded-sm bg-primary/80 animate-pulse [animation-delay:480ms]" style={{ height: 22 }} />
+                  </div>
+                  <div className="h-1 w-full rounded-full bg-muted" />
+                  <div className="h-1 w-3/4 rounded-full bg-muted" />
+                  <div className="mt-auto flex items-center gap-1.5 text-[9px] font-medium text-primary"><span className="h-1.5 w-1.5 rounded-full bg-success" /> Net worth +12.4%</div>
+                </div>
+              </div>
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-primary/5" />
             </div>
           </div>

@@ -30,23 +30,28 @@ function Debts() {
   const [f, setF] = useState({
     kind: "formal" as "formal" | "informal",
     name: "", creditor: "", principal: "", balance: "",
-    interest_rate: "", monthly_payment: "", due_date: "",
+    interest_rate: "", monthly_payment: "", due_date: "", deposit_account_id: "",
   });
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
     const isInformal = f.kind === "informal";
+    if (!f.deposit_account_id) return toast.error("Pick an account to deposit the borrowed amount into.");
     const { error } = await supabase.from("debts").insert({
       user_id: user!.id, kind: f.kind, name: f.name, creditor: f.creditor || null,
       principal: Number(f.principal), balance: Number(f.balance || f.principal),
       interest_rate: isInformal ? 0 : Number(f.interest_rate) || 0,
       monthly_payment: isInformal ? 0 : Number(f.monthly_payment) || 0,
       due_date: isInformal ? null : f.due_date || null,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      deposit_account_id: f.deposit_account_id,
+    } as never);
     if (error) return toast.error(error.message);
-    toast.success("Debt added"); setOpen(false);
-    setF({ kind: "formal", name: "", creditor: "", principal: "", balance: "", interest_rate: "", monthly_payment: "", due_date: "" });
+    toast.success(`Debt added — ${formatCurrency(Number(f.balance || f.principal), currency)} credited to the chosen account.`);
+    setOpen(false);
+    setF({ kind: "formal", name: "", creditor: "", principal: "", balance: "", interest_rate: "", monthly_payment: "", due_date: "", deposit_account_id: "" });
     qc.invalidateQueries({ queryKey: ["debts"] });
+    qc.invalidateQueries({ queryKey: ["accounts"] });
   }
   async function recordPayment(e: React.FormEvent) {
     e.preventDefault();
@@ -136,6 +141,13 @@ function Debts() {
                   <div className="space-y-1.5"><Label>Due date</Label><Input type="date" value={f.due_date} onChange={(e) => setF({ ...f, due_date: e.target.value })} /></div>
                 </div>
               )}
+              <div className="space-y-1.5"><Label>Deposit into account *</Label>
+                <Select value={f.deposit_account_id} onValueChange={(v) => setF({ ...f, deposit_account_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Which account receives the borrowed money?" /></SelectTrigger>
+                  <SelectContent>{(accounts.data ?? []).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                </Select>
+                <p className="text-[11px] text-muted-foreground">The outstanding balance is credited to this account immediately.</p>
+              </div>
               <Button type="submit" className="w-full">Add</Button>
             </form>
           </DialogContent>
