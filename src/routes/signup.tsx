@@ -15,6 +15,7 @@ export const Route = createFileRoute("/signup")({
 function Signup() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -22,13 +23,19 @@ function Signup() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 8) return toast.error("Password must be at least 8 characters");
+    const handle = username.trim().toLowerCase();
+    if (!/^[a-z0-9_]{3,30}$/.test(handle)) return toast.error("Username: 3–30 chars, letters/numbers/underscore.");
     setBusy(true);
+
+    // Check uniqueness (best-effort; DB unique constraint is the source of truth).
+    const { data: taken } = await supabase.from("profiles").select("id").eq("username", handle).maybeSingle();
+    if (taken) { setBusy(false); return toast.error("That username is taken. Try another."); }
+
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
+      email, password,
       options: {
         emailRedirectTo: window.location.origin + "/dashboard",
-        data: { full_name: name },
+        data: { full_name: name, username: handle },
       },
     });
     setBusy(false);
@@ -67,6 +74,14 @@ function Signup() {
           <div className="space-y-1.5">
             <Label htmlFor="name">Full name</Label>
             <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="username">Username</Label>
+            <div className="flex items-center rounded-md border bg-background px-2 focus-within:ring-1 focus-within:ring-ring">
+              <span className="text-sm text-muted-foreground">@</span>
+              <Input id="username" required value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} className="border-0 px-1 focus-visible:ring-0" placeholder="yourname" minLength={3} maxLength={30} pattern="[a-z0-9_]{3,30}" />
+            </div>
+            <p className="text-[11px] text-muted-foreground">Lowercase letters, numbers and underscores — 3 to 30 characters.</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>

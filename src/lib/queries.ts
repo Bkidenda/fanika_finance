@@ -7,12 +7,19 @@ export type Profile = {
   id: string;
   full_name: string | null;
   email: string | null;
+  username: string | null;
   currency: string;
   display_currency: string;
   net_income: number;
   tithe_enabled: boolean;
   tithe_rate: number;
   is_active: boolean;
+  mpesa_autosave_rate: number;
+  mpesa_autosave_enabled: boolean;
+};
+
+export type TithePayment = {
+  id: string; amount: number; paid_on: string; account_id: string | null; note: string | null;
 };
 
 export type Deduction = {
@@ -298,6 +305,22 @@ export function useMonthClosures() {
 export function useIsMonthClosed(period: string) {
   const closures = useMonthClosures();
   return (closures.data ?? []).some((c) => c.period === period);
+}
+
+export function useTithePayments(month?: string) {
+  const { user } = useAuth();
+  const m = month ?? monthKey();
+  const d = new Date(m);
+  d.setMonth(d.getMonth() + 1);
+  const end = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+  return useQuery({
+    queryKey: ["tithe-payments", user?.id, m], enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tithe_payments").select("*").gte("paid_on", m).lt("paid_on", end).order("paid_on", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as TithePayment[];
+    },
+  });
 }
 
 // Helper: previous month period in YYYY-MM form

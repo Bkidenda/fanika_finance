@@ -132,7 +132,7 @@ function Accounts() {
               </div>
               <button onClick={() => remove(a.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
             </div>
-            <div className="mt-3 text-2xl font-semibold tabular-nums">{formatCurrency(Number(a.balance), currency)}</div>
+            <EditableBalance id={a.id} value={Number(a.balance)} currency={currency} onSaved={() => qc.invalidateQueries({ queryKey: ["accounts"] })} />
           </div>
         ))}
         {!accounts.data?.length && <p className="rounded-xl border border-dashed py-10 text-center text-sm text-muted-foreground md:col-span-2">No accounts yet.</p>}
@@ -163,5 +163,34 @@ function Accounts() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function EditableBalance({ id, value, currency, onSaved }: { id: string; value: number; currency: string; onSaved: () => void }) {
+  const [editing, setEditing] = useState(false);
+  const [v, setV] = useState(String(value));
+  async function save() {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return toast.error("Invalid balance");
+    const { error } = await supabase.from("accounts").update({ balance: n }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Balance updated");
+    setEditing(false); onSaved();
+  }
+  if (editing) {
+    return (
+      <input
+        autoFocus type="number" step="0.01" value={v}
+        onChange={(e) => setV(e.target.value)}
+        onBlur={save}
+        onKeyDown={(e) => { if (e.key === "Enter") save(); if (e.key === "Escape") setEditing(false); }}
+        className="mt-3 w-full rounded border bg-background px-2 py-1 text-2xl font-semibold tabular-nums outline-none focus:ring-1 focus:ring-primary"
+      />
+    );
+  }
+  return (
+    <button onClick={() => { setV(String(value)); setEditing(true); }} className="mt-3 block text-left text-2xl font-semibold tabular-nums underline-offset-4 hover:underline">
+      {formatCurrency(value, currency)}
+    </button>
   );
 }

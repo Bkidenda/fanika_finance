@@ -17,7 +17,7 @@ const EMAIL = "bkidenda@gmail.com";
 const PHONE_DISPLAY = "+254 708 096 833";
 const PHONE_TEL = "+254708096833";
 const WHATSAPP_URL = "https://wa.me/254708096833";
-const DEMO_MAILTO = `mailto:${EMAIL}?subject=Book%20a%20free%20Nuru%20Steward%20demo&body=Hi%20Brian%2C%0D%0A%0D%0AI'd%20like%20to%20book%20a%20free%20demo%20of%20Nuru%20Steward.%0D%0A`;
+const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();

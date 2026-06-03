@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { UserCircle, Coins, CreditCard, LogOut, ShieldAlert, Eraser, PowerOff, Trash2, HandHeart } from "lucide-react";
+import { UserCircle, LogOut, ShieldAlert, Eraser, PowerOff, Trash2, HandHeart, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/settings")({ component: ProfilePage });
@@ -24,9 +24,12 @@ function ProfilePage() {
   const navigate = useNavigate();
 
   const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
   const [currency, setCurrency] = useState("KES");
   const [titheEnabled, setTitheEnabled] = useState(false);
   const [titheRate, setTitheRate] = useState("10");
+  const [mpesaEnabled, setMpesaEnabled] = useState(true);
+  const [mpesaRate, setMpesaRate] = useState("5");
   const [saving, setSaving] = useState(false);
 
   const [wipeOpen, setWipeOpen] = useState(false);
@@ -41,19 +44,26 @@ function ProfilePage() {
   useEffect(() => {
     if (profile.data) {
       setFullName(profile.data.full_name ?? "");
+      setUsername(profile.data.username ?? "");
       setCurrency(profile.data.currency);
       setTitheEnabled(!!profile.data.tithe_enabled);
       setTitheRate(String(Math.round((profile.data.tithe_rate ?? 0.10) * 100)));
+      setMpesaEnabled(!!profile.data.mpesa_autosave_enabled);
+      setMpesaRate(String(profile.data.mpesa_autosave_rate ?? 5));
     }
   }, [profile.data]);
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
+    const handle = username.trim().toLowerCase();
+    if (handle && !/^[a-z0-9_]{3,30}$/.test(handle)) return toast.error("Username: 3–30 chars, letters/numbers/underscore.");
     setSaving(true);
     const rate = Math.max(0, Math.min(100, Number(titheRate) || 0)) / 100;
+    const mp = Math.max(0, Math.min(100, Number(mpesaRate) || 0));
     const { error } = await supabase
       .from("profiles")
-      .update({ full_name: fullName, currency, tithe_enabled: titheEnabled, tithe_rate: rate })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update({ full_name: fullName, username: handle || null, currency, tithe_enabled: titheEnabled, tithe_rate: rate, mpesa_autosave_enabled: mpesaEnabled, mpesa_autosave_rate: mp } as any)
       .eq("id", user!.id);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -63,35 +73,21 @@ function ProfilePage() {
 
   async function handleWipe() {
     setBusy(true);
-    try {
-      await wipeFn({});
-      toast.success("All your financial data cleared.");
-      setWipeOpen(false);
-      qc.invalidateQueries();
-    } catch (e) { toast.error((e as Error).message); }
+    try { await wipeFn({}); toast.success("All your financial data cleared."); setWipeOpen(false); qc.invalidateQueries(); }
+    catch (e) { toast.error((e as Error).message); }
     finally { setBusy(false); }
   }
-
   async function handleDeactivate() {
     setBusy(true);
-    try {
-      await deactivateFn({});
-      toast.success("Account deactivated. You can reactivate by signing back in.");
-      await signOut();
-      navigate({ to: "/" });
-    } catch (e) { toast.error((e as Error).message); }
+    try { await deactivateFn({}); toast.success("Account deactivated."); await signOut(); navigate({ to: "/" }); }
+    catch (e) { toast.error((e as Error).message); }
     finally { setBusy(false); }
   }
-
   async function handleDelete() {
     if (deleteConfirm !== "DELETE") return toast.error("Type DELETE to confirm.");
     setBusy(true);
-    try {
-      await deleteFn({ data: { confirm: "DELETE" } });
-      toast.success("Account permanently deleted.");
-      await signOut();
-      navigate({ to: "/" });
-    } catch (e) { toast.error((e as Error).message); }
+    try { await deleteFn({ data: { confirm: "DELETE" } }); toast.success("Account permanently deleted."); await signOut(); navigate({ to: "/" }); }
+    catch (e) { toast.error((e as Error).message); }
     finally { setBusy(false); }
   }
 
@@ -115,9 +111,16 @@ function ProfilePage() {
             <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your name" />
           </div>
           <div className="space-y-1.5">
+            <Label>Username</Label>
+            <div className="flex items-center rounded-md border bg-background px-2 focus-within:ring-1 focus-within:ring-ring">
+              <span className="text-sm text-muted-foreground">@</span>
+              <Input value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} placeholder="yourname" className="border-0 px-1 focus-visible:ring-0" />
+            </div>
+            <p className="text-[11px] text-muted-foreground">3–30 chars, lowercase letters / numbers / underscore.</p>
+          </div>
+          <div className="space-y-1.5">
             <Label>Email</Label>
             <Input value={user?.email ?? ""} disabled />
-            <p className="text-xs text-muted-foreground">Email is managed by your sign-in provider.</p>
           </div>
           <div className="space-y-1.5">
             <Label>Display currency</Label>
@@ -135,7 +138,7 @@ function ProfilePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="font-semibold">Automatic tithe / giving</div>
-                  <p className="text-xs text-muted-foreground">When enabled, a percentage of every income entry is computed and set aside before disposable income is calculated.</p>
+                  <p className="text-xs text-muted-foreground">Computes tithe before disposable income is calculated. Record actual tithe payments on the Tithe page — they are tracked but don't reduce account balances (deducted pre-disposable).</p>
                 </div>
                 <Switch checked={titheEnabled} onCheckedChange={setTitheEnabled} />
               </div>
@@ -149,40 +152,45 @@ function ProfilePage() {
           </div>
         </div>
 
+        <div className="border-t pt-6">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary"><Smartphone className="h-4 w-4" /></div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-semibold">M-Pesa auto-save to Ziidi</div>
+                  <p className="text-xs text-muted-foreground">When you log an expense paid from an M-Pesa account, a percentage of it is automatically transferred to your "Ziidi" savings account. Requires a Ziidi account in Accounts.</p>
+                </div>
+                <Switch checked={mpesaEnabled} onCheckedChange={setMpesaEnabled} />
+              </div>
+              {mpesaEnabled && (
+                <div className="mt-4 grid max-w-xs gap-1.5">
+                  <Label>Auto-save rate (%)</Label>
+                  <Input type="number" min="0" max="100" step="0.5" value={mpesaRate} onChange={(e) => setMpesaRate(e.target.value)} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className="flex justify-end">
           <Button type="submit" disabled={saving}>{saving ? "Saving…" : "Save profile"}</Button>
         </div>
       </form>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Link to="/income-entries" className="rounded-2xl border bg-card p-5 shadow-card transition hover:shadow-elevated">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary"><Coins className="h-4 w-4" /></div>
-          <div className="mt-3 font-semibold">Income</div>
-          <p className="text-xs text-muted-foreground">Record salary, side income and any other money coming in on the Income page.</p>
-        </Link>
-        <Link to="/debts" className="rounded-2xl border bg-card p-5 shadow-card transition hover:shadow-elevated">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-primary"><CreditCard className="h-4 w-4" /></div>
-          <div className="mt-3 font-semibold">Loans & deductions</div>
-          <p className="text-xs text-muted-foreground">Track loans and standing deductions on the Debts page so they reconcile with your accounts.</p>
-        </Link>
-      </div>
-
       <div className="rounded-2xl border bg-card p-6 shadow-card">
         <h3 className="font-semibold">Session</h3>
-        <p className="mt-1 text-sm text-muted-foreground">Sign out of Nuru Steward on this device.</p>
         <div className="mt-4">
           <Button variant="outline" onClick={signOut}><LogOut className="mr-1 h-4 w-4" /> Sign out</Button>
         </div>
       </div>
 
-      {/* Danger zone */}
       <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 shadow-card">
         <div className="flex items-center gap-2 text-destructive">
           <ShieldAlert className="h-5 w-5" />
           <h3 className="font-semibold">Danger zone</h3>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">These actions are irreversible (except deactivate).</p>
-
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <Button variant="outline" onClick={() => setWipeOpen(true)} className="justify-start">
             <Eraser className="mr-2 h-4 w-4" /> Clear all my data
@@ -199,7 +207,7 @@ function ProfilePage() {
       <Dialog open={wipeOpen} onOpenChange={setWipeOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>Clear all financial data?</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground">This deletes every income entry, expense, budget, debt, investment, account, subscription, goal, AI insight and month closure. Your profile and login are preserved. This cannot be undone.</p>
+          <p className="text-sm text-muted-foreground">Deletes every income entry, expense, budget, debt, investment, account, subscription, goal, AI insight and month closure. Profile and login preserved. Cannot be undone.</p>
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setWipeOpen(false)} disabled={busy}>Cancel</Button>
             <Button variant="destructive" onClick={handleWipe} disabled={busy}>{busy ? "Clearing…" : "Yes, clear everything"}</Button>
@@ -210,7 +218,7 @@ function ProfilePage() {
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>Delete account permanently?</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground">This deletes your account, profile and every record. You will not be able to recover any data. Type <span className="font-mono font-semibold">DELETE</span> to confirm.</p>
+          <p className="text-sm text-muted-foreground">Type <span className="font-mono font-semibold">DELETE</span> to confirm.</p>
           <Input className="mt-3" value={deleteConfirm} onChange={(e) => setDeleteConfirm(e.target.value)} placeholder="Type DELETE" />
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setDeleteOpen(false)} disabled={busy}>Cancel</Button>
