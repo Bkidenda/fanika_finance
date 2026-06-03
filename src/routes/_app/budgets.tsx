@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useBudgets, useExpenses, useProfile, useRecurringBudgets } from "@/lib/queries";
+import { useBudgets, useExpenses, useProfile, useRecurringBudgets, useIncomeEntries } from "@/lib/queries";
 import { DEFAULT_BUDGET_CATEGORIES } from "@/lib/finance";
 import { formatCurrency, monthKey, monthLabel } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,14 @@ function Budgets() {
   const budgets = useBudgets(month);
   const expenses = useExpenses(month);
   const recurring = useRecurringBudgets();
+  const income = useIncomeEntries(month);
   const currency = profile.data?.currency ?? "KES";
+  const titheEnabled = !!profile.data?.tithe_enabled;
+  const titheRate = profile.data?.tithe_rate ?? 0.10;
+  const availableIncome = (income.data ?? []).reduce((s, e) => {
+    const t = (e.tithe_on ?? titheEnabled) ? Number(e.amount) * titheRate : 0;
+    return s + Number(e.amount) - t;
+  }, 0);
 
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState(DEFAULT_BUDGET_CATEGORIES[0]);
@@ -93,13 +100,24 @@ function Budgets() {
         <div>
           <p className="text-sm text-muted-foreground">{monthLabel()}</p>
           <h2 className="text-2xl font-semibold tracking-tight">Budgets</h2>
+      </div>
+
+      {availableIncome > 0 && total > availableIncome && (
+        <div className="flex items-start gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          <span className="mt-0.5">⚠️</span>
+          <div>
+            <div className="font-semibold">Budget exceeds available funds by {formatCurrency(total - availableIncome, currency)}.</div>
+            <div className="text-xs">Total budgeted ({formatCurrency(total, currency)}) is more than your post-tithe income this month ({formatCurrency(availableIncome, currency)}). Trim a category or add income.</div>
+          </div>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="mr-1 h-4 w-4" /> Add budget</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>New budget for {monthLabel()}</DialogTitle></DialogHeader>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button className="hidden"><Plus className="mr-1 h-4 w-4" /> Add budget</Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader><DialogTitle>New budget for {monthLabel()}</DialogTitle></DialogHeader>
             <form onSubmit={save} className="space-y-4">
               <div className="space-y-1.5">
                 <Label>Category</Label>
