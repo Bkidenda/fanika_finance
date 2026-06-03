@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, Globe, CalendarDays, FileText,
+  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, HandCoins,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -21,6 +21,7 @@ const money = [
   { title: "Income", url: "/income-entries", icon: Coins },
   { title: "Budgets", url: "/budgets", icon: Wallet },
   { title: "Expenses", url: "/expenses", icon: Receipt },
+  { title: "Tithe", url: "/tithe", icon: HandCoins },
   { title: "Subscriptions", url: "/subscriptions", icon: Repeat },
   { title: "Debts", url: "/debts", icon: CreditCard },
 ] as const;
@@ -33,9 +34,14 @@ const wealth = [
 ] as const;
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, setOpen, setOpenMobile, isMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const path = useRouterState({ select: (r) => r.location.pathname });
+
+  const closeAfterNav = () => {
+    if (isMobile) setOpenMobile(false);
+    else setOpen(false);
+  };
 
   const renderGroup = (label: string, items: ReadonlyArray<{ title: string; url: string; icon: typeof LayoutDashboard }>) => (
     <SidebarGroup>
@@ -45,7 +51,7 @@ export function AppSidebar() {
           {items.map((item) => (
             <SidebarMenuItem key={item.url}>
               <SidebarMenuButton asChild isActive={path === item.url}>
-                <Link to={item.url} className="flex items-center gap-3">
+                <Link to={item.url} onClick={closeAfterNav} className="flex items-center gap-3">
                   <item.icon className="h-4 w-4" />
                   {!collapsed && <span>{item.title}</span>}
                 </Link>
@@ -60,7 +66,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <Link to="/dashboard" className="flex items-center gap-2 px-2 py-2">
+        <Link to="/dashboard" onClick={closeAfterNav} className="flex items-center gap-2 px-2 py-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary shadow-card">
             <Sprout className="h-5 w-5 text-primary-foreground" />
           </div>
@@ -82,17 +88,9 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={path === "/settings"}>
-                  <Link to="/settings" className="flex items-center gap-3">
+                  <Link to="/settings" onClick={closeAfterNav} className="flex items-center gap-3">
                     <UserCircle className="h-4 w-4" />
                     {!collapsed && <span>My Profile</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/" className="flex items-center gap-3">
-                    <Globe className="h-4 w-4" />
-                    {!collapsed && <span>Marketing site</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
