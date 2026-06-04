@@ -168,6 +168,7 @@ function Expenses() {
                 <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">Add a "Ziidi" account to enable M-Pesa auto-save.</div>
               )}
               <Button type="submit" className="w-full">Add expense</Button>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
