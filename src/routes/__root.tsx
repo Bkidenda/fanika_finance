@@ -8,6 +8,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
 import appCss from "../styles.css?url";
+import faviconUrl from "@/assets/favicon.png?url";
 
 function NotFound() {
   return (
@@ -64,7 +65,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: faviconUrl },
+      { rel: "apple-touch-icon", href: faviconUrl },
+    ],
   }),
   shellComponent: Shell,
   component: RootComponent,
