@@ -82,22 +82,7 @@ function Home() {
                 decoding="async"
                 className="block h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
               />
-              {/* Animated tablet graphic overlay */}
-              <div aria-hidden className="pointer-events-none absolute -bottom-2 -right-2 hidden h-44 w-56 rotate-[-8deg] rounded-2xl border-4 border-primary/30 bg-card/95 p-2 shadow-elevated backdrop-blur duration-700 animate-in fade-in slide-in-from-right-4 md:block">
-                <div className="flex h-2 items-center justify-center gap-1 pb-1"><span className="h-1 w-6 rounded-full bg-muted-foreground/30" /></div>
-                <div className="flex h-full flex-col gap-1.5 px-1 pb-3">
-                  <div className="flex items-end gap-1 rounded-md bg-secondary/60 p-1.5">
-                    <span className="block w-3 rounded-sm bg-primary animate-pulse" style={{ height: 18 }} />
-                    <span className="block w-3 rounded-sm bg-primary/70 animate-pulse [animation-delay:120ms]" style={{ height: 26 }} />
-                    <span className="block w-3 rounded-sm bg-primary/50 animate-pulse [animation-delay:240ms]" style={{ height: 14 }} />
-                    <span className="block w-3 rounded-sm bg-primary animate-pulse [animation-delay:360ms]" style={{ height: 30 }} />
-                    <span className="block w-3 rounded-sm bg-primary/80 animate-pulse [animation-delay:480ms]" style={{ height: 22 }} />
-                  </div>
-                  <div className="h-1 w-full rounded-full bg-muted" />
-                  <div className="h-1 w-3/4 rounded-full bg-muted" />
-                  <div className="mt-auto flex items-center gap-1.5 text-[9px] font-medium text-primary"><span className="h-1.5 w-1.5 rounded-full bg-success" /> Net worth +12.4%</div>
-                </div>
-              </div>
+              {/* Hero image already shows the founder holding a dashboard tablet — no overlay needed. */}
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-primary/5" />
             </div>
           </div>
@@ -105,12 +90,12 @@ function Home() {
       </section>
 
       {/* WHY NURU */}
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-16">
         <div className="text-center">
           <p className="text-sm font-medium text-primary">Why Nuru Steward?</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Finance that serves your purpose.</h2>
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-4xl">Finance that serves your purpose.</h2>
         </div>
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-4 md:mt-12 md:gap-5 md:grid-cols-2 lg:grid-cols-4">
           {[
             { i: Eye, t: "Financial Clarity", d: "Know exactly where your money comes from, where it goes, and how every decision impacts your future." },
             { i: HandHeart, t: "Faithful Stewardship", d: "Prioritize tithes, offerings, generosity, and purpose-driven financial planning before allocating the rest of your income." },
