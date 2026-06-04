@@ -19,12 +19,12 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border bg-card p-5 shadow-card transition hover:shadow-elevated",
+        "rounded-2xl border bg-card p-3.5 md:p-5 shadow-card transition hover:shadow-elevated",
         accent && "bg-gradient-hero border-transparent text-primary-foreground",
         className
       )}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2 md:gap-3">
         <div className="space-y-1">
           <div
             className={cn(
@@ -34,7 +34,7 @@ export function StatCard({
           >
             {label}
           </div>
-          <div className="text-2xl font-semibold tabular-nums">{value}</div>
+          <div className="text-xl md:text-2xl font-semibold tabular-nums">{value}</div>
           {hint && (
             <div
               className={cn(
@@ -49,7 +49,7 @@ export function StatCard({
         {icon && (
           <div
             className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-xl",
+              "flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-xl",
               accent ? "bg-white/15" : "bg-secondary text-primary"
             )}
           >

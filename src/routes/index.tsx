@@ -74,7 +74,7 @@ function Home() {
               <div className="text-sm font-semibold tabular-nums">3 on track</div>
             </div>
 
-            <div className="relative w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
+            <div className="relative w-full overflow-hidden rounded-3xl border border-primary/20 bg-background shadow-elevated duration-700 animate-in fade-in zoom-in-95">
               <img
                 src={heroImg}
                 alt="Nuru Steward founder"
