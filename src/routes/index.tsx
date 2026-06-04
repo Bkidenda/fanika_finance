@@ -24,20 +24,20 @@ function Home() {
   return (
     <PublicLayout>
       {/* HERO */}
-      <section className="relative mx-auto max-w-7xl px-6 pb-16 pt-8">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+      <section className="relative mx-auto max-w-7xl px-4 pb-10 pt-4 md:px-6 md:pb-16 md:pt-8">
+        <div className="grid items-center gap-6 md:gap-10 lg:grid-cols-[1.1fr_1fr]">
           <div className="duration-700 animate-in fade-in slide-in-from-left-4">
             <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-card">
               <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Stewardship-first finance
             </span>
-            <h1 className="mt-5 text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
+            <h1 className="mt-4 text-balance text-3xl font-semibold leading-[1.05] tracking-tight md:mt-5 md:text-5xl lg:text-6xl">
               Manage Money with <span className="text-gradient-primary">Purpose</span>.<br />
               Build Wealth with <span className="text-gradient-primary">Discipline</span>.
             </h1>
-            <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">
+            <p className="mt-4 max-w-xl text-sm text-muted-foreground md:mt-5 md:text-lg">
               Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning. Nuru Steward helps you make intentional financial decisions rooted in stewardship, accountability, and long-term prosperity.
             </p>
-            <p className="mt-4 max-w-xl text-sm text-muted-foreground">
+            <p className="mt-3 hidden max-w-xl text-sm text-muted-foreground md:mt-4 md:block">
               Start from your net take-home pay, automate tithes and giving, plan monthly budgets, track spending, manage debts, monitor investments, and stay aligned with your financial goals — all in one place.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
