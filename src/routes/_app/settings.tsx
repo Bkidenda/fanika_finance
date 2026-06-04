@@ -112,11 +112,12 @@ function ProfilePage() {
           </div>
           <div className="space-y-1.5">
             <Label>Username</Label>
-            <div className="flex items-center rounded-md border bg-background px-2 focus-within:ring-1 focus-within:ring-ring">
-              <span className="text-sm text-muted-foreground">@</span>
-              <Input value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} placeholder="yourname" className="border-0 px-1 focus-visible:ring-0" />
-            </div>
-            <p className="text-[11px] text-muted-foreground">3–30 chars, lowercase letters / numbers / underscore.</p>
+            <Input
+              value={username}
+              onChange={(e) => setUsername(e.target.value.toLowerCase())}
+              placeholder="yourname"
+            />
+            <p className="text-[11px] text-muted-foreground">3–30 chars, lowercase letters / numbers / underscore. Shown as @{username || "yourname"}.</p>
           </div>
           <div className="space-y-1.5">
             <Label>Email</Label>

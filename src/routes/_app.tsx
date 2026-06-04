@@ -49,7 +49,7 @@ function AppLayout() {
   const handle = profile.data?.username || profile.data?.full_name?.split(" ")[0] || user.email?.split("@")[0];
 
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
         <div className="flex flex-1 flex-col">

@@ -24,20 +24,20 @@ function Home() {
   return (
     <PublicLayout>
       {/* HERO */}
-      <section className="relative mx-auto max-w-7xl px-6 pb-16 pt-8">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+      <section className="relative mx-auto max-w-7xl px-4 pb-10 pt-4 md:px-6 md:pb-16 md:pt-8">
+        <div className="grid items-center gap-6 md:gap-10 lg:grid-cols-[1.1fr_1fr]">
           <div className="duration-700 animate-in fade-in slide-in-from-left-4">
             <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-card">
               <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Stewardship-first finance
             </span>
-            <h1 className="mt-5 text-balance text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
+            <h1 className="mt-4 text-balance text-3xl font-semibold leading-[1.05] tracking-tight md:mt-5 md:text-5xl lg:text-6xl">
               Manage Money with <span className="text-gradient-primary">Purpose</span>.<br />
               Build Wealth with <span className="text-gradient-primary">Discipline</span>.
             </h1>
-            <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">
+            <p className="mt-4 max-w-xl text-sm text-muted-foreground md:mt-5 md:text-lg">
               Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning. Nuru Steward helps you make intentional financial decisions rooted in stewardship, accountability, and long-term prosperity.
             </p>
-            <p className="mt-4 max-w-xl text-sm text-muted-foreground">
+            <p className="mt-3 hidden max-w-xl text-sm text-muted-foreground md:mt-4 md:block">
               Start from your net take-home pay, automate tithes and giving, plan monthly budgets, track spending, manage debts, monitor investments, and stay aligned with your financial goals — all in one place.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
@@ -74,7 +74,7 @@ function Home() {
               <div className="text-sm font-semibold tabular-nums">3 on track</div>
             </div>
 
-            <div className="relative w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-elevated duration-700 animate-in fade-in zoom-in-95">
+            <div className="relative w-full overflow-hidden rounded-3xl border border-primary/20 bg-background shadow-elevated duration-700 animate-in fade-in zoom-in-95">
               <img
                 src={heroImg}
                 alt="Nuru Steward founder"
@@ -82,22 +82,7 @@ function Home() {
                 decoding="async"
                 className="block h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
               />
-              {/* Animated tablet graphic overlay */}
-              <div aria-hidden className="pointer-events-none absolute -bottom-2 -right-2 hidden h-44 w-56 rotate-[-8deg] rounded-2xl border-4 border-primary/30 bg-card/95 p-2 shadow-elevated backdrop-blur duration-700 animate-in fade-in slide-in-from-right-4 md:block">
-                <div className="flex h-2 items-center justify-center gap-1 pb-1"><span className="h-1 w-6 rounded-full bg-muted-foreground/30" /></div>
-                <div className="flex h-full flex-col gap-1.5 px-1 pb-3">
-                  <div className="flex items-end gap-1 rounded-md bg-secondary/60 p-1.5">
-                    <span className="block w-3 rounded-sm bg-primary animate-pulse" style={{ height: 18 }} />
-                    <span className="block w-3 rounded-sm bg-primary/70 animate-pulse [animation-delay:120ms]" style={{ height: 26 }} />
-                    <span className="block w-3 rounded-sm bg-primary/50 animate-pulse [animation-delay:240ms]" style={{ height: 14 }} />
-                    <span className="block w-3 rounded-sm bg-primary animate-pulse [animation-delay:360ms]" style={{ height: 30 }} />
-                    <span className="block w-3 rounded-sm bg-primary/80 animate-pulse [animation-delay:480ms]" style={{ height: 22 }} />
-                  </div>
-                  <div className="h-1 w-full rounded-full bg-muted" />
-                  <div className="h-1 w-3/4 rounded-full bg-muted" />
-                  <div className="mt-auto flex items-center gap-1.5 text-[9px] font-medium text-primary"><span className="h-1.5 w-1.5 rounded-full bg-success" /> Net worth +12.4%</div>
-                </div>
-              </div>
+              {/* Hero image already shows the founder holding a dashboard tablet — no overlay needed. */}
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-primary/5" />
             </div>
           </div>
@@ -105,12 +90,12 @@ function Home() {
       </section>
 
       {/* WHY NURU */}
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-16">
         <div className="text-center">
           <p className="text-sm font-medium text-primary">Why Nuru Steward?</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Finance that serves your purpose.</h2>
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-4xl">Finance that serves your purpose.</h2>
         </div>
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-4 md:mt-12 md:gap-5 md:grid-cols-2 lg:grid-cols-4">
           {[
             { i: Eye, t: "Financial Clarity", d: "Know exactly where your money comes from, where it goes, and how every decision impacts your future." },
             { i: HandHeart, t: "Faithful Stewardship", d: "Prioritize tithes, offerings, generosity, and purpose-driven financial planning before allocating the rest of your income." },

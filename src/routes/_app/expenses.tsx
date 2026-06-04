@@ -49,10 +49,18 @@ function Expenses() {
   const [desc, setDesc] = useState("");
   const [accountId, setAccountId] = useState("");
   const [method, setMethod] = useState("Cash");
+  const [skipAutosave, setSkipAutosave] = useState(false);
 
   const [edit, setEdit] = useState<EditState>(null);
 
   const availableCats = emergency ? DEFAULT_BUDGET_CATEGORIES : (budgetCats.length ? budgetCats : DEFAULT_BUDGET_CATEGORIES);
+  const selectedAccount = (accounts.data ?? []).find((a) => a.id === accountId);
+  const isMpesaSource = !!selectedAccount && /m-?pesa/i.test(selectedAccount.name);
+  const hasZiidi = (accounts.data ?? []).some((a) => /ziidi/i.test(a.name));
+  const autosaveRate = Number(profile.data?.mpesa_autosave_rate ?? 5);
+  const autosaveEnabled = !!profile.data?.mpesa_autosave_enabled;
+  const willAutosave = isMpesaSource && hasZiidi && autosaveEnabled && autosaveRate > 0 && !skipAutosave;
+  const autosaveAmt = willAutosave && Number(amount) > 0 ? Math.round(Number(amount) * autosaveRate) / 100 : 0;
 
   function invalidateAll() {
     qc.invalidateQueries({ queryKey: ["expenses"] });
@@ -68,10 +76,13 @@ function Expenses() {
       description: desc || null, payment_method: method,
       is_emergency: emergency, account_id: accountId || null,
       transaction_fee: Number(fee) || 0,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      skip_autosave: skipAutosave,
+    } as any);
     if (error) return toast.error(error.message);
-    toast.success("Expense added"); setOpen(false);
-    setAmount(""); setFee(""); setDesc(""); setEmergency(false);
+    toast.success(willAutosave ? `Expense added — ${formatCurrency(autosaveAmt, currency)} auto-saved to Ziidi.` : "Expense added");
+    setOpen(false);
+    setAmount(""); setFee(""); setDesc(""); setEmergency(false); setSkipAutosave(false);
     invalidateAll();
   }
   async function remove(id: string) {
@@ -142,6 +153,20 @@ function Expenses() {
                 </div>
               </div>
               <div className="space-y-1.5"><Label>Description</Label><Input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Optional" /></div>
+              {isMpesaSource && hasZiidi && autosaveEnabled && autosaveRate > 0 && (
+                <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium text-foreground">M-Pesa → Ziidi auto-save</div>
+                      <div className="text-muted-foreground">{autosaveRate}% of this expense ({formatCurrency(autosaveAmt, currency)}) will move to Ziidi.</div>
+                    </div>
+                    <label className="flex items-center gap-2"><span className="text-[11px]">Skip</span><Switch checked={skipAutosave} onCheckedChange={setSkipAutosave} /></label>
+                  </div>
+                </div>
+              )}
+              {isMpesaSource && !hasZiidi && (
+                <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">Add a "Ziidi" account to enable M-Pesa auto-save.</div>
+              )}
               <Button type="submit" className="w-full">Add expense</Button>
             </form>
           </DialogContent>

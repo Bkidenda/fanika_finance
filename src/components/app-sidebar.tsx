@@ -34,13 +34,13 @@ const wealth = [
 ] as const;
 
 export function AppSidebar() {
-  const { state, setOpen, setOpenMobile, isMobile } = useSidebar();
-  const collapsed = state === "collapsed";
+  const { state, setOpenMobile, isMobile } = useSidebar();
+  const collapsed = !isMobile && state === "collapsed";
   const path = useRouterState({ select: (r) => r.location.pathname });
 
   const closeAfterNav = () => {
+    // Auto-collapse only on mobile; keep desktop sidebar static.
     if (isMobile) setOpenMobile(false);
-    else setOpen(false);
   };
 
   const renderGroup = (label: string, items: ReadonlyArray<{ title: string; url: string; icon: typeof LayoutDashboard }>) => (
