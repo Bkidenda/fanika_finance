@@ -179,27 +179,16 @@ function Expenses() {
           <input placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
         </div>
         {filtered.length ? (
-          <div className="divide-y">
-            {filtered.map((e) => (
-              <div key={e.id} className="flex items-center justify-between px-4 py-3 text-sm hover:bg-secondary/50">
-                <div>
-                  <div className="font-medium flex items-center gap-2">{e.description || e.category}{e.is_emergency && <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900">Emergency</span>}{e.source_debt_payment_id && <span className="rounded-full bg-indigo-100 px-1.5 py-0.5 text-[10px] font-medium text-indigo-900">Auto · debt</span>}</div>
-                  <div className="text-xs text-muted-foreground">{e.date} · {e.category} · {e.payment_method}{Number(e.transaction_fee) > 0 ? ` · fee ${formatCurrency(Number(e.transaction_fee), currency)}` : ""}</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="tabular-nums font-medium">{formatCurrency(Number(e.amount), currency)}</span>
-                  {!e.source_debt_payment_id && (
-                    <button onClick={() => setEdit({
-                      id: e.id, date: e.date, amount: String(e.amount), category: e.category,
-                      description: e.description ?? "", account_id: e.account_id ?? "",
-                      is_emergency: e.is_emergency, transaction_fee: String(e.transaction_fee ?? 0),
-                    })} className="text-muted-foreground hover:text-primary"><Pencil className="h-4 w-4" /></button>
-                  )}
-                  <button onClick={() => remove(e.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <WeeklyExpenses
+            items={filtered}
+            currency={currency}
+            onEdit={(e) => setEdit({
+              id: e.id, date: e.date, amount: String(e.amount), category: e.category,
+              description: e.description ?? "", account_id: e.account_id ?? "",
+              is_emergency: e.is_emergency, transaction_fee: String(e.transaction_fee ?? 0),
+            })}
+            onRemove={remove}
+          />
         ) : <p className="py-10 text-center text-sm text-muted-foreground">No expenses yet.</p>}
       </div>
 
