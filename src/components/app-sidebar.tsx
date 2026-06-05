@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, HandCoins,
+  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, Church, Users,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -21,7 +21,7 @@ const money = [
   { title: "Income", url: "/income-entries", icon: Coins },
   { title: "Budgets", url: "/budgets", icon: Wallet },
   { title: "Expenses", url: "/expenses", icon: Receipt },
-  { title: "Tithe", url: "/tithe", icon: HandCoins },
+  { title: "Charity & Giving", url: "/giving", icon: Church },
   { title: "Subscriptions", url: "/subscriptions", icon: Repeat },
   { title: "Debts", url: "/debts", icon: CreditCard },
 ] as const;
@@ -30,6 +30,7 @@ const wealth = [
   { title: "Accounts", url: "/accounts", icon: Landmark },
   { title: "Investments", url: "/investments", icon: TrendingUp },
   { title: "Goals", url: "/goals", icon: Target },
+  { title: "Family Suite", url: "/family", icon: Users },
   { title: "Stewardship", url: "/stewardship", icon: BookOpen },
 ] as const;
 
@@ -39,7 +40,6 @@ export function AppSidebar() {
   const path = useRouterState({ select: (r) => r.location.pathname });
 
   const closeAfterNav = () => {
-    // Auto-collapse only on mobile; keep desktop sidebar static.
     if (isMobile) setOpenMobile(false);
   };
 

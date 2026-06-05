@@ -60,6 +60,7 @@ export type Database = {
           currency: string
           id: string
           institution: string | null
+          linked_debt_id: string | null
           name: string
           type: string
           user_id: string
@@ -70,6 +71,7 @@ export type Database = {
           currency?: string
           id?: string
           institution?: string | null
+          linked_debt_id?: string | null
           name: string
           type: string
           user_id: string
@@ -80,6 +82,7 @@ export type Database = {
           currency?: string
           id?: string
           institution?: string | null
+          linked_debt_id?: string | null
           name?: string
           type?: string
           user_id?: string
@@ -309,6 +312,7 @@ export type Database = {
           description: string | null
           id: string
           is_emergency: boolean
+          occurred_at: string
           payment_method: string | null
           skip_autosave: boolean
           source_debt_payment_id: string | null
@@ -325,6 +329,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_emergency?: boolean
+          occurred_at?: string
           payment_method?: string | null
           skip_autosave?: boolean
           source_debt_payment_id?: string | null
@@ -341,6 +346,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_emergency?: boolean
+          occurred_at?: string
           payment_method?: string | null
           skip_autosave?: boolean
           source_debt_payment_id?: string | null
@@ -349,6 +355,125 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      families: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      family_contributions: {
+        Row: {
+          account_id: string | null
+          amount: number
+          category: string
+          created_at: string
+          family_id: string
+          id: string
+          linked_expense_id: string | null
+          member_id: string | null
+          note: string | null
+          paid_on: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          category?: string
+          created_at?: string
+          family_id: string
+          id?: string
+          linked_expense_id?: string | null
+          member_id?: string | null
+          note?: string | null
+          paid_on?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          category?: string
+          created_at?: string
+          family_id?: string
+          id?: string
+          linked_expense_id?: string | null
+          member_id?: string | null
+          note?: string | null
+          paid_on?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_contributions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_contributions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          monthly_allowance: number
+          name: string
+          notes: string | null
+          relationship: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          monthly_allowance?: number
+          name: string
+          notes?: string | null
+          relationship?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          monthly_allowance?: number
+          name?: string
+          notes?: string | null
+          relationship?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       financial_events: {
         Row: {
@@ -505,6 +630,42 @@ export type Database = {
           id?: string
           period?: string
           snapshot?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      offerings: {
+        Row: {
+          account_id: string | null
+          amount: number
+          category: string
+          created_at: string
+          id: string
+          linked_expense_id: string | null
+          note: string | null
+          paid_on: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          category: string
+          created_at?: string
+          id?: string
+          linked_expense_id?: string | null
+          note?: string | null
+          paid_on?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          category?: string
+          created_at?: string
+          id?: string
+          linked_expense_id?: string | null
+          note?: string | null
+          paid_on?: string
           user_id?: string
         }
         Relationships: []

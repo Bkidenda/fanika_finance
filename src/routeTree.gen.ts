@@ -29,6 +29,8 @@ import { Route as AppIncomeEntriesRouteImport } from './routes/_app/income-entri
 import { Route as AppIncomeRouteImport } from './routes/_app/income'
 import { Route as AppHistoryRouteImport } from './routes/_app/history'
 import { Route as AppGoalsRouteImport } from './routes/_app/goals'
+import { Route as AppGivingRouteImport } from './routes/_app/giving'
+import { Route as AppFamilyRouteImport } from './routes/_app/family'
 import { Route as AppExpensesRouteImport } from './routes/_app/expenses'
 import { Route as AppDebtsRouteImport } from './routes/_app/debts'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
@@ -136,6 +138,16 @@ const AppGoalsRoute = AppGoalsRouteImport.update({
   path: '/goals',
   getParentRoute: () => AppRoute,
 } as any)
+const AppGivingRoute = AppGivingRouteImport.update({
+  id: '/giving',
+  path: '/giving',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFamilyRoute = AppFamilyRouteImport.update({
+  id: '/family',
+  path: '/family',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppExpensesRoute = AppExpensesRouteImport.update({
   id: '/expenses',
   path: '/expenses',
@@ -187,6 +199,8 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/debts': typeof AppDebtsRoute
   '/expenses': typeof AppExpensesRoute
+  '/family': typeof AppFamilyRoute
+  '/giving': typeof AppGivingRoute
   '/goals': typeof AppGoalsRoute
   '/history': typeof AppHistoryRoute
   '/income': typeof AppIncomeRoute
@@ -215,6 +229,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/debts': typeof AppDebtsRoute
   '/expenses': typeof AppExpensesRoute
+  '/family': typeof AppFamilyRoute
+  '/giving': typeof AppGivingRoute
   '/goals': typeof AppGoalsRoute
   '/history': typeof AppHistoryRoute
   '/income': typeof AppIncomeRoute
@@ -245,6 +261,8 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/debts': typeof AppDebtsRoute
   '/_app/expenses': typeof AppExpensesRoute
+  '/_app/family': typeof AppFamilyRoute
+  '/_app/giving': typeof AppGivingRoute
   '/_app/goals': typeof AppGoalsRoute
   '/_app/history': typeof AppHistoryRoute
   '/_app/income': typeof AppIncomeRoute
@@ -275,6 +293,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/debts'
     | '/expenses'
+    | '/family'
+    | '/giving'
     | '/goals'
     | '/history'
     | '/income'
@@ -303,6 +323,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/debts'
     | '/expenses'
+    | '/family'
+    | '/giving'
     | '/goals'
     | '/history'
     | '/income'
@@ -332,6 +354,8 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/debts'
     | '/_app/expenses'
+    | '/_app/family'
+    | '/_app/giving'
     | '/_app/goals'
     | '/_app/history'
     | '/_app/income'
@@ -500,6 +524,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppGoalsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/giving': {
+      id: '/_app/giving'
+      path: '/giving'
+      fullPath: '/giving'
+      preLoaderRoute: typeof AppGivingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/family': {
+      id: '/_app/family'
+      path: '/family'
+      fullPath: '/family'
+      preLoaderRoute: typeof AppFamilyRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/expenses': {
       id: '/_app/expenses'
       path: '/expenses'
@@ -560,6 +598,8 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppDebtsRoute: typeof AppDebtsRoute
   AppExpensesRoute: typeof AppExpensesRoute
+  AppFamilyRoute: typeof AppFamilyRoute
+  AppGivingRoute: typeof AppGivingRoute
   AppGoalsRoute: typeof AppGoalsRoute
   AppHistoryRoute: typeof AppHistoryRoute
   AppIncomeRoute: typeof AppIncomeRoute
@@ -581,6 +621,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppDebtsRoute: AppDebtsRoute,
   AppExpensesRoute: AppExpensesRoute,
+  AppFamilyRoute: AppFamilyRoute,
+  AppGivingRoute: AppGivingRoute,
   AppGoalsRoute: AppGoalsRoute,
   AppHistoryRoute: AppHistoryRoute,
   AppIncomeRoute: AppIncomeRoute,
@@ -610,13 +652,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
