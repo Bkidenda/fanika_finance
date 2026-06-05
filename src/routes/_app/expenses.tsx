@@ -223,3 +223,98 @@ function Expenses() {
     </div>
   );
 }
+
+type ExpenseRow = {
+  id: string; date: string; amount: number; category: string;
+  description: string | null; payment_method: string | null;
+  is_emergency: boolean; account_id: string | null; transaction_fee: number;
+  source_debt_payment_id: string | null;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  occurred_at?: any;
+};
+
+function weekKey(dateStr: string): { key: string; label: string; start: Date } {
+  const d = new Date(dateStr + "T00:00:00");
+  const day = d.getDay(); // 0=Sun
+  const diff = (day === 0 ? -6 : 1 - day); // start week on Mon
+  const start = new Date(d); start.setDate(d.getDate() + diff);
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  const key = start.toISOString().slice(0, 10);
+  const opt: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+  const label = `${start.toLocaleDateString("en", opt)} – ${end.toLocaleDateString("en", opt)}`;
+  return { key, label, start };
+}
+
+function WeeklyExpenses({ items, currency, onEdit, onRemove }: {
+  items: ExpenseRow[]; currency: string;
+  onEdit: (e: ExpenseRow) => void; onRemove: (id: string) => void;
+}) {
+  const [openWeeks, setOpenWeeks] = useState<Record<string, boolean>>({});
+  // Group by week, latest first
+  const groups = new Map<string, { label: string; start: Date; rows: ExpenseRow[] }>();
+  items.forEach((e) => {
+    const w = weekKey(e.date);
+    if (!groups.has(w.key)) groups.set(w.key, { label: w.label, start: w.start, rows: [] });
+    groups.get(w.key)!.rows.push(e);
+  });
+  const sorted = [...groups.entries()].sort((a, b) => b[1].start.getTime() - a[1].start.getTime());
+
+  return (
+    <div className="divide-y">
+      {sorted.map(([key, g], idx) => {
+        const isOpen = openWeeks[key] ?? idx < 2;
+        const total = g.rows.reduce((s, r) => s + Number(r.amount), 0);
+        // group rows by day desc
+        const byDay = new Map<string, ExpenseRow[]>();
+        g.rows.forEach((r) => {
+          if (!byDay.has(r.date)) byDay.set(r.date, []);
+          byDay.get(r.date)!.push(r);
+        });
+        const days = [...byDay.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+        return (
+          <div key={key}>
+            <button
+              onClick={() => setOpenWeeks((s) => ({ ...s, [key]: !isOpen }))}
+              className="flex w-full items-center justify-between bg-secondary/30 px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider hover:bg-secondary/60"
+            >
+              <span>{g.label} · {g.rows.length} entries</span>
+              <span className="tabular-nums">{formatCurrency(total, currency)} {isOpen ? "▾" : "▸"}</span>
+            </button>
+            {isOpen && days.map(([day, rows]) => (
+              <div key={day}>
+                <div className="bg-background px-4 py-1.5 text-[11px] font-medium text-muted-foreground">
+                  {new Date(day + "T00:00:00").toLocaleDateString("en", { weekday: "long", month: "short", day: "numeric" })}
+                </div>
+                {rows.map((e) => {
+                  const ts = e.occurred_at ? new Date(e.occurred_at) : null;
+                  const time = ts ? ts.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" }) : "";
+                  return (
+                    <div key={e.id} className="flex items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary/40">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 font-medium">
+                          <span className="truncate">{e.description || e.category}</span>
+                          {e.is_emergency && <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900">Emergency</span>}
+                          {e.source_debt_payment_id && <span className="rounded-full bg-indigo-100 px-1.5 py-0.5 text-[10px] font-medium text-indigo-900">Auto · debt</span>}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {time && <>{time} · </>}{e.category} · {e.payment_method}{Number(e.transaction_fee) > 0 ? ` · fee ${formatCurrency(Number(e.transaction_fee), currency)}` : ""}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <span className="tabular-nums font-medium">{formatCurrency(Number(e.amount), currency)}</span>
+                        {!e.source_debt_payment_id && (
+                          <button onClick={() => onEdit(e)} className="text-muted-foreground hover:text-primary"><Pencil className="h-3.5 w-3.5" /></button>
+                        )}
+                        <button onClick={() => onRemove(e.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
