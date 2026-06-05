@@ -27,9 +27,9 @@ function Signup() {
     if (!/^[a-z0-9_]{3,30}$/.test(handle)) return toast.error("Username: 3–30 chars, letters/numbers/underscore.");
     setBusy(true);
 
-    // Check uniqueness (best-effort; DB unique constraint is the source of truth).
-    const { data: taken } = await supabase.from("profiles").select("id").eq("username", handle).maybeSingle();
-    if (taken) { setBusy(false); return toast.error("That username is taken. Try another."); }
+    // Pre-check uniqueness so we surface the friendly error before signup commits.
+    const { data: taken } = await supabase.from("profiles").select("id").ilike("username", handle).maybeSingle();
+    if (taken) { setBusy(false); return toast.error("Username already in use"); }
 
     const { error } = await supabase.auth.signUp({
       email, password,
@@ -39,7 +39,13 @@ function Signup() {
       },
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = String(error.message ?? "");
+      if (/duplicate|unique|profiles_username|already/i.test(msg) && /username/i.test(msg)) {
+        return toast.error("Username already in use");
+      }
+      return toast.error(msg);
+    }
     toast.success("Check your email to confirm your account");
     navigate({ to: "/login" });
   }
