@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -14,6 +14,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Search, Trash2, AlertTriangle, Pencil } from "lucide-react";
 import { toast } from "sonner";
+
+// Payment-capable account types
+const PAYMENT_TYPES = new Set(["bank", "mpesa", "cash", "sacco"]);
+// Method options per account type
+const METHODS_BY_TYPE: Record<string, string[]> = {
+  bank: ["Bank transfer", "Card"],
+  sacco: ["Bank transfer", "Card"],
+  mpesa: ["M-Pesa"],
+  cash: ["Cash"],
+};
+const DEFAULT_METHOD_BY_TYPE: Record<string, string> = {
+  bank: "Bank transfer", sacco: "Bank transfer", mpesa: "M-Pesa", cash: "Cash",
+};
+const ALL_METHODS = ["Cash", "Card", "M-Pesa", "Bank transfer", "Other"];
 
 export const Route = createFileRoute("/_app/expenses")({ component: Expenses });
 
