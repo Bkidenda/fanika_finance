@@ -13,10 +13,10 @@ export function MobileTabBar() {
   const path = useRouterState({ select: (r) => r.location.pathname });
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-white/5 bg-[oklch(0.18_0.04_240)]/95 px-1 pb-[max(env(safe-area-inset-bottom),0.15rem)] pt-1 backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 w-full border-t border-white/10 bg-[oklch(0.18_0.04_240)]/95 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-1.5 backdrop-blur md:hidden"
       aria-label="Primary"
     >
-      <ul className="mx-auto grid max-w-md grid-cols-5">
+      <ul className="grid w-full grid-cols-5">
         {TABS.map((t) => {
           const active = path === t.to;
           const Icon = t.icon;
@@ -24,11 +24,11 @@ export function MobileTabBar() {
             <li key={t.to} className="flex">
               <Link
                 to={t.to}
-                className={`flex flex-1 flex-col items-center gap-0.5 rounded-lg px-1 py-1 text-[9px] font-medium transition ${
-                  active ? "text-[oklch(0.78_0.16_175)]" : "text-white/60 hover:text-white/90"
+                className={`flex flex-1 flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 text-[10px] font-medium transition ${
+                  active ? "text-[oklch(0.82_0.16_175)]" : "text-white/65 hover:text-white/90"
                 }`}
               >
-                <Icon className="h-4 w-4" strokeWidth={active ? 2.2 : 1.8} />
+                <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.8} />
                 <span className="leading-tight">{t.label}</span>
               </Link>
             </li>

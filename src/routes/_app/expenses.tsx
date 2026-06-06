@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -14,6 +14,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Search, Trash2, AlertTriangle, Pencil } from "lucide-react";
 import { toast } from "sonner";
+
+// Payment-capable account types
+const PAYMENT_TYPES = new Set(["bank", "mpesa", "cash", "sacco"]);
+// Method options per account type
+const METHODS_BY_TYPE: Record<string, string[]> = {
+  bank: ["Bank transfer", "Card"],
+  sacco: ["Bank transfer", "Card"],
+  mpesa: ["M-Pesa"],
+  cash: ["Cash"],
+};
+const DEFAULT_METHOD_BY_TYPE: Record<string, string> = {
+  bank: "Bank transfer", sacco: "Bank transfer", mpesa: "M-Pesa", cash: "Cash",
+};
+const ALL_METHODS = ["Cash", "Card", "M-Pesa", "Bank transfer", "Other"];
 
 export const Route = createFileRoute("/_app/expenses")({ component: Expenses });
 
@@ -61,6 +75,25 @@ function Expenses() {
   const autosaveEnabled = !!profile.data?.mpesa_autosave_enabled;
   const willAutosave = isMpesaSource && hasZiidi && autosaveEnabled && autosaveRate > 0 && !skipAutosave;
   const autosaveAmt = willAutosave && Number(amount) > 0 ? Math.round(Number(amount) * autosaveRate) / 100 : 0;
+  // Note: rate is %, so amount*rate/100 already preserves cents.
+
+  const paymentAccounts = useMemo(
+    () => (accounts.data ?? []).filter((a) => PAYMENT_TYPES.has(a.type)),
+    [accounts.data]
+  );
+
+  // Auto-select method based on chosen account's type
+  useEffect(() => {
+    if (!selectedAccount) return;
+    const opts = METHODS_BY_TYPE[selectedAccount.type];
+    const def = DEFAULT_METHOD_BY_TYPE[selectedAccount.type];
+    if (opts && !opts.includes(method)) setMethod(def ?? opts[0]);
+  }, [selectedAccount, method]);
+
+  const methodOptions = selectedAccount
+    ? METHODS_BY_TYPE[selectedAccount.type] ?? ALL_METHODS
+    : ALL_METHODS;
+  const methodLocked = selectedAccount?.type === "cash";
 
   function invalidateAll() {
     qc.invalidateQueries({ queryKey: ["expenses"] });
@@ -139,16 +172,19 @@ function Expenses() {
                 </Select>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5"><Label>Account</Label>
+                <div className="space-y-1.5"><Label>Paid from</Label>
                   <Select value={accountId} onValueChange={setAccountId}>
-                    <SelectTrigger><SelectValue placeholder="(none)" /></SelectTrigger>
-                    <SelectContent>{(accounts.data ?? []).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                    <SelectTrigger><SelectValue placeholder="Select account" /></SelectTrigger>
+                    <SelectContent>{paymentAccounts.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
                   </Select>
+                  {paymentAccounts.length === 0 && (
+                    <p className="text-[11px] text-muted-foreground">No payment accounts yet. Add a Bank, M-Pesa, or Cash account.</p>
+                  )}
                 </div>
                 <div className="space-y-1.5"><Label>Method</Label>
-                  <Select value={method} onValueChange={setMethod}>
+                  <Select value={method} onValueChange={setMethod} disabled={methodLocked}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{["Cash", "Card", "M-Pesa", "Bank transfer", "Other"].map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                    <SelectContent>{methodOptions.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
               </div>
@@ -211,7 +247,7 @@ function Expenses() {
               <div className="space-y-1.5"><Label>Account</Label>
                 <Select value={edit.account_id} onValueChange={(v) => setEdit({ ...edit, account_id: v })}>
                   <SelectTrigger><SelectValue placeholder="(none)" /></SelectTrigger>
-                  <SelectContent>{(accounts.data ?? []).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                  <SelectContent>{paymentAccounts.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5"><Label>Description</Label><Input value={edit.description} onChange={(ev) => setEdit({ ...edit, description: ev.target.value })} /></div>

@@ -54,7 +54,8 @@ function Dashboard() {
     spendByCat.set(e.category, (spendByCat.get(e.category) ?? 0) + Number(e.amount));
   });
   const totalSpent = Array.from(spendByCat.values()).reduce((s, v) => s + v, 0);
-  const remaining = breakdown.net - breakdown.tithe - breakdown.custom - totalSpent;
+  const totalFees = (expenses.data ?? []).reduce((s, e) => s + Number(e.transaction_fee ?? 0), 0);
+  const remaining = breakdown.net - breakdown.tithe - breakdown.custom - totalSpent - totalFees;
 
   const budgetTotal = (budgets.data ?? []).reduce((s, b) => s + Number(b.limit_amount), 0);
   const savingsRate = breakdown.net > 0 ? Math.max(0, remaining) / breakdown.net : 0;
@@ -135,42 +136,52 @@ function Dashboard() {
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2.5 md:gap-4 lg:grid-cols-4">
         <StatCard
           accent
           label="Income received"
           value={formatCurrency(breakdown.net, currency)}
-          hint={`${(incomeEntries.data ?? []).length} entries this month`}
+          hint={`${(incomeEntries.data ?? []).length} entries`}
           icon={<Wallet className="h-5 w-5" />}
         />
         <StatCard
-          label="Disposable remaining"
+          label="Disposable"
           value={formatCurrency(Math.max(0, remaining), currency)}
-          hint={remaining < 0 ? `Over by ${formatCurrency(-remaining, currency)}` : (titheEnabled ? "After tithe + spend" : "After spend")}
+          hint={remaining < 0 ? `Over by ${formatCurrency(-remaining, currency)}` : (titheEnabled ? "After tithe + spend + fees" : "After spend + fees")}
           icon={<HandCoins className="h-5 w-5" />}
         />
         <StatCard
           label="Net Worth"
           value={formatCurrency(nw.net, currency)}
-          hint={`Assets ${formatCurrency(nw.assets, currency)} · Debts ${formatCurrency(nw.liabilities, currency)}`}
+          hint={`Assets ${formatCurrency(nw.assets, currency)}`}
           icon={<Scale className="h-5 w-5" />}
         />
         <StatCard
-          label="Portfolio Value"
-          value={formatCurrency(portfolioValue, currency)}
-          hint={`${(investments.data ?? []).length} assets`}
+          label="Transaction fees"
+          value={formatCurrency(totalFees, currency)}
+          hint={`${(expenses.data ?? []).filter((e) => Number(e.transaction_fee) > 0).length} txns with fees`}
           icon={<TrendingUp className="h-5 w-5" />}
         />
       </div>
 
       {(accounts.data?.length ?? 0) > 0 && (
-        <div className="rounded-2xl border bg-card p-6 shadow-card">
+        <div className="rounded-2xl border bg-card p-3.5 md:p-6 shadow-card">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">Where your money is</h3>
-            <Link to="/accounts" className="text-xs font-medium text-primary hover:underline">Manage accounts</Link>
+            <h3 className="text-sm font-semibold md:text-base">Where your money is</h3>
+            <Link to="/accounts" className="text-xs font-medium text-primary hover:underline">Manage</Link>
           </div>
-          <p className="text-xs text-muted-foreground">Live balances — auto-updated by every income, expense and debt payment.</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <p className="text-[11px] md:text-xs text-muted-foreground">Live balances</p>
+          {/* Mobile: horizontal snap carousel. Desktop: grid */}
+          <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 md:hidden -mx-3.5 px-3.5 snap-x snap-mandatory">
+            {(accounts.data ?? []).map((a) => (
+              <div key={a.id} className="min-w-[58%] shrink-0 snap-start rounded-xl border bg-gradient-to-br from-secondary/40 to-background p-3">
+                <div className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">{a.type}</div>
+                <div className="mt-0.5 truncate text-xs font-medium">{a.name}</div>
+                <div className="mt-1 truncate text-base font-semibold tabular-nums">{formatCurrency(Number(a.balance), currency)}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 hidden gap-3 md:grid md:grid-cols-2 lg:grid-cols-4">
             {(accounts.data ?? []).map((a) => (
               <div key={a.id} className="rounded-xl border p-3">
                 <div className="text-xs text-muted-foreground capitalize">{a.type}{a.institution ? ` · ${a.institution}` : ""}</div>

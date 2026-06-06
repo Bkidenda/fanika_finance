@@ -144,7 +144,7 @@ function Debts() {
               <div className="space-y-1.5"><Label>Deposit into account *</Label>
                 <Select value={f.deposit_account_id} onValueChange={(v) => setF({ ...f, deposit_account_id: v })}>
                   <SelectTrigger><SelectValue placeholder="Which account receives the borrowed money?" /></SelectTrigger>
-                  <SelectContent>{(accounts.data ?? []).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                  <SelectContent>{(accounts.data ?? []).filter((a) => ["bank","mpesa","cash","sacco"].includes(a.type)).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
                 </Select>
                 <p className="text-[11px] text-muted-foreground">The outstanding balance is credited to this account immediately.</p>
               </div>
@@ -182,7 +182,7 @@ function Debts() {
             <div className="space-y-1.5"><Label>Paid from account</Label>
               <Select value={payAccount} onValueChange={setPayAccount}>
                 <SelectTrigger><SelectValue placeholder="(none — won't affect balances)" /></SelectTrigger>
-                <SelectContent>{(accounts.data ?? []).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                <SelectContent>{(accounts.data ?? []).filter((a) => ["bank","mpesa","cash","sacco"].includes(a.type)).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <Button type="submit" className="w-full">Save payment</Button>
