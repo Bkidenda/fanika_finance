@@ -76,6 +76,24 @@ function Expenses() {
   const willAutosave = isMpesaSource && hasZiidi && autosaveEnabled && autosaveRate > 0 && !skipAutosave;
   const autosaveAmt = willAutosave && Number(amount) > 0 ? Math.round(Number(amount) * autosaveRate) / 100 : 0;
 
+  const paymentAccounts = useMemo(
+    () => (accounts.data ?? []).filter((a) => PAYMENT_TYPES.has(a.type)),
+    [accounts.data]
+  );
+
+  // Auto-select method based on chosen account's type
+  useEffect(() => {
+    if (!selectedAccount) return;
+    const opts = METHODS_BY_TYPE[selectedAccount.type];
+    const def = DEFAULT_METHOD_BY_TYPE[selectedAccount.type];
+    if (opts && !opts.includes(method)) setMethod(def ?? opts[0]);
+  }, [selectedAccount, method]);
+
+  const methodOptions = selectedAccount
+    ? METHODS_BY_TYPE[selectedAccount.type] ?? ALL_METHODS
+    : ALL_METHODS;
+  const methodLocked = selectedAccount?.type === "cash";
+
   function invalidateAll() {
     qc.invalidateQueries({ queryKey: ["expenses"] });
     qc.invalidateQueries({ queryKey: ["expenses-all"] });
