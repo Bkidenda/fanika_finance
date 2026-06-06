@@ -247,7 +247,7 @@ function Expenses() {
               <div className="space-y-1.5"><Label>Account</Label>
                 <Select value={edit.account_id} onValueChange={(v) => setEdit({ ...edit, account_id: v })}>
                   <SelectTrigger><SelectValue placeholder="(none)" /></SelectTrigger>
-                  <SelectContent>{(accounts.data ?? []).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                  <SelectContent>{paymentAccounts.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5"><Label>Description</Label><Input value={edit.description} onChange={(ev) => setEdit({ ...edit, description: ev.target.value })} /></div>
