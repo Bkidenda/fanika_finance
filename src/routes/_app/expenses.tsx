@@ -75,6 +75,7 @@ function Expenses() {
   const autosaveEnabled = !!profile.data?.mpesa_autosave_enabled;
   const willAutosave = isMpesaSource && hasZiidi && autosaveEnabled && autosaveRate > 0 && !skipAutosave;
   const autosaveAmt = willAutosave && Number(amount) > 0 ? Math.round(Number(amount) * autosaveRate) / 100 : 0;
+  // Note: rate is %, so amount*rate/100 already preserves cents.
 
   const paymentAccounts = useMemo(
     () => (accounts.data ?? []).filter((a) => PAYMENT_TYPES.has(a.type)),
