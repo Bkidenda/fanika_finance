@@ -54,7 +54,8 @@ function Dashboard() {
     spendByCat.set(e.category, (spendByCat.get(e.category) ?? 0) + Number(e.amount));
   });
   const totalSpent = Array.from(spendByCat.values()).reduce((s, v) => s + v, 0);
-  const remaining = breakdown.net - breakdown.tithe - breakdown.custom - totalSpent;
+  const totalFees = (expenses.data ?? []).reduce((s, e) => s + Number(e.transaction_fee ?? 0), 0);
+  const remaining = breakdown.net - breakdown.tithe - breakdown.custom - totalSpent - totalFees;
 
   const budgetTotal = (budgets.data ?? []).reduce((s, b) => s + Number(b.limit_amount), 0);
   const savingsRate = breakdown.net > 0 ? Math.max(0, remaining) / breakdown.net : 0;
