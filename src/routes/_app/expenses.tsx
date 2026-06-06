@@ -172,16 +172,19 @@ function Expenses() {
                 </Select>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5"><Label>Account</Label>
+                <div className="space-y-1.5"><Label>Paid from</Label>
                   <Select value={accountId} onValueChange={setAccountId}>
-                    <SelectTrigger><SelectValue placeholder="(none)" /></SelectTrigger>
-                    <SelectContent>{(accounts.data ?? []).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                    <SelectTrigger><SelectValue placeholder="Select account" /></SelectTrigger>
+                    <SelectContent>{paymentAccounts.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
                   </Select>
+                  {paymentAccounts.length === 0 && (
+                    <p className="text-[11px] text-muted-foreground">No payment accounts yet. Add a Bank, M-Pesa, or Cash account.</p>
+                  )}
                 </div>
                 <div className="space-y-1.5"><Label>Method</Label>
-                  <Select value={method} onValueChange={setMethod}>
+                  <Select value={method} onValueChange={setMethod} disabled={methodLocked}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{["Cash", "Card", "M-Pesa", "Bank transfer", "Other"].map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                    <SelectContent>{methodOptions.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
               </div>
