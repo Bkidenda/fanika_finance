@@ -149,6 +149,85 @@ export type Database = {
         }
         Relationships: []
       }
+      child_entries: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string
+          id: string
+          member_id: string
+          note: string | null
+          owner_id: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          created_at?: string
+          id?: string
+          member_id: string
+          note?: string | null
+          owner_id: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          id?: string
+          member_id?: string
+          note?: string | null
+          owner_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_entries_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      child_goals: {
+        Row: {
+          created_at: string
+          current_amount: number
+          id: string
+          member_id: string
+          name: string
+          owner_id: string
+          target_amount: number
+        }
+        Insert: {
+          created_at?: string
+          current_amount?: number
+          id?: string
+          member_id: string
+          name: string
+          owner_id: string
+          target_amount: number
+        }
+        Update: {
+          created_at?: string
+          current_amount?: number
+          id?: string
+          member_id?: string
+          name?: string
+          owner_id?: string
+          target_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_goals_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       debt_payments: {
         Row: {
           account_id: string | null
@@ -436,34 +515,49 @@ export type Database = {
       }
       family_members: {
         Row: {
+          avatar_colour: string | null
           created_at: string
+          email: string | null
           family_id: string
           id: string
           monthly_allowance: number
           name: string
           notes: string | null
+          pocket_money: number
           relationship: string | null
+          role: string | null
           user_id: string
+          visibility: string
         }
         Insert: {
+          avatar_colour?: string | null
           created_at?: string
+          email?: string | null
           family_id: string
           id?: string
           monthly_allowance?: number
           name: string
           notes?: string | null
+          pocket_money?: number
           relationship?: string | null
+          role?: string | null
           user_id: string
+          visibility?: string
         }
         Update: {
+          avatar_colour?: string | null
           created_at?: string
+          email?: string | null
           family_id?: string
           id?: string
           monthly_allowance?: number
           name?: string
           notes?: string | null
+          pocket_money?: number
           relationship?: string | null
+          role?: string | null
           user_id?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -676,6 +770,7 @@ export type Database = {
           currency: string
           display_currency: string
           email: string | null
+          family_plan_enabled: boolean
           full_name: string | null
           id: string
           is_active: boolean
@@ -692,6 +787,7 @@ export type Database = {
           currency?: string
           display_currency?: string
           email?: string | null
+          family_plan_enabled?: boolean
           full_name?: string | null
           id: string
           is_active?: boolean
@@ -708,6 +804,7 @@ export type Database = {
           currency?: string
           display_currency?: string
           email?: string | null
+          family_plan_enabled?: boolean
           full_name?: string | null
           id?: string
           is_active?: boolean

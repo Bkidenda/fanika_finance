@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,10 +11,30 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import { Plus, Trash2, Users, HeartHandshake } from "lucide-react";
+import { Plus, Trash2, Users, HeartHandshake, Crown } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/family")({ component: FamilyPage });
+export const Route = createFileRoute("/_app/family")({ component: FamilyGate });
+
+function FamilyGate() {
+  const profile = useProfile();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (profile.data && !profile.data.family_plan_enabled) {
+      toast.error("Enable Family Plan in settings to access this feature");
+      navigate({ to: "/settings" });
+    }
+  }, [profile.data, navigate]);
+  if (!profile.data?.family_plan_enabled) {
+    return (
+      <div className="rounded-2xl border bg-card p-8 text-center shadow-card">
+        <Crown className="mx-auto h-8 w-8 text-amber-500" />
+        <p className="mt-3 text-sm text-muted-foreground">Family Plan is locked. Redirecting to settings…</p>
+      </div>
+    );
+  }
+  return <FamilyPage />;
+}
 
 const RELATIONSHIPS = ["Parent", "Sibling", "Spouse", "Child", "Extended", "Other"];
 const CONTRIBUTION_CATS = [

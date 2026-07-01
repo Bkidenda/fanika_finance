@@ -16,6 +16,7 @@ export type Profile = {
   is_active: boolean;
   mpesa_autosave_rate: number;
   mpesa_autosave_enabled: boolean;
+  family_plan_enabled: boolean;
 };
 
 export type TithePayment = {
