@@ -1,12 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, Church, Users,
+  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, Church, Crown,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
   SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar,
 } from "@/components/ui/sidebar";
+import { useProfile } from "@/lib/queries";
 
 const overview = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -30,7 +31,6 @@ const wealth = [
   { title: "Accounts", url: "/accounts", icon: Landmark },
   { title: "Investments", url: "/investments", icon: TrendingUp },
   { title: "Goals", url: "/goals", icon: Target },
-  { title: "Family Suite", url: "/family", icon: Users },
   { title: "Stewardship", url: "/stewardship", icon: BookOpen },
 ] as const;
 
@@ -38,6 +38,8 @@ export function AppSidebar() {
   const { state, setOpenMobile, isMobile } = useSidebar();
   const collapsed = !isMobile && state === "collapsed";
   const path = useRouterState({ select: (r) => r.location.pathname });
+  const profile = useProfile();
+  const familyEnabled = !!profile.data?.family_plan_enabled;
 
   const closeAfterNav = () => {
     if (isMobile) setOpenMobile(false);
@@ -82,6 +84,23 @@ export function AppSidebar() {
         {renderGroup("Overview", overview)}
         {renderGroup("Money", money)}
         {renderGroup("Wealth", wealth)}
+        {familyEnabled && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Family</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={path === "/family"}>
+                    <Link to="/family" onClick={closeAfterNav} className="flex items-center gap-3">
+                      <Crown className="h-4 w-4 text-[oklch(0.7_0.15_60)]" />
+                      {!collapsed && <span>Family Hub</span>}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
         <SidebarGroup>
           <SidebarGroupLabel>Account</SidebarGroupLabel>
           <SidebarGroupContent>

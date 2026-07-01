@@ -89,3 +89,98 @@ export function diversificationScore(streams: { amount: number }[]): number {
 
 // Back-compat for any leftover imports
 export const TITHE_RATE = DEFAULT_TITHE_RATE;
+
+// ---------- Financial statement engine ----------
+
+export type IncomeStatementLine = { label: string; amount: number };
+export type IncomeStatement = {
+  period: string;
+  revenue: IncomeStatementLine[];
+  totalRevenue: number;
+  expenses: IncomeStatementLine[];
+  totalExpenses: number;
+  tithe: number;
+  deductions: number;
+  netIncome: number;
+  savingsRate: number;
+};
+
+export function computeIncomeStatement(opts: {
+  period: string;
+  incomeEntries: { amount: number; source?: string }[];
+  expenses: { amount: number; category: string; transaction_fee?: number }[];
+  tithe: number;
+  deductions: number;
+}): IncomeStatement {
+  const revenue = opts.incomeEntries.map((e) => ({ label: e.source ?? "Income", amount: Number(e.amount) }));
+  const totalRevenue = revenue.reduce((s, r) => s + r.amount, 0);
+  const expenseMap = new Map<string, number>();
+  opts.expenses.forEach((e) => {
+    expenseMap.set(e.category, (expenseMap.get(e.category) ?? 0) + Number(e.amount) + Number(e.transaction_fee ?? 0));
+  });
+  const expenses = Array.from(expenseMap.entries()).map(([label, amount]) => ({ label, amount }));
+  const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
+  const netIncome = totalRevenue - totalExpenses - opts.tithe - opts.deductions;
+  const savingsRate = totalRevenue > 0 ? Math.max(0, netIncome) / totalRevenue : 0;
+  return { period: opts.period, revenue, totalRevenue, expenses, totalExpenses, tithe: opts.tithe, deductions: opts.deductions, netIncome, savingsRate };
+}
+
+export type BalanceSheet = {
+  period: string;
+  cashAndBank: number;
+  investments: number;
+  totalAssets: number;
+  totalLiabilities: number;
+  netWorth: number;
+  assetLines: { name: string; amount: number }[];
+  liabilityLines: { name: string; amount: number }[];
+};
+
+export function computeBalanceSheet(opts: {
+  period: string;
+  accounts: { balance: number; name: string }[];
+  investments: { current_value: number; name: string }[];
+  debts: { balance: number; name: string }[];
+}): BalanceSheet {
+  const cashAndBank = opts.accounts.reduce((s, a) => s + Number(a.balance), 0);
+  const investments = opts.investments.reduce((s, i) => s + Number(i.current_value), 0);
+  const totalAssets = cashAndBank + investments;
+  const totalLiabilities = opts.debts.reduce((s, d) => s + Number(d.balance), 0);
+  return {
+    period: opts.period,
+    cashAndBank, investments, totalAssets, totalLiabilities,
+    netWorth: totalAssets - totalLiabilities,
+    assetLines: [
+      ...opts.accounts.map((a) => ({ name: a.name, amount: Number(a.balance) })),
+      ...opts.investments.map((i) => ({ name: i.name, amount: Number(i.current_value) })),
+    ],
+    liabilityLines: opts.debts.map((d) => ({ name: d.name, amount: Number(d.balance) })),
+  };
+}
+
+export type CashFlowStatement = {
+  period: string;
+  operatingInflows: number;
+  operatingOutflows: number;
+  investingOutflows: number;
+  titheAndGiving: number;
+  netCashFlow: number;
+};
+
+export function computeCashFlow(opts: {
+  period: string;
+  totalRevenue: number;
+  totalExpenses: number;
+  investmentContributions: number;
+  tithe: number;
+}): CashFlowStatement {
+  return {
+    period: opts.period,
+    operatingInflows: opts.totalRevenue,
+    operatingOutflows: opts.totalExpenses,
+    investingOutflows: opts.investmentContributions,
+    titheAndGiving: opts.tithe,
+    netCashFlow: opts.totalRevenue - opts.totalExpenses - opts.investmentContributions - opts.tithe,
+  };
+}
+

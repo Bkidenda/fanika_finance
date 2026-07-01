@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { UserCircle, LogOut, ShieldAlert, Eraser, PowerOff, Trash2, HandHeart, Smartphone } from "lucide-react";
+import { UserCircle, LogOut, ShieldAlert, Eraser, PowerOff, Trash2, HandHeart, Smartphone, Crown, Home } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/settings")({ component: ProfilePage });
@@ -36,6 +37,19 @@ function ProfilePage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [busy, setBusy] = useState(false);
+  const [familyOpen, setFamilyOpen] = useState(false);
+  const [enablingFamily, setEnablingFamily] = useState(false);
+  const familyEnabled = !!profile.data?.family_plan_enabled;
+
+  async function enableFamilyPlan() {
+    setEnablingFamily(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await supabase.from("profiles").update({ family_plan_enabled: true } as any).eq("id", user!.id);
+    setEnablingFamily(false);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["profile"] });
+    setFamilyOpen(true);
+  }
 
   const deactivateFn = useServerFn(deactivateAccount);
   const deleteFn = useServerFn(deleteAccount);
@@ -185,6 +199,61 @@ function ProfilePage() {
           <Button variant="outline" onClick={signOut}><LogOut className="mr-1 h-4 w-4" /> Sign out</Button>
         </div>
       </div>
+
+      {/* Family Plan */}
+      <div className="overflow-hidden rounded-2xl border shadow-elevated">
+        <div className="bg-gradient-to-br from-[oklch(0.42_0.11_180)] via-[oklch(0.30_0.09_220)] to-[oklch(0.20_0.06_250)] p-6 text-white">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                <Crown className="h-5 w-5 text-amber-300" />
+              </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-widest opacity-80">Premium</div>
+                <div className="text-lg font-semibold">Family Plan</div>
+              </div>
+            </div>
+            <span className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${familyEnabled ? "bg-emerald-400/20 text-emerald-100" : "bg-white/10 text-white/80"}`}>
+              {familyEnabled ? "Active" : "Locked"}
+            </span>
+          </div>
+          <p className="mt-4 max-w-lg text-sm opacity-90">
+            Steward your household together. Invite your spouse and children, manage pocket money and savings goals, and see a combined household view — with privacy you control.
+          </p>
+          {!familyEnabled ? (
+            <>
+              <ul className="mt-4 grid gap-1.5 text-sm opacity-90 md:grid-cols-2">
+                <li>• Invite spouse and children</li>
+                <li>• Pocket money & child savings goals</li>
+                <li>• Household net worth snapshot</li>
+                <li>• Private-by-default sharing controls</li>
+              </ul>
+              <Button
+                onClick={enableFamilyPlan}
+                disabled={enablingFamily}
+                className="mt-5 bg-white text-[oklch(0.22_0.07_240)] hover:bg-white/90"
+              >
+                <Home className="mr-2 h-4 w-4" /> {enablingFamily ? "Unlocking…" : "Unlock Family Plan"}
+              </Button>
+            </>
+          ) : (
+            <Button asChild className="mt-5 bg-white text-[oklch(0.22_0.07_240)] hover:bg-white/90">
+              <Link to="/family"><Home className="mr-2 h-4 w-4" /> Manage Family</Link>
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <Dialog open={familyOpen} onOpenChange={setFamilyOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Welcome to Family Plan</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">You can now invite your family members and manage your household finances together.</p>
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setFamilyOpen(false)}>Later</Button>
+            <Button asChild onClick={() => setFamilyOpen(false)}><Link to="/family">Open Family Hub</Link></Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 shadow-card">
         <div className="flex items-center gap-2 text-destructive">
