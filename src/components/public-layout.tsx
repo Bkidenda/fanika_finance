@@ -38,9 +38,10 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Floating navbar — links left, CTAs far right */}
-      <header className="fixed inset-x-0 top-4 z-40 px-4">
-        <div className="mx-auto flex w-fit max-w-[min(96vw,72rem)] items-center justify-between gap-6 rounded-full border border-white/20 bg-gradient-to-r from-[oklch(0.45_0.12_180)]/95 via-[oklch(0.52_0.12_175)]/95 to-[oklch(0.58_0.13_185)]/95 px-3 py-2 text-primary-foreground shadow-elevated backdrop-blur-xl ml-auto lg:mr-6">
+      <header className="fixed inset-x-0 top-4 z-40 px-3">
+        <div className="mx-auto flex w-fit max-w-[calc(100vw-1.5rem)] items-center justify-between gap-3 rounded-full border border-white/20 bg-gradient-to-r from-[oklch(0.45_0.12_180)]/95 via-[oklch(0.52_0.12_175)]/95 to-[oklch(0.58_0.13_185)]/95 px-3 py-2 text-primary-foreground shadow-elevated backdrop-blur-xl md:gap-6 md:ml-auto md:mr-6">
           <nav className="hidden items-center gap-1 lg:flex">
+
             {NAV.map((n) => (
               <Link
                 key={n.to}
