@@ -25,7 +25,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-surface">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-surface">
+
       {/* Fixed wordmark, top-left, NOT part of floating pill */}
       <div className="fixed left-6 top-5 z-50">
         <Link to="/" className="flex items-center gap-2 rounded-2xl bg-card/95 px-3 py-2 shadow-card ring-1 ring-border backdrop-blur">
