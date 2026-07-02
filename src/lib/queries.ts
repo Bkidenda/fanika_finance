@@ -33,7 +33,7 @@ export type Deduction = {
   frequency: "monthly" | "annual" | "one_time";
 };
 
-export type Budget = { id: string; category: string; month: string; limit_amount: number };
+export type Budget = { id: string; category: string; month: string; limit_amount: number; is_recurring: boolean; notes: string | null; archived_at: string | null };
 
 export type RecurringBudget = {
   id: string;
@@ -131,12 +131,29 @@ export function useBudgets(month = monthKey()) {
   return useQuery({
     queryKey: ["budgets", user?.id, month], enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase.from("budgets").select("*").eq("month", month).order("category");
+      const { data, error } = await supabase
+        .from("budgets").select("*").eq("month", month)
+        .is("archived_at", null).order("category");
       if (error) throw error;
       return (data ?? []) as Budget[];
     },
   });
 }
+
+// All non-archived budgets across every month; used to seed a new month from prior one.
+export function useAllBudgets() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["budgets-all", user?.id], enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("budgets").select("*").is("archived_at", null).order("month", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Budget[];
+    },
+  });
+}
+
 
 export function useRecurringBudgets() {
   const { user } = useAuth();
