@@ -308,7 +308,7 @@ function EditableAmount({ value, currency, onSave }: { value: number; currency: 
   );
 }
 
-function EditableNotes({ id, value, onSaved }: { id: string; value: string; onSaved: (v: string) => void | Promise<void> }) {
+function EditableNotes({ id, value, onSaved }: { id: string; value: string; onSaved: (v: string) => unknown }) {
   const [v, setV] = useState(value);
   const [editing, setEditing] = useState(false);
   useEffect(() => setV(value), [value]);
