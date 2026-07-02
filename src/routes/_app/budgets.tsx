@@ -280,7 +280,7 @@ function TotalCard({ label, value, tone = "normal" }: { label: string; value: st
   );
 }
 
-function EditableAmount({ value, currency, onSave }: { value: number; currency: string; onSave: (n: number) => void | Promise<void> }) {
+function EditableAmount({ value, currency, onSave }: { value: number; currency: string; onSave: (n: number) => unknown }) {
   const [editing, setEditing] = useState(false);
   const [v, setV] = useState(String(value));
   useEffect(() => setV(String(value)), [value]);
