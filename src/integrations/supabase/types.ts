@@ -124,27 +124,36 @@ export type Database = {
       }
       budgets: {
         Row: {
+          archived_at: string | null
           category: string
           created_at: string
           id: string
+          is_recurring: boolean
           limit_amount: number
           month: string
+          notes: string | null
           user_id: string
         }
         Insert: {
+          archived_at?: string | null
           category: string
           created_at?: string
           id?: string
+          is_recurring?: boolean
           limit_amount?: number
           month: string
+          notes?: string | null
           user_id: string
         }
         Update: {
+          archived_at?: string | null
           category?: string
           created_at?: string
           id?: string
+          is_recurring?: boolean
           limit_amount?: number
           month?: string
+          notes?: string | null
           user_id?: string
         }
         Relationships: []
