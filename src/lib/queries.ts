@@ -33,7 +33,7 @@ export type Deduction = {
   frequency: "monthly" | "annual" | "one_time";
 };
 
-export type Budget = { id: string; category: string; month: string; limit_amount: number };
+export type Budget = { id: string; category: string; month: string; limit_amount: number; is_recurring: boolean; notes: string | null; archived_at: string | null };
 
 export type RecurringBudget = {
   id: string;
