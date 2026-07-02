@@ -54,14 +54,14 @@ function AppLayout() {
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col overflow-x-hidden">
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/80 px-3 backdrop-blur md:px-4">
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="flex min-w-0 items-center gap-2 md:gap-3">
               <SidebarTrigger />
-              <h1 className="text-sm font-semibold">{TITLES[path] ?? "Nuru Steward"}</h1>
+              <h1 className="truncate text-sm font-semibold">{TITLES[path] ?? "Nuru Steward"}</h1>
             </div>
-            <div className="flex items-center gap-1 md:gap-2">
-              <Button asChild variant="ghost" size="sm" className="max-w-[140px] truncate">
+            <div className="flex shrink-0 items-center gap-1 md:gap-2">
+              <Button asChild variant="ghost" size="sm" className="max-w-[120px] truncate">
                 <Link to="/settings">@{handle}</Link>
               </Button>
               <Button variant="ghost" size="icon" onClick={signOut} title="Sign out">
@@ -69,11 +69,12 @@ function AppLayout() {
               </Button>
             </div>
           </header>
-          <main className="flex-1 px-3 pt-4 pb-24 md:px-8 md:pt-6 md:pb-8">
+          <main className="flex-1 overflow-x-hidden px-3 pt-4 pb-24 md:px-8 md:pt-6 md:pb-8">
             <div className="mx-auto w-full max-w-7xl">
               <Outlet />
             </div>
           </main>
+
           <MobileTabBar />
           <AIChatbot />
         </div>
