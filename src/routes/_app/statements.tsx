@@ -21,6 +21,9 @@ import { FileText, Download } from "lucide-react";
 
 export const Route = createFileRoute("/_app/statements")({ component: Statements });
 
+const StatementPdfDownload = lazy(() => import("@/components/statement-pdf-download.client"));
+
+
 function ymdRange(period: string, scope: "month" | "quarter") {
   const [y, m] = period.split("-").map(Number);
   if (scope === "month") {
