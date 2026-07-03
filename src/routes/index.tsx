@@ -9,9 +9,9 @@ const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Nuru Steward — Manage Money with Purpose. Build Wealth with Discipline." },
+      { title: "Fanika — Manage Money with Purpose. Build Wealth with Discipline." },
       { name: "description", content: "Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning — rooted in stewardship." },
-      { property: "og:title", content: "Nuru Steward — Manage Money with Purpose" },
+      { property: "og:title", content: "Fanika — Manage Money with Purpose" },
       { property: "og:description", content: "Personal finance OS for disciplined stewards. Budgets, debts, investments, devotionals." },
       { property: "og:url", content: "https://nurusteward.lovable.app/" },
     ],
@@ -35,7 +35,7 @@ function Home() {
               Build Wealth with <span className="text-gradient-primary">Discipline</span>.
             </h1>
             <p className="mt-4 max-w-xl text-sm text-muted-foreground md:mt-5 md:text-lg">
-              Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning. Nuru Steward helps you make intentional financial decisions rooted in stewardship, accountability, and long-term prosperity.
+              Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning. Fanika helps you make intentional financial decisions rooted in stewardship, accountability, and long-term prosperity.
             </p>
             <p className="mt-3 hidden max-w-xl text-sm text-muted-foreground md:mt-4 md:block">
               Start from your net take-home pay, automate tithes and giving, plan monthly budgets, track spending, manage debts, monitor investments, and stay aligned with your financial goals — all in one place.
@@ -77,7 +77,7 @@ function Home() {
             <div className="relative w-full overflow-hidden rounded-3xl border border-primary/20 bg-background shadow-elevated duration-700 animate-in fade-in zoom-in-95">
               <img
                 src={heroImg}
-                alt="Nuru Steward founder"
+                alt="Fanika founder"
                 loading="eager"
                 decoding="async"
                 className="block h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
@@ -92,7 +92,7 @@ function Home() {
       {/* WHY NURU */}
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-16">
         <div className="text-center">
-          <p className="text-sm font-medium text-primary">Why Nuru Steward?</p>
+          <p className="text-sm font-medium text-primary">Why Fanika?</p>
           <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-4xl">Finance that serves your purpose.</h2>
         </div>
         <div className="mt-8 grid gap-4 md:mt-12 md:gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -141,7 +141,7 @@ function Home() {
           <p className="text-sm font-medium text-primary">About</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight">Stewardship made operational.</h2>
           <div className="prose prose-neutral mt-6 max-w-none text-muted-foreground">
-            <p>Nuru Steward exists for the household that wants to take faithful stewardship seriously — not as a Sunday idea, but as a daily operating system.</p>
+            <p>Fanika exists for the household that wants to take faithful stewardship seriously — not as a Sunday idea, but as a daily operating system.</p>
             <p>We started by asking: what would personal finance look like if tithing wasn't an afterthought, if family obligations were budgeted instead of guessed, and if every shilling — or dollar, or rupee — was visible across every account?</p>
             <p>The answer is what you see here. Budgets that group around how real households actually spend. A monthly close so the past is reconciled before the next month begins. And devotional context, because numbers without wisdom is just spreadsheets.</p>
           </div>

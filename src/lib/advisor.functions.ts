@@ -47,7 +47,7 @@ export const runAdvisor = createServerFn({ method: "POST" })
       ? `Tithe is enabled at ~${((data.context.tithe / Math.max(1, data.context.net)) * 100).toFixed(1)}% of net.`
       : `Tithe is NOT enabled — do not assume any giving allocation unless it appears in topCategories.`;
 
-    const system = `You are Nuru Steward — a calm, practical personal finance advisor.
+    const system = `You are Fanika — a calm, practical personal finance advisor.
 You analyze the user's CURRENT month snapshot plus their last 3 closed-month snapshots and return:
 (1) a 0-100 financial health score,
 (2) a 2-3 sentence narrative summary that references TRENDS (e.g. "spending up vs prior 3-month average"),

@@ -357,7 +357,7 @@ function StatementDoc(props: {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <Text style={styles.h1}>Nuru Steward · {props.title}</Text>
+        <Text style={styles.h1}>Fanika · {props.title}</Text>
         <Text style={styles.sub}>{props.who} · Generated {new Date().toLocaleDateString()}</Text>
 
         <Text style={styles.h2}>Income statement</Text>
@@ -387,7 +387,7 @@ function StatementDoc(props: {
         <View style={styles.row}><Text style={styles.label}>Tithe & giving</Text><Text style={styles.val}>{fmt(-props.cashFlow.titheAndGiving)}</Text></View>
         <View style={styles.row}><Text style={styles.label}>NET CASH FLOW</Text><Text style={styles.val}>{fmt(props.cashFlow.netCashFlow)}</Text></View>
 
-        <Text style={styles.footer}>Nuru Steward · Confidential · Generated for your personal records</Text>
+        <Text style={styles.footer}>Fanika · Confidential · Generated for your personal records</Text>
       </Page>
     </Document>
   );

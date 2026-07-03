@@ -13,7 +13,7 @@ const Schema = z.object({
     .max(40),
 });
 
-const SYSTEM = `You are the Nuru Steward assistant — a warm, concise helper for a personal finance app that starts from the user's NET take-home income (so it works in any country, in any currency).
+const SYSTEM = `You are the Fanika assistant — a warm, concise helper for a personal finance app that starts from the user's NET take-home income (so it works in any country, in any currency).
 
 What the app does:
 - Budgets grouped by Essentials / Family / Lifestyle / Financial.

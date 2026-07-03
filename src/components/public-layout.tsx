@@ -33,7 +33,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary text-primary-foreground">
             <Sprout className="h-4 w-4" />
           </div>
-          <span className="font-semibold tracking-tight">Nuru Steward</span>
+          <span className="font-semibold tracking-tight">Fanika</span>
         </Link>
       </div>
 
@@ -102,7 +102,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <div>
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary"><Sprout className="h-4 w-4 text-primary-foreground" /></div>
-              <span className="font-semibold">Nuru Steward</span>
+              <span className="font-semibold">Fanika</span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">Personal finance, anchored in stewardship.</p>
           </div>
@@ -133,7 +133,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <ContactForm />
           </div>
         </div>
-        <div className="border-t py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Nuru Steward</div>
+        <div className="border-t py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Fanika</div>
       </footer>
       <AIChatbot />
     </div>

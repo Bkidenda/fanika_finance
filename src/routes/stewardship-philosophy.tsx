@@ -6,10 +6,10 @@ import { BookOpen } from "lucide-react";
 export const Route = createFileRoute("/stewardship-philosophy")({
   head: () => ({
     meta: [
-      { title: "Stewardship — Nuru Steward" },
+      { title: "Stewardship — Fanika" },
       { name: "description", content: "Our stewardship philosophy: tithing first, contentment, and faithful planning." },
-      { property: "og:title", content: "Stewardship — Nuru Steward" },
-      { property: "og:description", content: "Tithing first. Contentment. Faithful planning. The philosophy behind Nuru Steward." },
+      { property: "og:title", content: "Stewardship — Fanika" },
+      { property: "og:description", content: "Tithing first. Contentment. Faithful planning. The philosophy behind Fanika." },
     ],
   }),
   component: Philosophy,
@@ -30,7 +30,7 @@ function Philosophy() {
           <BookOpen className="h-4 w-4" /> Stewardship
         </div>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">Money is a trust, not a possession.</h1>
-        <p className="mt-4 text-lg text-muted-foreground">Nuru Steward is built on a stewardship view of finance — drawing on Scripture and the writings of Ellen G. White on faithful management of resources.</p>
+        <p className="mt-4 text-lg text-muted-foreground">Fanika is built on a stewardship view of finance — drawing on Scripture and the writings of Ellen G. White on faithful management of resources.</p>
         <blockquote className="mt-8 rounded-2xl border-l-4 border-primary bg-card p-6 text-base italic shadow-card">
           "Honour the Lord with thy substance, and with the firstfruits of all thine increase."
           <div className="mt-2 text-xs not-italic text-muted-foreground">— Proverbs 3:9</div>

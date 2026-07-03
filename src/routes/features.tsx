@@ -5,10 +5,10 @@ import { Wallet, Landmark, Receipt, TrendingUp, Target, CreditCard, Repeat, Book
 export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
-      { title: "Features — Nuru Steward" },
+      { title: "Features — Fanika" },
       { name: "description", content: "Net-income budgeting, optional automated tithe, recurring budget lines, multi-account net worth, debt planner, AI advisor with monthly history, financial calendar, monthly close, printable statements, devotionals." },
-      { property: "og:title", content: "Features — Nuru Steward" },
-      { property: "og:description", content: "Every module in Nuru Steward, from net-income budgeting to printable statements." },
+      { property: "og:title", content: "Features — Fanika" },
+      { property: "og:description", content: "Every module in Fanika, from net-income budgeting to printable statements." },
     ],
   }),
   component: Features,
@@ -41,7 +41,7 @@ function Features() {
         <div className="max-w-3xl">
           <p className="text-sm font-medium text-primary">Features</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">Every module you need to run a household.</h1>
-          <p className="mt-4 text-lg text-muted-foreground">Nuru Steward is a personal finance OS, not a tracker. Each module connects to the next so your numbers always reconcile — fresh income each month, standing lines carried forward, accounts live, statements printable.</p>
+          <p className="mt-4 text-lg text-muted-foreground">Fanika is a personal finance OS, not a tracker. Each module connects to the next so your numbers always reconcile — fresh income each month, standing lines carried forward, accounts live, statements printable.</p>
         </div>
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {MODULES.map((m) => (

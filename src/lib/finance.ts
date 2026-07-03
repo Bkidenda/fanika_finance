@@ -1,4 +1,4 @@
-// Nuru Steward — multi-country, net-salary based finance engine.
+// Fanika — multi-country, net-salary based finance engine.
 // Starts from NET take-home in any currency. Tithe is OPTIONAL per user.
 
 export type Deduction = {
