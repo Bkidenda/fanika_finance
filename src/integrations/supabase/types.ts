@@ -281,6 +281,7 @@ export type Database = {
           id: string
           interest_rate: number
           kind: string
+          linked_account_id: string | null
           monthly_payment: number
           name: string
           notes: string | null
@@ -298,6 +299,7 @@ export type Database = {
           id?: string
           interest_rate?: number
           kind?: string
+          linked_account_id?: string | null
           monthly_payment?: number
           name: string
           notes?: string | null
@@ -315,6 +317,7 @@ export type Database = {
           id?: string
           interest_rate?: number
           kind?: string
+          linked_account_id?: string | null
           monthly_payment?: number
           name?: string
           notes?: string | null
@@ -322,7 +325,15 @@ export type Database = {
           start_date?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "debts_linked_account_id_fkey"
+            columns: ["linked_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       deductions: {
         Row: {
@@ -465,6 +476,50 @@ export type Database = {
         }
         Relationships: []
       }
+      family_chores: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          member_id: string | null
+          reward: number
+          status: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          member_id?: string | null
+          reward?: number
+          status?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          member_id?: string | null
+          reward?: number
+          status?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_chores_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_contributions: {
         Row: {
           account_id: string | null
@@ -518,6 +573,44 @@ export type Database = {
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_invites: {
+        Row: {
+          created_at: string
+          email: string
+          family_id: string
+          id: string
+          invited_by: string
+          role: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          family_id: string
+          id?: string
+          invited_by: string
+          role?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          family_id?: string
+          id?: string
+          invited_by?: string
+          role?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_invites_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
             referencedColumns: ["id"]
           },
         ]
@@ -775,6 +868,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           currency: string
           display_currency: string
@@ -792,6 +886,7 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           currency?: string
           display_currency?: string
@@ -809,6 +904,7 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           currency?: string
           display_currency?: string
@@ -902,6 +998,7 @@ export type Database = {
           created_at: string
           cycle: string
           id: string
+          last_charged: string | null
           name: string
           next_charge: string | null
           notes: string | null
@@ -915,6 +1012,7 @@ export type Database = {
           created_at?: string
           cycle?: string
           id?: string
+          last_charged?: string | null
           name: string
           next_charge?: string | null
           notes?: string | null
@@ -928,6 +1026,7 @@ export type Database = {
           created_at?: string
           cycle?: string
           id?: string
+          last_charged?: string | null
           name?: string
           next_charge?: string | null
           notes?: string | null
