@@ -58,7 +58,7 @@ function AppLayout() {
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/80 px-3 backdrop-blur md:px-4">
             <div className="flex min-w-0 items-center gap-2 md:gap-3">
               <SidebarTrigger />
-              <h1 className="truncate text-sm font-semibold">{TITLES[path] ?? "Nuru Steward"}</h1>
+              <h1 className="truncate text-sm font-semibold">{TITLES[path] ?? "Fanika"}</h1>
             </div>
             <div className="flex shrink-0 items-center gap-1 md:gap-2">
               <Button asChild variant="ghost" size="sm" className="max-w-[120px] truncate">

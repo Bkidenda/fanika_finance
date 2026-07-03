@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 type Msg = { role: "user" | "assistant"; content: string };
 
 const SUGGESTIONS = [
-  "How does Nuru Steward work?",
+  "How does Fanika work?",
   "How do I close a month?",
   "Why does the system start from net income?",
   "How is tithe calculated?",
@@ -14,7 +14,7 @@ const SUGGESTIONS = [
 export function AIChatbot() {
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([
-    { role: "assistant", content: "Hi! I'm the Nuru Steward assistant. Ask me anything about budgeting, tithing, debts, or how to use the app." },
+    { role: "assistant", content: "Hi! I'm the Fanika assistant. Ask me anything about budgeting, tithing, debts, or how to use the app." },
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);

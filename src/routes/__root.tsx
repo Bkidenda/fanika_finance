@@ -49,14 +49,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Nuru Steward — Intelligent Personal Finance" },
+      { title: "Fanika — Intelligent Personal Finance" },
       {
         name: "description",
         content:
           "Stewardship-first personal finance OS: budgets, expenses, investments, tithes, and devotional insight.",
       },
-      { property: "og:title", content: "Nuru Steward — Intelligent Personal Finance" },
-      { name: "twitter:title", content: "Nuru Steward — Intelligent Personal Finance" },
+      { property: "og:title", content: "Fanika — Intelligent Personal Finance" },
+      { name: "twitter:title", content: "Fanika — Intelligent Personal Finance" },
       { name: "description", content: "Your personal finance operating system" },
       { property: "og:description", content: "Your personal finance operating system" },
       { name: "twitter:description", content: "Your personal finance operating system" },

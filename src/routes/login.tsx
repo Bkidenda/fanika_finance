@@ -48,7 +48,7 @@ function Login() {
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary shadow-card">
             <Sprout className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="font-semibold">Nuru Steward</span>
+          <span className="font-semibold">Fanika</span>
         </Link>
         <h1 className="mt-6 text-2xl font-semibold tracking-tight">Welcome back</h1>
         <p className="mt-1 text-sm text-muted-foreground">Sign in to your stewardship dashboard.</p>

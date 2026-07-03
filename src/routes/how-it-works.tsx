@@ -6,10 +6,10 @@ import { ArrowRight } from "lucide-react";
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How it works — Nuru Steward" },
-      { name: "description", content: "Five steps to a fully reconciled financial life with Nuru Steward — set up, plan each month, log day-to-day, close and reconcile, repeat." },
-      { property: "og:title", content: "How it works — Nuru Steward" },
-      { property: "og:description", content: "Set up, plan monthly, log daily, close and reconcile — the Nuru Steward rhythm." },
+      { title: "How it works — Fanika" },
+      { name: "description", content: "Five steps to a fully reconciled financial life with Fanika — set up, plan each month, log day-to-day, close and reconcile, repeat." },
+      { property: "og:title", content: "How it works — Fanika" },
+      { property: "og:description", content: "Set up, plan monthly, log daily, close and reconcile — the Fanika rhythm." },
     ],
   }),
   component: HowItWorks,

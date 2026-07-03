@@ -9,7 +9,7 @@ const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Nuru Steward" },
+      { title: "Pricing — Fanika" },
       { name: "description", content: "Three simple tiers. Start free, upgrade for AI advisory and family-scale stewardship." },
     ],
   }),

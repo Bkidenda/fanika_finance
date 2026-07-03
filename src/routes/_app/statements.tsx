@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
+
 import {
   useProfile, useAccounts, useInvestments, useDebts, useSubscriptions,
   useIncomeEntries, useExpenses, useDeductions,
@@ -20,6 +20,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { FileText, Download } from "lucide-react";
 
 export const Route = createFileRoute("/_app/statements")({ component: Statements });
+
+const StatementPdfDownload = lazy(() => import("@/components/statement-pdf-download.client"));
+
 
 function ymdRange(period: string, scope: "month" | "quarter") {
   const [y, m] = period.split("-").map(Number);
@@ -53,6 +56,9 @@ function Statements() {
   const [period, setPeriod] = useState(defaultPeriod);
   const [scope, setScope] = useState<"month" | "quarter">("month");
   const [tab, setTab] = useState<"income" | "balance" | "cash">("income");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
 
   const range = useMemo(() => ymdRange(period, scope), [period, scope]);
 
@@ -189,26 +195,24 @@ function Statements() {
             <input type="month" value={period} onChange={(e) => setPeriod(e.target.value)} className="h-9 w-full rounded-md border bg-background px-3 text-sm" />
           </div>
           <div className="flex items-end">
-            <PDFDownloadLink
-              fileName={filenamePdf}
-              document={
-                <StatementDoc
+            {mounted ? (
+              <Suspense fallback={<Button className="w-full" disabled><Download className="mr-1 h-4 w-4" />Preparing PDF…</Button>}>
+                <StatementPdfDownload
+                  fileName={filenamePdf}
                   title={`${scope === "month" ? "Monthly" : "Quarterly"} statement — ${range.label}`}
                   who={profile.data?.full_name || profile.data?.email || "Account holder"}
                   currency={currency}
                   income={incomeStatement}
                   balance={balanceSheet}
                   cashFlow={cashFlow}
+                  disabled={data.isLoading}
                 />
-              }
-            >
-              {({ loading }) => (
-                <Button className="w-full" disabled={loading || data.isLoading}>
-                  <Download className="mr-1 h-4 w-4" />{loading ? "Preparing PDF…" : "Download PDF"}
-                </Button>
-              )}
-            </PDFDownloadLink>
+              </Suspense>
+            ) : (
+              <Button className="w-full" disabled><Download className="mr-1 h-4 w-4" />Preparing PDF…</Button>
+            )}
           </div>
+
         </div>
       </div>
 
@@ -333,62 +337,3 @@ function Row({ label, value, positive, negative }: { label: string; value: strin
   );
 }
 
-// ---------- PDF document ----------
-const styles = StyleSheet.create({
-  page: { padding: 36, fontSize: 10, fontFamily: "Helvetica", color: "#0f172a" },
-  h1: { fontSize: 18, fontWeight: 700, marginBottom: 2 },
-  sub: { fontSize: 10, color: "#64748b", marginBottom: 16 },
-  h2: { fontSize: 12, fontWeight: 700, marginTop: 14, marginBottom: 6, color: "#0e9488" },
-  row: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 3, borderBottom: 1, borderColor: "#e2e8f0" },
-  label: { color: "#475569" },
-  val: { fontWeight: 700 },
-  footer: { position: "absolute", bottom: 24, left: 36, right: 36, fontSize: 8, color: "#94a3b8", textAlign: "center" },
-});
-
-function StatementDoc(props: {
-  title: string;
-  who: string;
-  currency: string;
-  income: ReturnType<typeof computeIncomeStatement>;
-  balance: ReturnType<typeof computeBalanceSheet>;
-  cashFlow: ReturnType<typeof computeCashFlow>;
-}) {
-  const fmt = (n: number) => `${props.currency} ${Math.round(n).toLocaleString()}`;
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.h1}>Nuru Steward · {props.title}</Text>
-        <Text style={styles.sub}>{props.who} · Generated {new Date().toLocaleDateString()}</Text>
-
-        <Text style={styles.h2}>Income statement</Text>
-        {props.income.revenue.map((r, i) => (
-          <View key={`r-${i}`} style={styles.row}><Text style={styles.label}>{r.label}</Text><Text style={styles.val}>{fmt(r.amount)}</Text></View>
-        ))}
-        <View style={styles.row}><Text style={styles.label}>Total revenue</Text><Text style={styles.val}>{fmt(props.income.totalRevenue)}</Text></View>
-        {props.income.expenses.map((r, i) => (
-          <View key={`e-${i}`} style={styles.row}><Text style={styles.label}>{r.label}</Text><Text style={styles.val}>{fmt(r.amount)}</Text></View>
-        ))}
-        <View style={styles.row}><Text style={styles.label}>Total expenses</Text><Text style={styles.val}>{fmt(props.income.totalExpenses)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Tithe & giving</Text><Text style={styles.val}>{fmt(props.income.tithe)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Custom deductions</Text><Text style={styles.val}>{fmt(props.income.deductions)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>NET INCOME</Text><Text style={styles.val}>{fmt(props.income.netIncome)}</Text></View>
-
-        <Text style={styles.h2}>Balance sheet</Text>
-        <View style={styles.row}><Text style={styles.label}>Cash & bank</Text><Text style={styles.val}>{fmt(props.balance.cashAndBank)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Investments</Text><Text style={styles.val}>{fmt(props.balance.investments)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Total assets</Text><Text style={styles.val}>{fmt(props.balance.totalAssets)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Total liabilities</Text><Text style={styles.val}>{fmt(props.balance.totalLiabilities)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>NET WORTH</Text><Text style={styles.val}>{fmt(props.balance.netWorth)}</Text></View>
-
-        <Text style={styles.h2}>Cash flow</Text>
-        <View style={styles.row}><Text style={styles.label}>Operating inflows</Text><Text style={styles.val}>{fmt(props.cashFlow.operatingInflows)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Operating outflows</Text><Text style={styles.val}>{fmt(-props.cashFlow.operatingOutflows)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Investing outflows</Text><Text style={styles.val}>{fmt(-props.cashFlow.investingOutflows)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Tithe & giving</Text><Text style={styles.val}>{fmt(-props.cashFlow.titheAndGiving)}</Text></View>
-        <View style={styles.row}><Text style={styles.label}>NET CASH FLOW</Text><Text style={styles.val}>{fmt(props.cashFlow.netCashFlow)}</Text></View>
-
-        <Text style={styles.footer}>Nuru Steward · Confidential · Generated for your personal records</Text>
-      </Page>
-    </Document>
-  );
-}
