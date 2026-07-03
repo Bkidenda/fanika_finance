@@ -56,6 +56,9 @@ function Statements() {
   const [period, setPeriod] = useState(defaultPeriod);
   const [scope, setScope] = useState<"month" | "quarter">("month");
   const [tab, setTab] = useState<"income" | "balance" | "cash">("income");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
 
   const range = useMemo(() => ymdRange(period, scope), [period, scope]);
 
