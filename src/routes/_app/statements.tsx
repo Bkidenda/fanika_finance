@@ -189,26 +189,24 @@ function Statements() {
             <input type="month" value={period} onChange={(e) => setPeriod(e.target.value)} className="h-9 w-full rounded-md border bg-background px-3 text-sm" />
           </div>
           <div className="flex items-end">
-            <PDFDownloadLink
-              fileName={filenamePdf}
-              document={
-                <StatementDoc
+            {mounted ? (
+              <Suspense fallback={<Button className="w-full" disabled><Download className="mr-1 h-4 w-4" />Preparing PDF…</Button>}>
+                <StatementPdfDownload
+                  fileName={filenamePdf}
                   title={`${scope === "month" ? "Monthly" : "Quarterly"} statement — ${range.label}`}
                   who={profile.data?.full_name || profile.data?.email || "Account holder"}
                   currency={currency}
                   income={incomeStatement}
                   balance={balanceSheet}
                   cashFlow={cashFlow}
+                  disabled={data.isLoading}
                 />
-              }
-            >
-              {({ loading }) => (
-                <Button className="w-full" disabled={loading || data.isLoading}>
-                  <Download className="mr-1 h-4 w-4" />{loading ? "Preparing PDF…" : "Download PDF"}
-                </Button>
-              )}
-            </PDFDownloadLink>
+              </Suspense>
+            ) : (
+              <Button className="w-full" disabled><Download className="mr-1 h-4 w-4" />Preparing PDF…</Button>
+            )}
           </div>
+
         </div>
       </div>
 
