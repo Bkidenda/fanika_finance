@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
+
 import {
   useProfile, useAccounts, useInvestments, useDebts, useSubscriptions,
   useIncomeEntries, useExpenses, useDeductions,
