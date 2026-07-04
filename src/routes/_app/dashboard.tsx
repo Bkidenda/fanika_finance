@@ -77,7 +77,9 @@ function Dashboard() {
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 8);
 
-  const COLORS = ["#0e9488", "#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#ec4899", "#14b8a6", "#64748b"];
+  // Calm brown/caramel palette (no greens)
+  const COLORS = ["#5c3a1e", "#8a5a35", "#a06c3a", "#c4956b", "#d4a574", "#b8845c", "#8a7a5a", "#6b4a2e"];
+
 
   async function handleClose(p: string) {
     setClosing(true);
