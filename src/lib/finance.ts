@@ -170,7 +170,11 @@ export type CashFlowStatement = {
   period: string;
   operatingInflows: number;
   operatingOutflows: number;
+  netOperating: number;
   investingOutflows: number;
+  netInvesting: number;
+  financingOutflows: number;
+  netFinancing: number;
   titheAndGiving: number;
   netCashFlow: number;
 };
@@ -181,14 +185,24 @@ export function computeCashFlow(opts: {
   totalExpenses: number;
   investmentContributions: number;
   tithe: number;
+  debtPrincipalPayments?: number;
 }): CashFlowStatement {
+  const financing = opts.debtPrincipalPayments ?? 0;
+  const netOperating = opts.totalRevenue - opts.totalExpenses - opts.tithe;
+  const netInvesting = -opts.investmentContributions;
+  const netFinancing = -financing;
   return {
     period: opts.period,
     operatingInflows: opts.totalRevenue,
     operatingOutflows: opts.totalExpenses,
+    netOperating,
     investingOutflows: opts.investmentContributions,
+    netInvesting,
+    financingOutflows: financing,
+    netFinancing,
     titheAndGiving: opts.tithe,
-    netCashFlow: opts.totalRevenue - opts.totalExpenses - opts.investmentContributions - opts.tithe,
+    netCashFlow: netOperating + netInvesting + netFinancing,
   };
 }
+
 
