@@ -178,11 +178,11 @@ function Dashboard() {
         <div className="mt-4 grid grid-cols-3 gap-3">
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">Assets</div>
-            <div className="mt-0.5 text-base font-semibold tabular-nums text-emerald-600 md:text-xl">{formatCurrency(nw.assets, currency)}</div>
+            <div className="mt-0.5 text-base font-semibold tabular-nums text-primary md:text-xl">{formatCurrency(nw.assets, currency)}</div>
           </div>
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">Liabilities</div>
-            <div className="mt-0.5 text-base font-semibold tabular-nums text-rose-600 md:text-xl">{formatCurrency(nw.liabilities, currency)}</div>
+            <div className="mt-0.5 text-base font-semibold tabular-nums text-[oklch(0.5_0.12_35)] md:text-xl">{formatCurrency(nw.liabilities, currency)}</div>
           </div>
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">Net worth</div>
@@ -195,14 +195,15 @@ function Dashboard() {
           const liabPct = (nw.liabilities / total) * 100;
           return (
             <div className="mt-4 flex h-2.5 w-full overflow-hidden rounded-full bg-secondary">
-              <div className="h-full bg-[oklch(0.55_0.15_175)]" style={{ width: `${assetPct}%` }} />
-              <div className="h-full bg-rose-500" style={{ width: `${liabPct}%` }} />
+              <div className="h-full bg-[oklch(0.42_0.08_55)]" style={{ width: `${assetPct}%` }} />
+              <div className="h-full bg-[oklch(0.68_0.11_65)]" style={{ width: `${liabPct}%` }} />
             </div>
           );
         })()}
-        <p className={`mt-3 text-xs font-medium ${nw.net >= 0 ? "text-emerald-700" : "text-amber-700"}`}>
+        <p className={`mt-3 text-xs font-medium ${nw.net >= 0 ? "text-primary" : "text-[oklch(0.5_0.12_35)]"}`}>
           {nw.net >= 0 ? "You own more than you owe. Keep building." : "Your liabilities exceed your assets. Focus on debt reduction."}
         </p>
+
       </div>
 
       {(accounts.data?.length ?? 0) > 0 && (
