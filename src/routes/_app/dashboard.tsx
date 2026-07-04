@@ -298,11 +298,12 @@ function Dashboard() {
             {categorySpend.length ? (
               <ResponsiveContainer>
                 <BarChart data={categorySpend}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(0.92 0.012 230)" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(0.9 0.02 70)" />
                   <XAxis dataKey="category" tick={{ fontSize: 11 }} interval={0} angle={-20} textAnchor="end" height={60} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
-                  <Bar dataKey="amount" fill="oklch(0.52 0.12 175)" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="amount" fill="oklch(0.42 0.08 55)" radius={[6, 6, 0, 0]} />
+
                 </BarChart>
               </ResponsiveContainer>
             ) : <EmptyState label="No expenses logged" to="/expenses" cta="Add expenses" />}
