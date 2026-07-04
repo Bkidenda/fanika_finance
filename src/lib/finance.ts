@@ -131,9 +131,12 @@ export type BalanceSheet = {
   investments: number;
   totalAssets: number;
   totalLiabilities: number;
+  totalEquity: number;
   netWorth: number;
+  totalLiabilitiesAndEquity: number;
   assetLines: { name: string; amount: number }[];
   liabilityLines: { name: string; amount: number }[];
+  equityLines: { name: string; amount: number }[];
 };
 
 export function computeBalanceSheet(opts: {
@@ -146,23 +149,32 @@ export function computeBalanceSheet(opts: {
   const investments = opts.investments.reduce((s, i) => s + Number(i.current_value), 0);
   const totalAssets = cashAndBank + investments;
   const totalLiabilities = opts.debts.reduce((s, d) => s + Number(d.balance), 0);
+  // Owner's equity is the residual so that A = L + E always balances.
+  const totalEquity = totalAssets - totalLiabilities;
   return {
     period: opts.period,
-    cashAndBank, investments, totalAssets, totalLiabilities,
-    netWorth: totalAssets - totalLiabilities,
+    cashAndBank, investments, totalAssets, totalLiabilities, totalEquity,
+    netWorth: totalEquity,
+    totalLiabilitiesAndEquity: totalLiabilities + totalEquity,
     assetLines: [
       ...opts.accounts.map((a) => ({ name: a.name, amount: Number(a.balance) })),
       ...opts.investments.map((i) => ({ name: i.name, amount: Number(i.current_value) })),
     ],
     liabilityLines: opts.debts.map((d) => ({ name: d.name, amount: Number(d.balance) })),
+    equityLines: [{ name: "Owner's equity (retained)", amount: totalEquity }],
   };
 }
+
 
 export type CashFlowStatement = {
   period: string;
   operatingInflows: number;
   operatingOutflows: number;
+  netOperating: number;
   investingOutflows: number;
+  netInvesting: number;
+  financingOutflows: number;
+  netFinancing: number;
   titheAndGiving: number;
   netCashFlow: number;
 };
@@ -173,14 +185,24 @@ export function computeCashFlow(opts: {
   totalExpenses: number;
   investmentContributions: number;
   tithe: number;
+  debtPrincipalPayments?: number;
 }): CashFlowStatement {
+  const financing = opts.debtPrincipalPayments ?? 0;
+  const netOperating = opts.totalRevenue - opts.totalExpenses - opts.tithe;
+  const netInvesting = -opts.investmentContributions;
+  const netFinancing = -financing;
   return {
     period: opts.period,
     operatingInflows: opts.totalRevenue,
     operatingOutflows: opts.totalExpenses,
+    netOperating,
     investingOutflows: opts.investmentContributions,
+    netInvesting,
+    financingOutflows: financing,
+    netFinancing,
     titheAndGiving: opts.tithe,
-    netCashFlow: opts.totalRevenue - opts.totalExpenses - opts.investmentContributions - opts.tithe,
+    netCashFlow: netOperating + netInvesting + netFinancing,
   };
 }
+
 

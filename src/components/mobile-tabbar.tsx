@@ -15,9 +15,10 @@ const TABS: readonly Tab[] = [
 ];
 
 const ACTIONS = [
-  { to: "/income-entries", label: "Add Income", icon: ArrowDownRight, color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
-  { to: "/expenses", label: "Add Expense", icon: ArrowUpRight, color: "bg-rose-500/15 text-rose-400 border-rose-500/30" },
-  { to: "/goals", label: "Update Goal", icon: Target, color: "bg-amber-500/15 text-amber-400 border-amber-500/30" },
+  { to: "/income-entries", label: "Add Income", icon: ArrowDownRight, color: "bg-[oklch(0.55_0.09_55)]/20 text-[oklch(0.85_0.06_65)] border-[oklch(0.55_0.09_55)]/40" },
+  { to: "/expenses", label: "Add Expense", icon: ArrowUpRight, color: "bg-[oklch(0.58_0.15_35)]/20 text-[oklch(0.82_0.10_45)] border-[oklch(0.58_0.15_35)]/40" },
+  { to: "/goals", label: "Update Goal", icon: Target, color: "bg-[oklch(0.68_0.12_60)]/20 text-[oklch(0.88_0.08_65)] border-[oklch(0.68_0.12_60)]/40" },
+
   { to: "/investments", label: "Log Investment", icon: TrendingUp, color: "bg-indigo-500/15 text-indigo-400 border-indigo-500/30" },
   { to: "/debts", label: "Log Payment", icon: CreditCard, color: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
   { to: "/statements", label: "Statements", icon: FileText, color: "bg-purple-500/15 text-purple-400 border-purple-500/30" },

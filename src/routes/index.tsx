@@ -61,12 +61,13 @@ function Home() {
 
           <div className="relative">
             <div aria-hidden className="pointer-events-none absolute -left-8 -top-8 h-24 w-24 rounded-3xl bg-gradient-primary opacity-25 blur-2xl animate-pulse" />
-            <div aria-hidden className="pointer-events-none absolute -right-6 top-16 h-28 w-28 rounded-full bg-[oklch(0.72_0.14_175)] opacity-30 blur-3xl animate-pulse [animation-delay:600ms]" />
-            <div aria-hidden className="pointer-events-none absolute -bottom-6 right-12 h-32 w-32 rounded-3xl bg-[oklch(0.78_0.15_75)] opacity-25 blur-3xl animate-pulse [animation-delay:1200ms]" />
+            <div aria-hidden className="pointer-events-none absolute -right-6 top-16 h-28 w-28 rounded-full bg-[oklch(0.68_0.12_60)] opacity-30 blur-3xl animate-pulse [animation-delay:600ms]" />
+            <div aria-hidden className="pointer-events-none absolute -bottom-6 right-12 h-32 w-32 rounded-3xl bg-[oklch(0.78_0.10_65)] opacity-25 blur-3xl animate-pulse [animation-delay:1200ms]" />
 
             {/* Floating chips */}
             <div className="pointer-events-none absolute -right-3 top-20 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-200 duration-700 animate-in fade-in slide-in-from-right-4 md:block">
-              <div className="flex items-center gap-1.5"><TrendingUp className="h-3 w-3 text-success" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Net worth</span></div>
+              <div className="flex items-center gap-1.5"><TrendingUp className="h-3 w-3 text-primary" /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Net worth</span></div>
+
               <div className="text-sm font-semibold tabular-nums">+12.4%</div>
             </div>
             <div className="pointer-events-none absolute -left-2 bottom-12 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-500 duration-700 animate-in fade-in slide-in-from-bottom-4 md:block">

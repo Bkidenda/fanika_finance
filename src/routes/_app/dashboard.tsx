@@ -77,7 +77,9 @@ function Dashboard() {
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 8);
 
-  const COLORS = ["#0e9488", "#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#ec4899", "#14b8a6", "#64748b"];
+  // Calm brown/caramel palette (no greens)
+  const COLORS = ["#5c3a1e", "#8a5a35", "#a06c3a", "#c4956b", "#d4a574", "#b8845c", "#8a7a5a", "#6b4a2e"];
+
 
   async function handleClose(p: string) {
     setClosing(true);
@@ -121,7 +123,7 @@ function Dashboard() {
 
       {/* Close-previous-month nudge */}
       {prevHasActivity && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent/50 bg-accent/20 p-4 text-sm text-accent-foreground">
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4" />
             <div>
@@ -176,11 +178,11 @@ function Dashboard() {
         <div className="mt-4 grid grid-cols-3 gap-3">
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">Assets</div>
-            <div className="mt-0.5 text-base font-semibold tabular-nums text-emerald-600 md:text-xl">{formatCurrency(nw.assets, currency)}</div>
+            <div className="mt-0.5 text-base font-semibold tabular-nums text-primary md:text-xl">{formatCurrency(nw.assets, currency)}</div>
           </div>
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">Liabilities</div>
-            <div className="mt-0.5 text-base font-semibold tabular-nums text-rose-600 md:text-xl">{formatCurrency(nw.liabilities, currency)}</div>
+            <div className="mt-0.5 text-base font-semibold tabular-nums text-[oklch(0.5_0.12_35)] md:text-xl">{formatCurrency(nw.liabilities, currency)}</div>
           </div>
           <div>
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">Net worth</div>
@@ -193,14 +195,15 @@ function Dashboard() {
           const liabPct = (nw.liabilities / total) * 100;
           return (
             <div className="mt-4 flex h-2.5 w-full overflow-hidden rounded-full bg-secondary">
-              <div className="h-full bg-[oklch(0.55_0.15_175)]" style={{ width: `${assetPct}%` }} />
-              <div className="h-full bg-rose-500" style={{ width: `${liabPct}%` }} />
+              <div className="h-full bg-[oklch(0.42_0.08_55)]" style={{ width: `${assetPct}%` }} />
+              <div className="h-full bg-[oklch(0.68_0.11_65)]" style={{ width: `${liabPct}%` }} />
             </div>
           );
         })()}
-        <p className={`mt-3 text-xs font-medium ${nw.net >= 0 ? "text-emerald-700" : "text-amber-700"}`}>
+        <p className={`mt-3 text-xs font-medium ${nw.net >= 0 ? "text-primary" : "text-[oklch(0.5_0.12_35)]"}`}>
           {nw.net >= 0 ? "You own more than you owe. Keep building." : "Your liabilities exceed your assets. Focus on debt reduction."}
         </p>
+
       </div>
 
       {(accounts.data?.length ?? 0) > 0 && (
@@ -295,11 +298,12 @@ function Dashboard() {
             {categorySpend.length ? (
               <ResponsiveContainer>
                 <BarChart data={categorySpend}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(0.92 0.012 230)" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(0.9 0.02 70)" />
                   <XAxis dataKey="category" tick={{ fontSize: 11 }} interval={0} angle={-20} textAnchor="end" height={60} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
-                  <Bar dataKey="amount" fill="oklch(0.52 0.12 175)" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="amount" fill="oklch(0.42 0.08 55)" radius={[6, 6, 0, 0]} />
+
                 </BarChart>
               </ResponsiveContainer>
             ) : <EmptyState label="No expenses logged" to="/expenses" cta="Add expenses" />}
