@@ -107,13 +107,16 @@ function Statements() {
 
   const investingOutflows = (rawExpenses.filter((e) => e.category === "Investments" || e.category === "Savings"))
     .reduce((s, e) => s + Number(e.amount), 0);
+  const debtPrincipalPayments = (data.data?.debtPayments ?? []).reduce((s, p) => s + Number(p.amount), 0);
   const cashFlow = computeCashFlow({
     period: range.label,
     totalRevenue,
     totalExpenses: incomeStatement.totalExpenses,
     investmentContributions: investingOutflows,
     tithe: breakdown.tithe,
+    debtPrincipalPayments,
   });
+
 
   const nw = computeNetWorth({
     accounts: accounts.data ?? [],
