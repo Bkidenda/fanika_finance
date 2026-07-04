@@ -411,12 +411,33 @@ function TotalRow({ label, value, accent }: { label: string; value: string; acce
   );
 }
 
-function Row({ label, value, positive, negative }: { label: string; value: string; positive?: boolean; negative?: boolean }) {
+function SubtotalRow({ label, value, accent, className = "" }: { label: string; value: string; accent?: boolean; className?: string }) {
   return (
-    <div className="flex justify-between border-b py-2">
-      <span>{label}</span>
-      <span className={`tabular-nums font-medium ${positive ? "text-emerald-600" : ""} ${negative ? "text-rose-600" : ""}`}>{value}</span>
+    <div className={`mt-1 flex justify-between border-t-2 px-2 py-2 text-sm font-semibold ${accent ? "border-primary/40 bg-secondary/60 text-primary" : "border-border/60"} ${className}`}>
+      <span className="uppercase tracking-wide">{label}</span>
+      <span className="tabular-nums">{value}</span>
     </div>
   );
 }
+
+function StatementHeader({ entity, title, period, currency }: { entity: string; title: string; period: string; currency: string }) {
+  return (
+    <div className="border-b-2 border-primary/30 pb-3 text-center">
+      <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{entity}</div>
+      <div className="mt-1 text-lg font-bold uppercase tracking-wide text-primary md:text-xl">{title}</div>
+      <div className="mt-0.5 text-xs text-muted-foreground">{period}</div>
+      <div className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">All amounts in {currency}</div>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string; positive?: boolean; negative?: boolean }) {
+  return (
+    <div className="flex justify-between border-b py-2 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="tabular-nums font-medium">{value}</span>
+    </div>
+  );
+}
+
 
