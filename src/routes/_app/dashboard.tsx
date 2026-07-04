@@ -123,7 +123,7 @@ function Dashboard() {
 
       {/* Close-previous-month nudge */}
       {prevHasActivity && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent/50 bg-accent/20 p-4 text-sm text-accent-foreground">
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4" />
             <div>
