@@ -194,7 +194,7 @@ function Budgets() {
       <div className="rounded-2xl border bg-card p-4 shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
           <span className="text-muted-foreground">Variance (Budget − Actual)</span>
-          <span className={`tabular-nums font-semibold ${variance < 0 ? "text-destructive" : "text-emerald-600"}`}>
+          <span className={`tabular-nums font-semibold ${variance < 0 ? "text-destructive" : "text-primary"}`}>
             {variance >= 0 ? "+" : "−"}{formatCurrency(Math.abs(variance), currency)}
           </span>
         </div>
