@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark, Sparkles, Calendar, Eye, HandHeart, Bot, Target } from "lucide-react";
 import { PublicLayout } from "@/components/public-layout";
+import { useAuth } from "@/hooks/use-auth";
 import heroImg from "@/assets/hero-dashboard.jpg";
 
 const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
@@ -21,6 +23,20 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (loading) return;
+    const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+    if (!isMobile) return;
+    if (user) {
+      navigate({ to: "/dashboard", replace: true });
+    } else if (typeof window !== "undefined" && window.localStorage.getItem("fanika:has_account") === "1") {
+      navigate({ to: "/login", replace: true });
+    }
+  }, [user, loading, navigate]);
+
   return (
     <PublicLayout>
       {/* HERO */}
