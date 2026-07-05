@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark, Sparkles, Calendar, Eye, HandHeart, Bot, Target } from "lucide-react";
 import { PublicLayout } from "@/components/public-layout";
-import heroImg from "@/assets/founder-portrait.jpg";
+import heroImg from "@/assets/hero-dashboard.jpg";
 
 const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
@@ -77,13 +77,12 @@ function Home() {
 
             <div className="relative w-full overflow-hidden rounded-3xl border border-primary/20 bg-background shadow-elevated duration-700 animate-in fade-in zoom-in-95">
               <img
-                src={heroImg}
-                alt="Fanika founder"
+              src={heroImg}
+                alt="Fanika dashboard preview"
                 loading="eager"
                 decoding="async"
                 className="block h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
               />
-              {/* Hero image already shows the founder holding a dashboard tablet — no overlay needed. */}
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/0 to-primary/5" />
             </div>
           </div>
