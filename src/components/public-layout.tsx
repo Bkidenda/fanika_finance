@@ -145,8 +145,8 @@ function ContactForm() {
   const [msg, setMsg] = useState("");
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const body = `Hi Brian,%0D%0A%0D%0A${encodeURIComponent(msg)}%0D%0A%0D%0A— ${encodeURIComponent(name || "Nuru visitor")}`;
-    window.location.href = `mailto:${EMAIL}?subject=Question%20from%20Nuru%20Steward&body=${body}`;
+    const body = `Hi Brian,%0D%0A%0D%0A${encodeURIComponent(msg)}%0D%0A%0D%0A— ${encodeURIComponent(name || "Fanika visitor")}`;
+    window.location.href = `mailto:${EMAIL}?subject=Question%20from%20Fanika&body=${body}`;
   }
   return (
     <form onSubmit={submit} className="mt-4 space-y-2">
