@@ -34,7 +34,7 @@ const STEPS = [
   {
     n: "04",
     t: "Close the month — next month auto-opens",
-    d: "At month end, hit Close month. Nuru generates a reconciliation snapshot (income, expenses, savings rate, debt paid, tithe, net worth) and immediately opens the next month with your recurring lines pre-seeded so you can budget before the 1st. If you try to plan the next month while the current one is still open, you'll be prompted to close it first.",
+    d: "At month end, hit Close month. Fanika generates a reconciliation snapshot (income, expenses, savings rate, debt paid, tithe, net worth) and immediately opens the next month with your recurring lines pre-seeded so you can budget before the 1st. If you try to plan the next month while the current one is still open, you'll be prompted to close it first.",
   },
   {
     n: "05",

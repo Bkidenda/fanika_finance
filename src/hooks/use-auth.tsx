@@ -24,10 +24,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
       setLoading(false);
+      if (s && typeof window !== "undefined") window.localStorage.setItem("fanika:has_account", "1");
     });
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
+      if (data.session && typeof window !== "undefined") window.localStorage.setItem("fanika:has_account", "1");
     });
     return () => subscription.unsubscribe();
   }, []);

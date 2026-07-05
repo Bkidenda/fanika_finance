@@ -15,7 +15,7 @@ export const Route = createFileRoute("/features")({
 });
 
 const MODULES = [
-  { i: Coins, t: "Net-income first", d: "Start from your take-home pay in any currency. No country-specific payroll math — Nuru works wherever you live." },
+  { i: Coins, t: "Net-income first", d: "Start from your take-home pay in any currency. No country-specific payroll math — Fanika works wherever you live." },
   { i: HandHeart, t: "Optional automatic tithe", d: "Turn tithe on if you want — pick the rate. Tithe is set aside before disposable income is calculated. Off by default; entirely your call." },
   { i: Wallet, t: "Budgets entered each month", d: "Income and budgets are entered fresh each month because life isn't standard. Standing categories (rent, insurance) are added once as recurring lines." },
   { i: Repeat, t: "Recurring budget lines", d: "Rent, insurance, school fees — set them once and they auto-seed every new month when you close the previous one." },

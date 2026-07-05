@@ -64,7 +64,7 @@ export function AIChatbot() {
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5" />
               <div>
-                <div className="text-sm font-semibold leading-tight">Nuru Assistant</div>
+                <div className="text-sm font-semibold leading-tight">Fanika Assistant</div>
                 <div className="text-[11px] opacity-80">Always-on AI help</div>
               </div>
             </div>
