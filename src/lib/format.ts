@@ -1,19 +1,22 @@
 export function formatCurrency(amount: number, currency = "KES") {
   const n = amount || 0;
-  const hasFraction = Math.abs(n - Math.trunc(n)) > 0.0001;
+  const abs = Math.abs(n);
+  const hasFraction = Math.abs(abs - Math.trunc(abs)) > 0.0001;
+  let formatted: string;
   try {
-    return new Intl.NumberFormat("en-US", {
+    formatted = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency,
       minimumFractionDigits: hasFraction ? 2 : 0,
       maximumFractionDigits: hasFraction ? 2 : 0,
-    }).format(n);
+    }).format(abs);
   } catch {
-    return `${currency} ${n.toLocaleString(undefined, {
+    formatted = `${currency} ${abs.toLocaleString(undefined, {
       minimumFractionDigits: hasFraction ? 2 : 0,
       maximumFractionDigits: hasFraction ? 2 : 0,
     })}`;
   }
+  return n < 0 ? `(${formatted})` : formatted;
 }
 
 export function formatNumber(n: number) {

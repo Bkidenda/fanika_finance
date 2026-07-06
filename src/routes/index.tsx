@@ -32,7 +32,7 @@ function Home() {
     if (!isMobile) return;
     if (user) {
       navigate({ to: "/dashboard", replace: true });
-    } else if (typeof window !== "undefined" && window.localStorage.getItem("fanika:has_account") === "1") {
+    } else {
       navigate({ to: "/login", replace: true });
     }
   }, [user, loading, navigate]);

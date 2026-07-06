@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Component, useEffect, useMemo, useState, lazy, Suspense, type ReactNode } from "react";
+import { useEffect, useMemo, useState, lazy, Suspense } from "react";
 
 import {
   useProfile, useAccounts, useInvestments, useDebts, useSubscriptions,
@@ -21,27 +21,14 @@ import { FileText, Download } from "lucide-react";
 
 export const Route = createFileRoute("/_app/statements")({ component: Statements });
 
-const StatementPdfDownload = lazy(() => import("@/components/statement-pdf-download-lazy"));
+const StatementPdfButtons = lazy(() => import("@/components/statement-pdf-download-lazy"));
 
-class PdfLoadBoundary extends Component<
-  { children: ReactNode; fallback: ReactNode },
-  { hasError: boolean }
-> {
-  state = { hasError: false };
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: unknown) {
-    console.error("Failed to load statement PDF download", error);
-  }
-
-  render() {
-    if (this.state.hasError) return this.props.fallback;
-    return this.props.children;
-  }
+async function loadSummaryDownloader() {
+  const mod = await import("@/components/statement-pdf-download-lazy");
+  return mod.downloadSummaryPdf;
 }
+
+
 
 
 function ymdRange(period: string, scope: "month" | "quarter") {
@@ -77,7 +64,7 @@ function Statements() {
   const [scope, setScope] = useState<"month" | "quarter">("month");
   const [tab, setTab] = useState<"income" | "balance" | "cash">("income");
   const [mounted, setMounted] = useState(false);
-  const [pdfRequested, setPdfRequested] = useState(false);
+  
   useEffect(() => { setMounted(true); }, []);
 
 
@@ -146,43 +133,34 @@ function Statements() {
   });
 
   const fmt = (n: number) => formatCurrency(n, currency);
-  const filenamePdf = `fanika-statement-${scope}-${period}.pdf`;
+  const fileBase = `fanika-statement-${scope}-${period}`;
 
-  function downloadTxt() {
-    const lines: string[] = [];
-    lines.push(`FANIKA — ${range.label}`);
-    lines.push(`Prepared for ${profile.data?.full_name ?? profile.data?.email ?? "Account holder"}`);
-    lines.push(`Generated ${new Date().toLocaleString()}`);
-    lines.push("");
-    lines.push("=== INCOME STATEMENT ===");
-    lines.push(`Total revenue: ${fmt(incomeStatement.totalRevenue)}`);
-    incomeStatement.revenue.forEach((r) => lines.push(`  ${r.label}: ${fmt(r.amount)}`));
-    lines.push(`Total expenses: ${fmt(incomeStatement.totalExpenses)}`);
-    incomeStatement.expenses.forEach((r) => lines.push(`  ${r.label}: ${fmt(r.amount)}`));
-    lines.push(`Tithe & giving: ${fmt(incomeStatement.tithe)}`);
-    lines.push(`Custom deductions: ${fmt(incomeStatement.deductions)}`);
-    lines.push(`Net income: ${fmt(incomeStatement.netIncome)}`);
-    lines.push(`Savings rate: ${Math.round(incomeStatement.savingsRate * 100)}%`);
-    lines.push("");
-    lines.push("=== BALANCE SHEET ===");
-    lines.push(`Cash & bank: ${fmt(balanceSheet.cashAndBank)}`);
-    lines.push(`Investments: ${fmt(balanceSheet.investments)}`);
-    lines.push(`Total assets: ${fmt(balanceSheet.totalAssets)}`);
-    lines.push(`Total liabilities: ${fmt(balanceSheet.totalLiabilities)}`);
-    lines.push(`NET WORTH: ${fmt(balanceSheet.netWorth)}`);
-    lines.push("");
-    lines.push("=== CASH FLOW ===");
-    lines.push(`Operating inflows: ${fmt(cashFlow.operatingInflows)}`);
-    lines.push(`Operating outflows: ${fmt(cashFlow.operatingOutflows)}`);
-    lines.push(`Investing outflows: ${fmt(cashFlow.investingOutflows)}`);
-    lines.push(`Tithe & giving: ${fmt(cashFlow.titheAndGiving)}`);
-    lines.push(`Net cash flow: ${fmt(cashFlow.netCashFlow)}`);
-    const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `fanika-statement-${period}.txt`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+  const topExpenses = [...incomeStatement.expenses].sort((a, b) => b.amount - a.amount).slice(0, 6);
+
+  async function downloadSummary() {
+    try {
+      const download = await loadSummaryDownloader();
+      await download({
+        who: profile.data?.full_name || profile.data?.email || "Account holder",
+        currency,
+        asOf: new Date().toLocaleDateString(),
+        netWorth: nw.net,
+        totalAssets: balanceSheet.totalAssets,
+        totalLiabilities: balanceSheet.totalLiabilities,
+        cashAndBank: balanceSheet.cashAndBank,
+        investments: balanceSheet.investments,
+        monthlyRevenue: incomeStatement.totalRevenue,
+        monthlyExpenses: incomeStatement.totalExpenses,
+        monthlyNetIncome: incomeStatement.netIncome,
+        savingsRate: incomeStatement.savingsRate,
+        tithe: incomeStatement.tithe,
+        topExpenses,
+        accounts: (accounts.data ?? []).map((a) => ({ name: a.name, balance: Number(a.balance) })),
+        debts: (debts.data ?? []).map((d) => ({ name: d.name, balance: Number(d.balance) })),
+      }, `fanika-financial-summary-${period}.pdf`);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return (
@@ -198,7 +176,7 @@ function Statements() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={downloadTxt}><Download className="mr-1 h-4 w-4" /> Download report (.txt)</Button>
+          <Button variant="outline" onClick={downloadSummary}><Download className="mr-1 h-4 w-4" /> Download report (PDF)</Button>
         </div>
       </div>
 
@@ -219,38 +197,28 @@ function Statements() {
             <input type="month" value={period} onChange={(e) => setPeriod(e.target.value)} className="h-9 w-full rounded-md border bg-background px-3 text-sm" />
           </div>
           <div className="flex items-end">
-            {mounted && pdfRequested ? (
-              <PdfLoadBoundary
-                fallback={
-                  <Button className="w-full" variant="outline" onClick={() => setPdfRequested(false)}>
-                    <Download className="mr-1 h-4 w-4" />Retry PDF
-                  </Button>
-                }
-              >
-                <Suspense fallback={<Button className="w-full" disabled><Download className="mr-1 h-4 w-4" />Preparing PDF…</Button>}>
-                  <StatementPdfDownload
-                    fileName={filenamePdf}
-                    title={`${scope === "month" ? "Monthly" : "Quarterly"} statement — ${range.label}`}
-                    who={profile.data?.full_name || profile.data?.email || "Account holder"}
-                    currency={currency}
-                    income={incomeStatement}
-                    balance={balanceSheet}
-                    cashFlow={cashFlow}
-                    disabled={data.isLoading}
-                  />
-                </Suspense>
-              </PdfLoadBoundary>
-            ) : mounted ? (
-              <Button className="w-full" onClick={() => setPdfRequested(true)} disabled={data.isLoading}>
-                <Download className="mr-1 h-4 w-4" />Prepare PDF
-              </Button>
+            {mounted ? (
+              <Suspense fallback={<Button className="w-full" disabled><Download className="mr-1 h-4 w-4" />Loading…</Button>}>
+                <StatementPdfButtons
+                  fileBase={fileBase}
+                  currentTab={tab}
+                  title={`${scope === "month" ? "Monthly" : "Quarterly"} statement — ${range.label}`}
+                  who={profile.data?.full_name || profile.data?.email || "Account holder"}
+                  currency={currency}
+                  income={incomeStatement}
+                  balance={balanceSheet}
+                  cashFlow={cashFlow}
+                  disabled={data.isLoading}
+                />
+              </Suspense>
             ) : (
-              <Button className="w-full" disabled><Download className="mr-1 h-4 w-4" />Preparing PDF…</Button>
+              <Button className="w-full" disabled><Download className="mr-1 h-4 w-4" />Loading…</Button>
             )}
           </div>
 
         </div>
       </div>
+
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
         <TabsList>
