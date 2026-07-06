@@ -64,7 +64,7 @@ function Statements() {
   const [scope, setScope] = useState<"month" | "quarter">("month");
   const [tab, setTab] = useState<"income" | "balance" | "cash">("income");
   const [mounted, setMounted] = useState(false);
-  const [pdfRequested, setPdfRequested] = useState(false);
+  
   useEffect(() => { setMounted(true); }, []);
 
 
