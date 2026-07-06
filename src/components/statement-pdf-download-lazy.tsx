@@ -214,7 +214,7 @@ function SummaryPage(s: SummaryData) {
   );
 }
 
-async function downloadPdf(doc: ReactElement, fileName: string) {
+async function downloadPdf(doc: ReactElement<DocumentProps>, fileName: string) {
   const blob = await pdf(doc).toBlob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
