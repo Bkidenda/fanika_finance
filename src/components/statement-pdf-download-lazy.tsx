@@ -1,4 +1,4 @@
-import { pdf, Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { pdf, Document, Page, Text, View, StyleSheet, type DocumentProps } from "@react-pdf/renderer";
 import type { ReactElement } from "react";
 import type {
   computeIncomeStatement,
