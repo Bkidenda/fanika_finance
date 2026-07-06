@@ -21,27 +21,14 @@ import { FileText, Download } from "lucide-react";
 
 export const Route = createFileRoute("/_app/statements")({ component: Statements });
 
-const StatementPdfDownload = lazy(() => import("@/components/statement-pdf-download-lazy"));
+const StatementPdfButtons = lazy(() => import("@/components/statement-pdf-download-lazy"));
 
-class PdfLoadBoundary extends Component<
-  { children: ReactNode; fallback: ReactNode },
-  { hasError: boolean }
-> {
-  state = { hasError: false };
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: unknown) {
-    console.error("Failed to load statement PDF download", error);
-  }
-
-  render() {
-    if (this.state.hasError) return this.props.fallback;
-    return this.props.children;
-  }
+async function loadSummaryDownloader() {
+  const mod = await import("@/components/statement-pdf-download-lazy");
+  return mod.downloadSummaryPdf;
 }
+
+
 
 
 function ymdRange(period: string, scope: "month" | "quarter") {
