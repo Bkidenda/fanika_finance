@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "migrate:supabase": "node scripts/migrate-supabase-data.mjs",
+    "migrate:supabase:dump": "bash scripts/supabase-dump-import.sh"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",

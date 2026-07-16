@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useBudgets, useExpenses, useProfile, useAllBudgets } from "@/lib/queries";
+import { useBudgets, useExpenses, useProfile, useAllBudgets, useBudgetSplitRules, useIncomeEntries } from "@/lib/queries";
 import { DEFAULT_BUDGET_CATEGORIES } from "@/lib/finance";
 import { formatCurrency } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,8 @@ function Budgets() {
   const budgets = useBudgets(month);
   const expenses = useExpenses(month);
   const allBudgets = useAllBudgets();
+  const splitRules = useBudgetSplitRules(month);
+  const incomeEntries = useIncomeEntries(month);
   const currency = profile.data?.currency ?? "KES";
 
   const [open, setOpen] = useState(false);
@@ -49,6 +51,12 @@ function Budgets() {
   const [limit, setLimit] = useState("");
   const [recurring, setRecurring] = useState(false);
   const [notes, setNotes] = useState("");
+  const [splitCategory, setSplitCategory] = useState<string>(DEFAULT_BUDGET_CATEGORIES[0]);
+  const [splitCustomCat, setSplitCustomCat] = useState("");
+  const [splitPercent, setSplitPercent] = useState("25");
+  const [splitBaseType, setSplitBaseType] = useState<"income" | "disposable">("income");
+  const [splitNotes, setSplitNotes] = useState("");
+  const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
 
   // Group spend by category for this month.
   const spendByCat = useMemo(() => {
@@ -63,6 +71,17 @@ function Budgets() {
   const totalBudget = (budgets.data ?? []).reduce((s, b) => s + Number(b.limit_amount), 0);
   const totalSpent = (expenses.data ?? []).reduce((s, e) => s + Number(e.amount), 0);
   const remaining = totalBudget - totalSpent;
+  const monthlyIncome = (incomeEntries.data ?? []).reduce((s, entry) => s + Number(entry.amount), 0);
+  const disposableBase = Math.max(0, monthlyIncome);
+  const splitSuggestions = useMemo(() => {
+    const rules = (splitRules.data ?? []).filter((rule) => Number(rule.percentage) > 0);
+    if (!rules.length) return [] as Array<{ category: string; amount: number; percentage: number }>;
+    return rules.map((rule) => ({
+      category: rule.category,
+      percentage: Number(rule.percentage),
+      amount: (splitBaseType === "disposable" ? disposableBase : monthlyIncome) * (Number(rule.percentage) / 100),
+    }));
+  }, [disposableBase, monthlyIncome, splitBaseType, splitRules.data]);
   const utilization = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
   const variance = totalBudget - totalSpent;
 
@@ -128,6 +147,88 @@ function Budgets() {
     qc.invalidateQueries({ queryKey: ["budgets-all"] });
   }
 
+  async function saveSplitRule(e: React.FormEvent) {
+    e.preventDefault();
+    const cat = splitCategory === "__custom__" ? splitCustomCat.trim() : splitCategory;
+    if (!cat) return toast.error("Pick a category");
+    const pct = Number(splitPercent);
+    if (!Number.isFinite(pct) || pct <= 0 || pct > 100) return toast.error("Percent must be between 1 and 100");
+
+    const payload = {
+      user_id: user!.id,
+      category: cat,
+      percentage: pct,
+      base_type: splitBaseType,
+      month,
+      active: true,
+      notes: splitNotes || null,
+    };
+
+    if (editingRuleId) {
+      const { error } = await (supabase.from("budget_split_rules" as never) as any).update(payload).eq("id", editingRuleId);
+      if (error) return toast.error(error.message);
+      toast.success("Split rule updated");
+    } else {
+      const { error } = await (supabase.from("budget_split_rules" as never) as any).upsert(payload, { onConflict: "user_id,category,month,base_type" });
+      if (error) return toast.error(error.message);
+      toast.success("Split rule saved");
+    }
+
+    setEditingRuleId(null);
+    setSplitCategory(DEFAULT_BUDGET_CATEGORIES[0]);
+    setSplitCustomCat("");
+    setSplitNotes("");
+    setSplitPercent("25");
+    setSplitBaseType("income");
+    qc.invalidateQueries({ queryKey: ["budget-split-rules"] });
+  }
+
+  async function applySplitRulesToBudgets() {
+    if (!user) return;
+    const rules = (splitRules.data ?? []).filter((rule) => Number(rule.percentage) > 0);
+    if (!rules.length) return toast.error("Add at least one split rule first");
+    for (const rule of rules) {
+      const pct = Number(rule.percentage ?? 0);
+      if (!Number.isFinite(pct) || pct <= 0) continue;
+      const baseAmount = rule.base_type === "disposable" ? disposableBase : monthlyIncome;
+      const amount = baseAmount * (pct / 100);
+      if (amount <= 0) continue;
+      const { error } = await (supabase.from("budgets" as never) as any).upsert({
+        user_id: user.id,
+        category: rule.category,
+        month,
+        limit_amount: amount,
+        is_recurring: false,
+        notes: rule.notes ?? "Auto-filled from income split",
+      }, { onConflict: "user_id,category,month" });
+      if (error) return toast.error(error.message);
+    }
+    toast.success("Split rules applied to budget lines");
+    qc.invalidateQueries({ queryKey: ["budgets"] });
+    qc.invalidateQueries({ queryKey: ["budgets-all"] });
+  }
+
+  function startEditRule(rule: { id: string; category: string; percentage: number; base_type: "income" | "disposable"; notes: string | null }) {
+    setEditingRuleId(rule.id);
+    if (DEFAULT_BUDGET_CATEGORIES.includes(rule.category)) {
+      setSplitCategory(rule.category);
+      setSplitCustomCat("");
+    } else {
+      setSplitCategory("__custom__");
+      setSplitCustomCat(rule.category);
+    }
+    setSplitPercent(String(rule.percentage));
+    setSplitBaseType(rule.base_type);
+    setSplitNotes(rule.notes ?? "");
+  }
+
+  async function removeSplitRule(id: string) {
+    const { error } = await (supabase.from("budget_split_rules" as never) as any).update({ active: false }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Split rule removed");
+    qc.invalidateQueries({ queryKey: ["budget-split-rules"] });
+  }
+
   return (
     <div className="space-y-5">
       {/* Month nav */}
@@ -188,6 +289,90 @@ function Budgets() {
         <TotalCard label="Total spent" value={formatCurrency(totalSpent, currency)} />
         <TotalCard label="Remaining" value={formatCurrency(remaining, currency)} tone={remaining < 0 ? "danger" : "normal"} />
         <TotalCard label="Utilization" value={`${utilization.toFixed(1)}%`} tone={utilization > 100 ? "danger" : "normal"} />
+      </div>
+
+      {/* Percentage split tools */}
+      <div className="rounded-2xl border bg-card p-4 shadow-card">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div>
+            <h3 className="font-semibold">Percentage split rules</h3>
+            <p className="text-xs text-muted-foreground">Auto-suggest budget amounts from income. The rules apply to this month and can be customized.</p>
+          </div>
+        </div>
+        <form onSubmit={saveSplitRule} className="grid gap-3 md:grid-cols-[1.2fr_0.7fr_0.8fr_auto]">
+          <div className="space-y-1.5">
+            <Label>Category</Label>
+            <Select value={splitCategory} onValueChange={setSplitCategory}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {DEFAULT_BUDGET_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                <SelectItem value="__custom__">Custom…</SelectItem>
+              </SelectContent>
+            </Select>
+            {splitCategory === "__custom__" && (
+              <Input className="mt-2" placeholder="Custom category" value={splitCustomCat} onChange={(e) => setSplitCustomCat(e.target.value)} />
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <Label>Percent</Label>
+            <Input type="number" min="1" max="100" step="1" value={splitPercent} onChange={(e) => setSplitPercent(e.target.value)} required />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Base</Label>
+            <Select value={splitBaseType} onValueChange={(v) => setSplitBaseType(v as "income" | "disposable") }>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="income">Income</SelectItem>
+                <SelectItem value="disposable">Disposable</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-col gap-2 self-end">
+            <Button type="submit">{editingRuleId ? "Update rule" : "Save rule"}</Button>
+            {editingRuleId ? (
+              <Button type="button" variant="outline" onClick={() => { setEditingRuleId(null); setSplitCategory(DEFAULT_BUDGET_CATEGORIES[0]); setSplitCustomCat(""); setSplitPercent("25"); setSplitBaseType("income"); setSplitNotes(""); }}>
+                Cancel
+              </Button>
+            ) : null}
+          </div>
+        </form>
+        <div className="mt-3 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-xs text-muted-foreground">Monthly split preview</div>
+            <Button type="button" variant="outline" size="sm" onClick={applySplitRulesToBudgets}>Apply to budget lines</Button>
+          </div>
+          {splitSuggestions.length ? splitSuggestions.map((rule) => (
+            <div key={`${rule.category}-${rule.percentage}`} className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm">
+              <span>{rule.category}</span>
+              <span className="font-medium">{rule.percentage}% → {formatCurrency(rule.amount, currency)}</span>
+            </div>
+          )) : <div className="rounded-lg border border-dashed px-3 py-3 text-sm text-muted-foreground">Add a split rule to preview suggested budget amounts.</div>}
+          {splitRules.data?.length ? (
+            <div className="space-y-2 rounded-lg border p-3">
+              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Saved rules</div>
+              {splitRules.data.map((rule) => {
+                const amount = ((rule.base_type === "disposable" ? disposableBase : monthlyIncome) * Number(rule.percentage)) / 100;
+                return (
+                  <div key={rule.id} className="flex items-center justify-between gap-2 rounded-md border px-2.5 py-2 text-sm">
+                    <div>
+                      <div className="font-medium">{rule.category}</div>
+                      <div className="text-[11px] text-muted-foreground">{rule.percentage}% · {rule.base_type === "disposable" ? "Disposable" : "Income"}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{formatCurrency(amount, currency)}</span>
+                      <button title="Edit rule" type="button" onClick={() => startEditRule(rule)} className="text-muted-foreground hover:text-primary">
+                        Edit
+                      </button>
+                      <button title="Remove rule" type="button" onClick={() => removeSplitRule(rule.id)} className="text-muted-foreground hover:text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* Variance chip */}

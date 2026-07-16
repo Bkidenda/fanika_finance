@@ -35,6 +35,17 @@ export type Deduction = {
 
 export type Budget = { id: string; category: string; month: string; limit_amount: number; is_recurring: boolean; notes: string | null; archived_at: string | null };
 
+export type BudgetSplitRule = {
+  id: string;
+  user_id: string;
+  category: string;
+  percentage: number;
+  base_type: "income" | "disposable";
+  month: string;
+  active: boolean;
+  notes: string | null;
+};
+
 export type RecurringBudget = {
   id: string;
   category: string;
@@ -163,6 +174,39 @@ export function useRecurringBudgets() {
       const { data, error } = await supabase.from("recurring_budgets").select("*").order("created_at");
       if (error) throw error;
       return (data ?? []) as RecurringBudget[];
+    },
+  });
+}
+
+export function useBudgetSplitRules(month = monthKey()) {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["budget-split-rules", user?.id, month], enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("budget_split_rules" as never)
+        .select("*")
+        .eq("month", month)
+        .eq("active", true)
+        .order("category");
+      if (error) throw error;
+      const rows = (data ?? []) as BudgetSplitRule[];
+      if (rows.length) return rows;
+
+      const { data: seededData, error: seededError } = await supabase.rpc("seed_budget_split_rules_for_month", {
+        p_user_id: user!.id,
+        p_target_month: month,
+      });
+      if (seededError) throw seededError;
+
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from("budget_split_rules" as never)
+        .select("*")
+        .eq("month", month)
+        .eq("active", true)
+        .order("category");
+      if (fallbackError) throw fallbackError;
+      return (fallbackData ?? []) as BudgetSplitRule[];
     },
   });
 }

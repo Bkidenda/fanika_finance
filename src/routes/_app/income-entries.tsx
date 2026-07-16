@@ -35,15 +35,62 @@ function IncomeEntries() {
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
+    const incomeAmount = Number(f.amount);
     const { error } = await supabase.from("income_entries").insert({
-      user_id: user!.id, date: f.date, source: f.source, amount: Number(f.amount),
+      user_id: user!.id, date: f.date, source: f.source, amount: incomeAmount,
       account_id: f.account_id || null, notes: f.notes || null,
       tithe_on: f.tithe_on,
     });
     if (error) return toast.error(error.message);
+
+    const month = `${f.date.slice(0, 7)}-01`;
+    const titheRate = Number(profile.data?.tithe_rate ?? 0.10);
+    const titheAmount = f.tithe_on && !!profile.data?.tithe_enabled ? incomeAmount * titheRate : 0;
+    const disposableBase = Math.max(0, incomeAmount - titheAmount);
+
+    const { error: seedError } = await supabase.rpc("seed_budget_split_rules_for_month", {
+      p_user_id: user!.id,
+      p_target_month: month,
+    });
+    if (seedError) {
+      toast.error(seedError.message);
+      return;
+    }
+
+    const { data: splitRules, error: splitRulesError } = await supabase.from("budget_split_rules" as never)
+      .select("*")
+      .eq("month", month)
+      .eq("active", true);
+
+    if (splitRulesError) {
+      toast.error(splitRulesError.message);
+      return;
+    }
+
+    for (const rule of splitRules ?? []) {
+      const pct = Number(rule.percentage ?? 0);
+      if (!Number.isFinite(pct) || pct <= 0) continue;
+      const baseAmount = rule.base_type === "disposable" ? disposableBase : incomeAmount;
+      const amount = baseAmount * (pct / 100);
+      if (amount <= 0) continue;
+      const { error: budgetError } = await supabase.from("budgets").upsert({
+        user_id: user!.id,
+        category: rule.category,
+        month,
+        limit_amount: amount,
+        is_recurring: false,
+        notes: rule.notes ?? "Auto-filled from income split",
+      }, { onConflict: "user_id,category,month" });
+      if (budgetError) {
+        toast.error(budgetError.message);
+      }
+    }
+
     toast.success("Income received"); setOpen(false);
     setF({ date: isoLocalDate(), source: "Salary", amount: "", account_id: "", notes: "", tithe_on: titheDefault });
     qc.invalidateQueries({ queryKey: ["income-entries"] });
+    qc.invalidateQueries({ queryKey: ["budgets"] });
+    qc.invalidateQueries({ queryKey: ["budgets-all"] });
     qc.invalidateQueries({ queryKey: ["accounts"] });
   }
   async function remove(id: string) {
