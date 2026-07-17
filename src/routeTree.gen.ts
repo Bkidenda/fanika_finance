@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StewardshipPhilosophyRouteImport } from './routes/stewardship-philosophy'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
@@ -49,6 +50,11 @@ const StewardshipPhilosophyRoute = StewardshipPhilosophyRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/stewardship-philosophy': typeof StewardshipPhilosophyRoute
   '/accounts': typeof AppAccountsRoute
@@ -235,6 +242,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/stewardship-philosophy': typeof StewardshipPhilosophyRoute
   '/accounts': typeof AppAccountsRoute
@@ -269,6 +277,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/stewardship-philosophy': typeof StewardshipPhilosophyRoute
   '/_app/accounts': typeof AppAccountsRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/pricing'
+    | '/reset-password'
     | '/signup'
     | '/stewardship-philosophy'
     | '/accounts'
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/pricing'
+    | '/reset-password'
     | '/signup'
     | '/stewardship-philosophy'
     | '/accounts'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/pricing'
+    | '/reset-password'
     | '/signup'
     | '/stewardship-philosophy'
     | '/_app/accounts'
@@ -402,6 +414,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   StewardshipPhilosophyRoute: typeof StewardshipPhilosophyRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -421,6 +434,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -687,6 +707,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   StewardshipPhilosophyRoute: StewardshipPhilosophyRoute,
   ApiChatRoute: ApiChatRoute,
