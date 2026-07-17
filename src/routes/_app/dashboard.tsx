@@ -71,14 +71,32 @@ function Dashboard() {
     debts: debts.data ?? [],
   });
 
-  const allocation = (budgets.data ?? []).map((b) => ({ name: b.category, value: Number(b.limit_amount) }));
-  const categorySpend = Array.from(spendByCat.entries())
-    .map(([category, amount]) => ({ category, amount }))
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 8);
+  const allocation = (budgets.data ?? [])
+  .map((b) => ({
+    name: b.category,
+    value: Number(b.limit_amount),
+  }))
+  .sort((a, b) => b.value - a.value);
+  
+const categorySpend = Array.from(spendByCat.entries())
+  .map(([category, amount]) => ({
+    category,
+    amount,
+  }))
+  .sort((a, b) => b.amount - a.amount)
+  .slice(0, 8);
 
-  // Calm brown/caramel palette (no greens)
-  const COLORS = ["#5c3a1e", "#8a5a35", "#a06c3a", "#c4956b", "#d4a574", "#b8845c", "#8a7a5a", "#6b4a2e"];
+  // Consistent palette from largest → smallest
+const COLORS = [
+  "#2563EB", // Blue
+  "#10B981", // Emerald
+  "#F59E0B", // Amber
+  "#8B5CF6", // Violet
+  "#EF4444", // Red
+  "#06B6D4", // Cyan
+  "#F97316", // Orange
+  "#84CC16", // Lime
+];
 
 
   async function handleClose(p: string) {
@@ -302,7 +320,14 @@ function Dashboard() {
                   <XAxis dataKey="category" tick={{ fontSize: 11 }} interval={0} angle={-20} textAnchor="end" height={60} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
-                  <Bar dataKey="amount" fill="oklch(0.42 0.08 55)" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="amount" radius={[6, 6, 0, 0]}>
+  {categorySpend.map((_, index) => (
+    <Cell
+      key={index}
+      fill={COLORS[index % COLORS.length]}
+    />
+  ))}
+</Bar>
 
                 </BarChart>
               </ResponsiveContainer>
