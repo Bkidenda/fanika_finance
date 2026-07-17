@@ -38,9 +38,10 @@ function Login() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: getAuthRedirectUrl('/dashboard'),
+        redirectTo: getAuthRedirectUrl("/dashboard"),
       },
     });
+
     if (error) toast.error(error.message ?? "Sign-in failed");
   }
 
@@ -53,25 +54,56 @@ function Login() {
           </div>
           <span className="font-semibold">Fanika</span>
         </Link>
-        <h1 className="mt-6 text-2xl font-semibold tracking-tight">Welcome back</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Sign in to your stewardship dashboard.</p>
+
+        <h1 className="mt-6 text-2xl font-semibold tracking-tight">
+          Welcome back
+        </h1>
+
+        <p className="mt-1 text-sm text-muted-foreground">
+          Sign in to your stewardship dashboard.
+        </p>
 
         <Button variant="outline" className="mt-6 w-full" onClick={google}>
           Continue with Google
         </Button>
+
         <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-          <div className="h-px flex-1 bg-border" /> OR <div className="h-px flex-1 bg-border" />
+          <div className="h-px flex-1 bg-border" /> OR{" "}
+          <div className="h-px flex-1 bg-border" />
         </div>
 
         <form onSubmit={signIn} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <div className="text-right">
+              <Link
+                to="/forgot-password"
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </div>
+
           <Button type="submit" className="w-full" disabled={busy}>
             {busy ? "Signing in…" : "Sign in"}
           </Button>
@@ -79,7 +111,10 @@ function Login() {
 
         <p className="mt-5 text-center text-sm text-muted-foreground">
           New here?{" "}
-          <Link to="/signup" className="font-medium text-primary hover:underline">
+          <Link
+            to="/signup"
+            className="font-medium text-primary hover:underline"
+          >
             Create an account
           </Link>
         </p>
