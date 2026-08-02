@@ -1,66 +1,80 @@
-Large multi-area update. Here's what I'll ship, grouped by area.
+# Fanika — Full Product Redesign
 
-## 1. Statements page error fix
-The `PDFDownloadLink` from `@react-pdf/renderer` fails during SSR/hydration with "Cannot read properties of undefined (reading 'call')". Wrap it in a client-only guard (mount check) so it only renders after hydration, and lazy-load the `@react-pdf/renderer` module dynamically.
+One big pass. Brown is fully replaced by the emerald/blue/amber system. Every existing module is kept, nested under the new navigation.
 
-## 2. Rebrand to Fanika
-- Rename in: landing page (`src/routes/index.tsx`), `public-layout.tsx`, `_app.tsx` header, sidebar, mobile tabbar, PDF documents, `.txt` exports, features/how-it-works/pricing pages, chatbot copy, meta tags in `__root.tsx`, package.json name where user-facing.
-- Preserve internal file/table names.
+## 1. New design system
 
-## 3. Brown theme
-Rework `src/styles.css` tokens to warm brown palette:
-- `--primary`: rich brown (e.g. `oklch(0.42 0.08 55)`)
-- `--accent`: warm caramel
-- `--background`: cream/off-white
-- `--gradient-primary`, `--gradient-hero`, `--shadow-elegant` re-tuned.
-- Keep semantic tokens; no component-level color changes needed.
+Rebuild `src/styles.css` tokens (all values as tokens, no hardcoded colours in components):
 
-## 4. Multi-expense entry
-In `src/routes/_app/expenses.tsx`, add "Add another" inside the expense dialog: builds an array of line items, saves them all in one `insert` call.
+- Primary Deep Emerald `#15803D`, secondary Royal Blue `#2563EB`, accent Amber `#F59E0B`
+- Success `#22C55E`, Warning `#F97316`, Danger `#EF4444`, Info `#0EA5E9`
+- Background `#FAFAFA`, cards white, text `#111827` / `#6B7280`, borders `#E5E7EB`
+- Radius 12–16px, soft card shadows, subtle hover elevation, dark-mode tokens kept in place
+- Typography: bold headings, regular body, semibold tabular figures for money
+- Remove every brown/emerald-legacy literal from hero, navbar, charts, tabbar, PDFs, favicon background
 
-## 5. Subscription automation
-- New scheduled logic: helper `processDueSubscriptions()` runs on app load (in `_app.tsx` layout mount) that finds subs where `next_charge <= today` and `active=true`, creates an expense, debits account, advances `next_charge` by cycle. Idempotent per (sub_id, charge_date).
-- Add `last_charged` column to subscriptions to prevent double-charging.
+## 2. Uniform chart palette
 
-## 6. Debt ↔ Account link
-- When creating a debt with an existing account, allow "Reflect as negative balance in an existing account" option (e.g., Equity bank loan on Equity account). Store `linked_account_id` on debts.
-- Trigger already exists for negative-balance→debt sync; ensure reverse: debt payments reduce the linked account's overdraft (already implicit via debt payment triggering account debit).
-- Backfill: allow the user to link the existing Equity debt to the Equity account in the debts UI.
+A single `chartColorByRank(index)` helper in a new `src/lib/chart-colors.ts`, ranked: dark emerald, blue, amber, purple, teal, orange, pink, then neutral greys. Every pie/donut/bar/stacked chart sorts by value and consumes this helper — no per-chart colour arrays anywhere.
 
-## 7. Ziidi auto-save verification
-Audit the M-Pesa expense flow. Ensure: on any expense debiting an M-Pesa account (not just via UI), a percentage transfer creates a matching credit to the Ziidi account and a debit from M-Pesa. Move logic into a shared helper called from both the expense dialog and subscription automation.
+## 3. Navigation (nothing removed)
 
-## 8. Mobile: chatbot button position
-Move `AIChatbot` FAB above the mobile tabbar (add `bottom-24` on mobile, `bottom-6` on desktop). Also ensure dashboard bottom padding accommodates it.
+Sidebar grouped:
 
-## 9. Header username → real name + avatar
-- Add `avatar_url` support (already in profiles?). Add upload UI in My Profile using Supabase Storage bucket `avatars`.
-- Header in `_app.tsx`: replace `@username` with `full_name`; show avatar `<Avatar>` component with initials fallback.
+```text
+MAIN        Dashboard · Transactions · Accounts · Budgets · Goals · Debts · Investments · Reports · Settings
+MONEY FLOW  Income · Expenses · Subscriptions · Charity & Giving · Calendar
+INSIGHTS    AI Advisor · Insights · Statements (inside Reports) · History
+FAMILY      Family Suite · Stewardship
+```
 
-## 10. Daily rotating devotionals
-`src/routes/_app/stewardship.tsx` currently shows static content. Add a `devotionals` table (seed ~60 entries across finance/health/temperance/growth) and select by `dayOfYear % count` so it changes every day.
+- Transactions becomes a new unified page (income + expenses + transfers + fees, filterable, editable inline) that links out to Income/Expenses.
+- Reports becomes the home for Statements + Insights exports.
+- Mobile tabbar: Home, Transactions, Add (FAB), Budgets, Accounts.
 
-## 11. Mobile landing page fit
-Landing page CTAs overlap on small screens. In `src/routes/index.tsx`:
-- Reduce button sizes on mobile (`size="sm"` responsive).
-- Stack CTAs with `flex-col sm:flex-row`.
-- Reduce hero heading `text-3xl` on mobile.
-- Verify no element exceeds viewport.
+## 4. Executive dashboard
 
-## 12. Family Suite → Premium
-Expand `src/routes/_app/family.tsx` beyond allowance tracking:
-- **Shared budgets**: family members contribute to shared expense pools (already partly there).
-- **Kids' savings goals** with visual progress and parent-approved payouts.
-- **Chore board**: chores with monetary rewards; completion auto-credits child's account.
-- **Family calendar**: shared financial events (school fees, family holidays).
-- **Money lessons**: age-appropriate weekly lessons tied to devotionals.
-- **Family dashboard**: combined net worth, per-member balances, upcoming obligations.
-- **Invite system**: send invite to spouse/child email; role-based access (parent/child/spouse).
-- Premium gate: hide behind `family_plan_enabled` toggle (already exists) with an upgrade CTA.
+Replaces the current dashboard content. No duplicated module data:
 
-## Order & scope
-I'll ship these in this order; heavy migrations (devotionals seeding, avatar bucket) run first, then code changes in parallel where possible.
+- Five summary tiles: Net Worth, Monthly Cash Flow, Savings Rate, Financial Health, Budget Performance
+- AI insights strip (spending deltas, goal progress, overspend forecast)
+- One combined trend chart: income / spending / savings by month
+- Goal progress bars, next upcoming bills only, last five transactions with a link to Transactions
+- Removed from dashboard: full account listings, long budget tables, repeated debt tables
 
-## Out of scope for this pass
-- Actual payment processor integration for premium billing (already handled by existing Paddle/Stripe plumbing if user upgrades separately).
-- CBK live FX rates (already stubbed previously — no changes here unless issues surface).
+## 5. Financial health score
+
+Replace the 45% floor. If a user lacks income entries, accounts and at least one month of expenses, the card shows "Complete your financial profile" with a CTA and no number. Score computes only once minimum data exists, from savings rate, budget adherence, debt ratio, giving and liquidity buffer.
+
+## 6. Full CRUD everywhere
+
+Audit and add missing edit/delete + confirmation dialogs for: accounts, transactions, budgets, income, debts, goals, investments, subscriptions, recurring bills, giving records, categories, family members/chores. Optimistic updates with rollback, undo toast on delete, autosaved dialog drafts, smart validation and human error messages.
+
+## 7. Reports
+
+Monthly / Quarterly / Annual with Cash Flow, Income vs Expenses, Net Worth Growth, Budget Performance, Debt Reduction, Savings Growth, Investment Growth. Exports: PDF (existing lazy renderer, restyled), CSV, and Excel via `xlsx`.
+
+## 8. Architecture, security, performance
+
+- Split presentation / logic / data: business rules move into `src/lib/services/*`, data access into typed query hooks in `src/lib/queries.ts`, components stay presentational
+- All privileged work stays in `createServerFn` handlers; no secrets in client code; verify RLS + GRANTs on every table and fix gaps found by a security scan; Zod validation on every server-fn input
+- Route-level lazy loading and code splitting, memoized derived finance calculations, React Query cache keys consolidated so a transaction write invalidates exactly the affected views
+- Strict TS types, dead code and unused components removed, shared form/dialog/empty-state/skeleton primitives
+
+## 9. Responsiveness, accessibility, motion
+
+No horizontal scroll anywhere except the dashboard balance-card rail. WCAG AA contrast, focus rings, labels, keyboard shortcuts for new/search. Subtle transitions only: 150–200ms fades, hover elevation, skeleton loaders.
+
+## 10. Final audit
+
+End-to-end pass with the browser: every route rendered at desktop/tablet/mobile, console clean, navigation intact, no duplicate functionality, spacing/typography/colour consistent, security scan reviewed.
+
+## Technical notes
+
+- Migrations expected: recurring-bill/category normalisation if gaps are found during the CRUD audit; no destructive schema changes.
+- `chart-colors.ts`, `src/lib/services/*`, `src/routes/_app/transactions.tsx`, and `src/routes/_app/reports.tsx` are new; existing module routes are restyled and kept.
+- Excel export adds one dependency (`xlsx`).
+
+## Blocking build error (fix first)
+
+`src/components/SignUpForm.tsx` has raw SQL (a `create table public.profiles` block plus RLS policies) pasted after the TypeScript code, and uses `React.FormEvent` without importing React. The build currently fails. Step one of the pass is deleting the stray SQL from that file and importing `FormEvent` from `react`.
