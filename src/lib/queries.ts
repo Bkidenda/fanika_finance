@@ -391,3 +391,16 @@ export function previousPeriod(period: string): string {
   const d = new Date(Date.UTC(y, m - 2, 1));
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }
+
+export function useAllIncomeEntries() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["income-entries-all", user?.id], enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("income_entries").select("*").order("date", { ascending: false }).limit(1000);
+      if (error) throw error;
+      return (data ?? []) as IncomeEntry[];
+    },
+  });
+}
