@@ -1,20 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   useProfile, useDeductions, useBudgets, useExpenses, useInvestments, useGoals,
   useDevotional, useAccounts, useDebts, useIsMonthClosed, useIncomeEntries,
-  useMonthClosures, previousPeriod,
+  useMonthClosures, useSubscriptions, useAllExpenses, useAllIncomeEntries, previousPeriod,
 } from "@/lib/queries";
-import { computeBreakdown, healthScore, computeNetWorth } from "@/lib/finance";
+import { computeDashboard } from "@/lib/services/dashboard";
+import { healthScoreBand } from "@/lib/finance";
 import { formatCurrency, monthLabel, monthKey } from "@/lib/format";
-import { StatCard } from "@/components/stat-card";
+import { chartColorByRank, SERIES_COLORS, CHART_GRID_STROKE, CHART_AXIS_TICK } from "@/lib/chart-colors";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Wallet, TrendingUp, HandCoins, Target, Sparkles, BookOpen, Scale, Lock, CheckCircle2, AlertTriangle } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import {
+  Wallet, HandCoins, Target, Sparkles, BookOpen, Scale, Lock, CheckCircle2,
+  AlertTriangle, ArrowRight, CalendarClock, Activity, TrendingUp, Info,
+} from "lucide-react";
+import {
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid,
+  AreaChart, Area, Legend,
+} from "recharts";
 import { closeMonth } from "@/lib/close-month.functions";
 import { toast } from "sonner";
 
@@ -25,17 +32,22 @@ function Dashboard() {
   const deductions = useDeductions();
   const budgets = useBudgets();
   const expenses = useExpenses();
+  const allExpenses = useAllExpenses();
+  const allIncome = useAllIncomeEntries();
   const investments = useInvestments();
   const goals = useGoals();
   const devo = useDevotional();
   const accounts = useAccounts();
   const debts = useDebts();
+  const subscriptions = useSubscriptions();
   const incomeEntries = useIncomeEntries();
   const closures = useMonthClosures();
+
   const period = monthKey().slice(0, 7);
   const prev = previousPeriod(period);
   const isClosed = useIsMonthClosed(period);
   const prevClosed = (closures.data ?? []).some((c) => c.period === prev);
+
   const qc = useQueryClient();
   const closeFn = useServerFn(closeMonth);
   const [closing, setClosing] = useState(false);
@@ -43,61 +55,28 @@ function Dashboard() {
   const [closePrev, setClosePrev] = useState(false);
 
   const currency = profile.data?.currency ?? "KES";
-  const titheEnabled = !!profile.data?.tithe_enabled;
-  const titheRate = profile.data?.tithe_rate ?? 0.10;
 
-  const receivedIncome = (incomeEntries.data ?? []).reduce((s, e) => s + Number(e.amount), 0);
-  const breakdown = computeBreakdown(receivedIncome, deductions.data ?? [], { titheEnabled, titheRate });
-
-  const spendByCat = new Map<string, number>();
-  (expenses.data ?? []).forEach((e) => {
-    spendByCat.set(e.category, (spendByCat.get(e.category) ?? 0) + Number(e.amount));
-  });
-  const totalSpent = Array.from(spendByCat.values()).reduce((s, v) => s + v, 0);
-  const totalFees = (expenses.data ?? []).reduce((s, e) => s + Number(e.transaction_fee ?? 0), 0);
-  const remaining = breakdown.net - breakdown.tithe - breakdown.custom - totalSpent - totalFees;
-
-  const budgetTotal = (budgets.data ?? []).reduce((s, b) => s + Number(b.limit_amount), 0);
-  const savingsRate = breakdown.net > 0 ? Math.max(0, remaining) / breakdown.net : 0;
-  const givingRate = breakdown.net > 0 ? breakdown.tithe / breakdown.net : 0;
-  const adherence = budgetTotal > 0 ? Math.max(0, 1 - Math.max(0, totalSpent - budgetTotal) / budgetTotal) : 1;
-  const debtRatio = breakdown.net > 0 ? breakdown.custom / breakdown.net : 0;
-  const score = healthScore({ savingsRate, givingRate, budgetAdherence: adherence, debtRatio });
-
-  const portfolioValue = (investments.data ?? []).reduce((s, i) => s + Number(i.current_value), 0);
-  const nw = computeNetWorth({
-    accounts: accounts.data ?? [],
-    investments: investments.data ?? [],
-    debts: debts.data ?? [],
-  });
-
-  const allocation = (budgets.data ?? [])
-  .map((b) => ({
-    name: b.category,
-    value: Number(b.limit_amount),
-  }))
-  .sort((a, b) => b.value - a.value);
-  
-const categorySpend = Array.from(spendByCat.entries())
-  .map(([category, amount]) => ({
-    category,
-    amount,
-  }))
-  .sort((a, b) => b.amount - a.amount)
-  .slice(0, 8);
-
-  // Consistent palette from largest → smallest
-const COLORS = [
-  "#2563EB", // Blue
-  "#10B981", // Emerald
-  "#F59E0B", // Amber
-  "#8B5CF6", // Violet
-  "#EF4444", // Red
-  "#06B6D4", // Cyan
-  "#F97316", // Orange
-  "#84CC16", // Lime
-];
-
+  const m = useMemo(
+    () => computeDashboard({
+      incomeEntries: incomeEntries.data ?? [],
+      expenses: expenses.data ?? [],
+      budgets: budgets.data ?? [],
+      accounts: accounts.data ?? [],
+      debts: debts.data ?? [],
+      investments: investments.data ?? [],
+      goals: goals.data ?? [],
+      subscriptions: subscriptions.data ?? [],
+      deductions: deductions.data ?? [],
+      allExpenses: allExpenses.data ?? [],
+      allIncome: allIncome.data ?? [],
+      titheEnabled: !!profile.data?.tithe_enabled,
+      titheRate: profile.data?.tithe_rate ?? 0.1,
+      period,
+    }),
+    [incomeEntries.data, expenses.data, budgets.data, accounts.data, debts.data,
+     investments.data, goals.data, subscriptions.data, deductions.data,
+     allExpenses.data, allIncome.data, profile.data, period],
+  );
 
   async function handleClose(p: string) {
     setClosing(true);
@@ -115,21 +94,19 @@ const COLORS = [
     }
   }
 
-  // Detect: previous month has activity but isn't closed.
-  const prevHasActivity = !prevClosed && (closures.data?.length ?? 0) >= 0; // simple cue; real data check below
-  // We surface the banner whenever the previous month closure is missing — user can dismiss by closing.
+  const band = m.score != null ? healthScoreBand(m.score) : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 md:space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-sm text-muted-foreground">{monthLabel()}</p>
-          <h2 className="text-2xl font-semibold tracking-tight">
+          <h2 className="text-xl font-bold tracking-tight md:text-2xl">
             Welcome{profile.data?.full_name ? `, ${profile.data.full_name.split(" ")[0]}` : ""}.
           </h2>
         </div>
         {isClosed ? (
-          <div className="flex items-center gap-2 rounded-full bg-success/15 px-3 py-1.5 text-xs font-medium text-success">
+          <div className="flex items-center gap-2 rounded-full bg-success/15 px-3 py-1.5 text-xs font-semibold text-success">
             <CheckCircle2 className="h-3.5 w-3.5" /> {period} closed
           </div>
         ) : (
@@ -139,14 +116,13 @@ const COLORS = [
         )}
       </div>
 
-      {/* Close-previous-month nudge */}
-      {prevHasActivity && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent/50 bg-accent/20 p-4 text-sm text-accent-foreground">
+      {!prevClosed && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent bg-accent/60 p-4 text-sm text-accent-foreground">
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4" />
             <div>
-              <div className="font-medium">Previous month ({prev}) isn't closed yet.</div>
-              <div className="text-xs">Close it to lock its reconciliation snapshot. You can reopen and edit it any time from History.</div>
+              <div className="font-semibold">Previous month ({prev}) isn't closed yet.</div>
+              <div className="text-xs opacity-90">Close it to lock its reconciliation snapshot. You can reopen and edit it any time from History.</div>
             </div>
           </div>
           <div className="flex gap-2">
@@ -156,134 +132,124 @@ const COLORS = [
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2.5 md:gap-4 lg:grid-cols-4">
-        <StatCard
-          accent
-          label="Income received"
-          value={formatCurrency(breakdown.net, currency)}
-          hint={`${(incomeEntries.data ?? []).length} entries`}
-          icon={<Wallet className="h-5 w-5" />}
+      {/* Executive summary tiles */}
+      <div className="grid grid-cols-2 gap-2.5 md:gap-4 lg:grid-cols-5">
+        <Tile
+          label="Net worth"
+          value={formatCurrency(m.netWorth.net, currency)}
+          hint={`Assets ${formatCurrency(m.netWorth.assets, currency)}`}
+          icon={<Scale className="h-4 w-4" />}
+          emphasis
         />
-        <StatCard
-          label="Disposable"
-          value={formatCurrency(Math.max(0, remaining), currency)}
-          hint={remaining < 0 ? `Over by ${formatCurrency(-remaining, currency)}` : (titheEnabled ? "After tithe + spend + fees" : "After spend + fees")}
-          icon={<HandCoins className="h-5 w-5" />}
+        <Tile
+          label="Monthly cash flow"
+          value={formatCurrency(m.cashFlow, currency)}
+          hint={m.cashFlow >= 0 ? "Retained this month" : "Spending exceeds income"}
+          icon={<HandCoins className="h-4 w-4" />}
+          tone={m.cashFlow >= 0 ? "success" : "destructive"}
         />
-        <StatCard
-          label="Net Worth"
-          value={formatCurrency(nw.net, currency)}
-          hint={`Assets ${formatCurrency(nw.assets, currency)}`}
-          icon={<Scale className="h-5 w-5" />}
+        <Tile
+          label="Savings rate"
+          value={`${Math.round(m.savingsRate * 100)}%`}
+          hint={`Target 20% · income ${formatCurrency(m.income, currency)}`}
+          icon={<TrendingUp className="h-4 w-4" />}
         />
-        <StatCard
-          label="Transaction fees"
-          value={formatCurrency(totalFees, currency)}
-          hint={`${(expenses.data ?? []).filter((e) => Number(e.transaction_fee) > 0).length} txns with fees`}
-          icon={<TrendingUp className="h-5 w-5" />}
+        <Tile
+          label="Financial health"
+          value={m.score != null ? `${m.score}/100` : "—"}
+          hint={band ? band.label : "Complete your profile"}
+          icon={<Activity className="h-4 w-4" />}
+          tone={band?.tone === "destructive" ? "destructive" : band?.tone === "warning" ? "warning" : band ? "success" : undefined}
+        />
+        <Tile
+          label="Budget performance"
+          value={m.budgetTotal > 0 ? `${Math.round(m.budgetUsedPct)}%` : "—"}
+          hint={m.budgetTotal > 0 ? `${formatCurrency(m.spent, currency)} of ${formatCurrency(m.budgetTotal, currency)}` : "No budgets yet"}
+          icon={<Wallet className="h-4 w-4" />}
+          tone={m.budgetUsedPct > 100 ? "destructive" : m.budgetUsedPct > 85 ? "warning" : undefined}
         />
       </div>
 
-      {/* Net Worth tracker */}
-      <div className="rounded-2xl border bg-card p-4 md:p-6 shadow-card">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold">Net worth</h3>
-            <p className="text-[11px] text-muted-foreground md:text-xs">Assets minus liabilities · updates live</p>
-          </div>
-          <Scale className="h-5 w-5 text-primary" />
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-3">
-          <div>
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">Assets</div>
-            <div className="mt-0.5 text-base font-semibold tabular-nums text-primary md:text-xl">{formatCurrency(nw.assets, currency)}</div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">Liabilities</div>
-            <div className="mt-0.5 text-base font-semibold tabular-nums text-[oklch(0.5_0.12_35)] md:text-xl">{formatCurrency(nw.liabilities, currency)}</div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">Net worth</div>
-            <div className={`mt-0.5 text-base font-semibold tabular-nums md:text-xl ${nw.net >= 0 ? "text-primary" : "text-destructive"}`}>{formatCurrency(nw.net, currency)}</div>
-          </div>
-        </div>
-        {(() => {
-          const total = Math.max(1, nw.assets + nw.liabilities);
-          const assetPct = (nw.assets / total) * 100;
-          const liabPct = (nw.liabilities / total) * 100;
-          return (
-            <div className="mt-4 flex h-2.5 w-full overflow-hidden rounded-full bg-secondary">
-              <div className="h-full bg-[oklch(0.42_0.08_55)]" style={{ width: `${assetPct}%` }} />
-              <div className="h-full bg-[oklch(0.68_0.11_65)]" style={{ width: `${liabPct}%` }} />
-            </div>
-          );
-        })()}
-        <p className={`mt-3 text-xs font-medium ${nw.net >= 0 ? "text-primary" : "text-[oklch(0.5_0.12_35)]"}`}>
-          {nw.net >= 0 ? "You own more than you owe. Keep building." : "Your liabilities exceed your assets. Focus on debt reduction."}
-        </p>
-
-      </div>
-
-      {(accounts.data?.length ?? 0) > 0 && (
-        <div className="rounded-2xl border bg-card p-3.5 md:p-6 shadow-card">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold md:text-base">Where your money is</h3>
-            <Link to="/accounts" className="text-xs font-medium text-primary hover:underline">Manage</Link>
-          </div>
-          <p className="text-[11px] md:text-xs text-muted-foreground">Live balances</p>
-          {/* Mobile: horizontal snap carousel. Desktop: grid */}
-          <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 md:hidden -mx-3.5 px-3.5 snap-x snap-mandatory">
-            {(accounts.data ?? []).map((a) => (
-              <div key={a.id} className="min-w-[58%] shrink-0 snap-start rounded-xl border bg-gradient-to-br from-secondary/40 to-background p-3">
-                <div className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">{a.type}</div>
-                <div className="mt-0.5 truncate text-xs font-medium">{a.name}</div>
-                <div className="mt-1 truncate text-base font-semibold tabular-nums">{formatCurrency(Number(a.balance), currency)}</div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 hidden gap-3 md:grid md:grid-cols-2 lg:grid-cols-4">
-            {(accounts.data ?? []).map((a) => (
-              <div key={a.id} className="rounded-xl border p-3">
-                <div className="text-xs text-muted-foreground capitalize">{a.type}{a.institution ? ` · ${a.institution}` : ""}</div>
-                <div className="mt-0.5 text-sm font-medium">{a.name}</div>
-                <div className="mt-1 text-lg font-semibold tabular-nums">{formatCurrency(Number(a.balance), currency)}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
+      {/* Health score detail / onboarding */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border bg-card p-6 shadow-card lg:col-span-2">
-          <div className="flex items-center justify-between">
+        <div className="rounded-2xl border bg-card p-5 shadow-card lg:col-span-2 md:p-6">
+          {m.score == null ? (
             <div>
-              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Financial Health</div>
-              <div className="mt-1 text-3xl font-semibold tabular-nums">{score}<span className="text-base text-muted-foreground"> / 100</span></div>
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <Info className="h-4 w-4" /> Financial health
+              </div>
+              <h3 className="mt-2 text-lg">Complete your financial profile</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Your score appears once there is enough to measure. Still to do: {m.missing.join(", ")}.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button asChild size="sm"><Link to="/income-entries">Record income</Link></Button>
+                <Button asChild size="sm" variant="outline"><Link to="/accounts">Add accounts</Link></Button>
+                <Button asChild size="sm" variant="outline"><Link to="/expenses">Log expenses</Link></Button>
+              </div>
             </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary">
-              <Sparkles className="h-6 w-6" />
+          ) : (
+            <>
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Financial health</div>
+                  <div className="mt-1 text-3xl font-bold tabular-nums">
+                    {m.score}<span className="text-base font-medium text-muted-foreground"> / 100</span>
+                  </div>
+                  <div className={`mt-1 text-xs font-semibold ${
+                    band!.tone === "success" ? "text-success"
+                    : band!.tone === "info" ? "text-info"
+                    : band!.tone === "warning" ? "text-warning" : "text-destructive"}`}>
+                    {band!.label}
+                  </div>
+                </div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+              </div>
+              <Progress value={m.score} className="mt-4" />
+              <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+                <Metric label="Savings rate" value={`${Math.round(m.savingsRate * 100)}%`} />
+                <Metric label="Budget adherence" value={`${Math.round(m.adherence * 100)}%`} />
+                <Metric label="Debt service" value={`${Math.round(m.debtRatio * 100)}%`} />
+                <Metric label="Liquidity" value={`${m.liquidityMonths.toFixed(1)} mo`} />
+              </div>
+            </>
+          )}
+
+          {m.insights.length > 0 && (
+            <div className="mt-5 space-y-2 border-t pt-4">
+              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">AI insights</div>
+              {m.insights.map((ins, idx) => (
+                <div
+                  key={idx}
+                  className={`flex items-start gap-2 rounded-xl border p-2.5 text-xs ${
+                    ins.tone === "success" ? "border-success/30 bg-success/10 text-success"
+                    : ins.tone === "warning" ? "border-warning/30 bg-warning/10 text-warning"
+                    : "border-info/30 bg-info/10 text-info"}`}
+                >
+                  <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  <span className="font-medium leading-relaxed">{ins.text}</span>
+                </div>
+              ))}
+              <Link to="/advisor" className="inline-flex items-center gap-1 pt-1 text-xs font-semibold text-primary hover:underline">
+                Ask the AI advisor <ArrowRight className="h-3 w-3" />
+              </Link>
             </div>
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
-            <Metric label="Total income" value={formatCurrency(breakdown.net, currency)} />
-            {titheEnabled && <Metric label={`Tithe (${Math.round(titheRate * 100)}%)`} value={formatCurrency(breakdown.tithe, currency)} />}
-            <Metric label="Spent" value={formatCurrency(totalSpent, currency)} />
-            <Metric label="Disposable" value={formatCurrency(Math.max(0, remaining), currency)} />
-          </div>
+          )}
         </div>
 
-        <div className="rounded-2xl border bg-gradient-hero p-6 text-primary-foreground shadow-elevated">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-80">
-            <BookOpen className="h-4 w-4" />
-            Today's stewardship
+        <div className="rounded-2xl border bg-gradient-hero p-5 text-primary-foreground shadow-elevated md:p-6">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest opacity-80">
+            <BookOpen className="h-4 w-4" /> Today's stewardship
           </div>
           {devo.data ? (
             <>
-              <p className="mt-3 text-sm leading-relaxed italic">"{devo.data.verse}"</p>
+              <p className="mt-3 text-sm italic leading-relaxed">"{devo.data.verse}"</p>
               <p className="mt-1 text-xs opacity-80">— {devo.data.verse_reference}</p>
               <p className="mt-4 text-sm leading-relaxed opacity-90">"{devo.data.egw_quote}"</p>
               {devo.data.egw_source && <p className="mt-1 text-[11px] opacity-70">— {devo.data.egw_source}</p>}
-              <Link to="/stewardship" className="mt-4 inline-block text-xs font-medium underline opacity-90">Open devotional →</Link>
+              <Link to="/stewardship" className="mt-4 inline-block text-xs font-semibold underline opacity-90">Open devotional →</Link>
             </>
           ) : (
             <p className="mt-3 text-sm opacity-80">Loading today's reflection…</p>
@@ -291,16 +257,63 @@ const COLORS = [
         </div>
       </div>
 
+      {/* Balances rail — the only horizontal scroller in the app */}
+      {(accounts.data?.length ?? 0) > 0 && (
+        <div className="rounded-2xl border bg-card p-3.5 shadow-card md:p-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold md:text-base">Where your money is</h3>
+            <Link to="/accounts" className="text-xs font-semibold text-primary hover:underline">Manage</Link>
+          </div>
+          <p className="text-[11px] text-muted-foreground md:text-xs">
+            Liquid {formatCurrency(m.liquid, currency)} · live balances
+          </p>
+          <div className="-mx-3.5 mt-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-3.5 pb-1 md:mx-0 md:px-0">
+            {(accounts.data ?? []).map((a) => (
+              <div key={a.id} className="min-w-[58%] shrink-0 snap-start rounded-xl border bg-gradient-surface p-3 md:min-w-[220px]">
+                <div className="truncate text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{a.type}</div>
+                <div className="mt-0.5 truncate text-xs font-medium">{a.name}</div>
+                <div className="mt-1 truncate text-base font-bold tabular-nums">{formatCurrency(Number(a.balance), currency)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Trend */}
+      <div className="rounded-2xl border bg-card p-4 shadow-card md:p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-bold md:text-base">Income, spending & savings</h3>
+            <p className="text-[11px] text-muted-foreground md:text-xs">Last 6 months</p>
+          </div>
+          <Link to="/statements" className="text-xs font-semibold text-primary hover:underline">Reports</Link>
+        </div>
+        <div className="mt-4 h-60 w-full md:h-72">
+          <ResponsiveContainer>
+            <AreaChart data={m.trend} margin={{ left: -18, right: 6, top: 6, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={CHART_GRID_STROKE} />
+              <XAxis dataKey="month" tick={CHART_AXIS_TICK} />
+              <YAxis tick={CHART_AXIS_TICK} width={64} tickFormatter={(v: number) => Intl.NumberFormat(undefined, { notation: "compact" }).format(v)} />
+              <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Area type="monotone" dataKey="income" stroke={SERIES_COLORS.income} fill={SERIES_COLORS.income} fillOpacity={0.15} strokeWidth={2} />
+              <Area type="monotone" dataKey="spending" stroke={SERIES_COLORS.spending} fill={SERIES_COLORS.spending} fillOpacity={0.12} strokeWidth={2} />
+              <Area type="monotone" dataKey="savings" stroke={SERIES_COLORS.savings} fill={SERIES_COLORS.savings} fillOpacity={0.12} strokeWidth={2} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border bg-card p-6 shadow-card">
-          <h3 className="font-semibold">Budget allocation</h3>
-          <p className="text-xs text-muted-foreground">{monthLabel()}</p>
-          <div className="mt-4 h-64">
-            {allocation.length ? (
+        <div className="rounded-2xl border bg-card p-4 shadow-card md:p-6">
+          <h3 className="text-sm font-bold md:text-base">Budget allocation</h3>
+          <p className="text-[11px] text-muted-foreground md:text-xs">{monthLabel()}</p>
+          <div className="mt-4 h-60 w-full">
+            {m.allocation.length ? (
               <ResponsiveContainer>
                 <PieChart>
-                  <Pie data={allocation} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} paddingAngle={2}>
-                    {allocation.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                  <Pie data={m.allocation} dataKey="value" nameKey="name" innerRadius={48} outerRadius={86} paddingAngle={2}>
+                    {m.allocation.map((_, i) => <Cell key={i} fill={chartColorByRank(i)} />)}
                   </Pie>
                   <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
                 </PieChart>
@@ -309,101 +322,95 @@ const COLORS = [
           </div>
         </div>
 
-        <div className="rounded-2xl border bg-card p-6 shadow-card">
-          <h3 className="font-semibold">Top spending categories</h3>
-          <p className="text-xs text-muted-foreground">{monthLabel()}</p>
-          <div className="mt-4 h-64">
-            {categorySpend.length ? (
-              <ResponsiveContainer>
-                <BarChart data={categorySpend}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(0.9 0.02 70)" />
-                  <XAxis dataKey="category" tick={{ fontSize: 11 }} interval={0} angle={-20} textAnchor="end" height={60} />
-                  <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
-                  <Bar dataKey="amount" radius={[6, 6, 0, 0]}>
-  {categorySpend.map((_, index) => (
-    <Cell
-      key={index}
-      fill={COLORS[index % COLORS.length]}
-    />
-  ))}
-</Bar>
-
-                </BarChart>
-              </ResponsiveContainer>
-            ) : <EmptyState label="No expenses logged" to="/expenses" cta="Add expenses" />}
+        <div className="rounded-2xl border bg-card p-4 shadow-card md:p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold md:text-base">Upcoming bills</h3>
+              <p className="text-[11px] text-muted-foreground md:text-xs">Next scheduled charges</p>
+            </div>
+            <Link to="/subscriptions" className="text-xs font-semibold text-primary hover:underline">Manage</Link>
           </div>
+          {m.upcomingBills.length ? (
+            <ul className="mt-4 divide-y">
+              {m.upcomingBills.map((b) => (
+                <li key={b.id} className="flex items-center justify-between gap-3 py-2.5">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <CalendarClock className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">{b.name}</div>
+                      <div className="text-[11px] text-muted-foreground">{b.due}</div>
+                    </div>
+                  </div>
+                  <div className="shrink-0 text-sm font-semibold tabular-nums">{formatCurrency(b.amount, currency)}</div>
+                </li>
+              ))}
+            </ul>
+          ) : <div className="mt-4"><EmptyState label="No upcoming bills" to="/subscriptions" cta="Add a subscription" /></div>}
         </div>
       </div>
 
-      <div className="rounded-2xl border bg-card p-6 shadow-card">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Budget progress</h3>
-          <Link to="/budgets" className="text-xs font-medium text-primary hover:underline">Manage</Link>
-        </div>
-        {budgets.data?.length ? (
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {budgets.data.map((b) => {
-              const spent = spendByCat.get(b.category) ?? 0;
-              const pct = b.limit_amount > 0 ? Math.min(100, (spent / b.limit_amount) * 100) : 0;
-              const over = spent > b.limit_amount;
-              return (
-                <div key={b.id} className="space-y-1.5">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border bg-card p-4 shadow-card md:p-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold md:text-base">Savings goals</h3>
+            <Link to="/goals" className="text-xs font-semibold text-primary hover:underline">Manage</Link>
+          </div>
+          {m.goals.length ? (
+            <div className="mt-4 space-y-4">
+              {m.goals.map((g) => (
+                <div key={g.id}>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{b.category}</span>
-                    <span className={over ? "text-destructive" : "text-muted-foreground"}>
-                      {formatCurrency(spent, currency)} / {formatCurrency(b.limit_amount, currency)}
+                    <span className="flex items-center gap-1.5 font-medium"><Target className="h-3.5 w-3.5 text-primary" />{g.name}</span>
+                    <span className="tabular-nums text-muted-foreground">
+                      {formatCurrency(g.current, currency)} / {formatCurrency(g.target, currency)}
                     </span>
                   </div>
-                  <Progress value={pct} />
+                  <Progress value={g.pct} className="mt-2" />
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          <EmptyState className="mt-4" label="No budgets set up yet" to="/budgets" cta="Set up budgets" />
-        )}
-      </div>
-
-      <div className="rounded-2xl border bg-card p-6 shadow-card">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Savings goals</h3>
-          <Link to="/goals" className="text-xs font-medium text-primary hover:underline">Manage</Link>
+              ))}
+            </div>
+          ) : <div className="mt-4"><EmptyState label="No goals yet" to="/goals" cta="Create a goal" /></div>}
         </div>
-        {goals.data?.length ? (
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
-            {goals.data.slice(0, 3).map((g) => {
-              const pct = g.target_amount > 0 ? Math.min(100, (g.current_amount / g.target_amount) * 100) : 0;
-              return (
-                <div key={g.id} className="rounded-xl border p-4">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <Target className="h-4 w-4 text-primary" />
-                    {g.name}
-                  </div>
-                  <div className="mt-2 text-lg font-semibold tabular-nums">
-                    {formatCurrency(g.current_amount, currency)}
-                    <span className="ml-1 text-xs font-normal text-muted-foreground">/ {formatCurrency(g.target_amount, currency)}</span>
-                  </div>
-                  <Progress value={pct} className="mt-3" />
-                </div>
-              );
-            })}
+
+        <div className="rounded-2xl border bg-card p-4 shadow-card md:p-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold md:text-base">Recent transactions</h3>
+            <Link to="/transactions" className="text-xs font-semibold text-primary hover:underline">View all</Link>
           </div>
-        ) : (
-          <EmptyState className="mt-4" label="No goals yet" to="/goals" cta="Create a goal" />
-        )}
+          {(expenses.data?.length ?? 0) + (incomeEntries.data?.length ?? 0) > 0 ? (
+            <ul className="mt-3 divide-y">
+              {[
+                ...(incomeEntries.data ?? []).map((e) => ({ id: e.id, date: e.date, label: e.source, amount: Number(e.amount), kind: "in" as const })),
+                ...(expenses.data ?? []).map((e) => ({ id: e.id, date: e.date, label: e.description || e.category, amount: Number(e.amount), kind: "out" as const })),
+              ]
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .slice(0, 5)
+                .map((t) => (
+                  <li key={`${t.kind}-${t.id}`} className="flex items-center justify-between gap-3 py-2.5">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">{t.label}</div>
+                      <div className="text-[11px] text-muted-foreground">{t.date}</div>
+                    </div>
+                    <div className={`shrink-0 text-sm font-semibold tabular-nums ${t.kind === "in" ? "text-success" : "text-foreground"}`}>
+                      {t.kind === "in" ? "+" : "−"}{formatCurrency(t.amount, currency)}
+                    </div>
+                  </li>
+                ))}
+            </ul>
+          ) : <div className="mt-4"><EmptyState label="Nothing logged yet" to="/transactions" cta="Add a transaction" /></div>}
+        </div>
       </div>
 
       <Dialog open={confirm} onOpenChange={setConfirm}>
         <DialogContent>
           <DialogHeader><DialogTitle>Close {period}?</DialogTitle></DialogHeader>
           <div className="space-y-3 text-sm">
-            <p>This locks the current month and produces a reconciliation snapshot. {period} will be archived and protected from edits. Next month auto-opens with your recurring budget lines pre-filled.</p>
-            <div className="rounded-xl border bg-secondary/50 p-3 text-xs">
-              <div className="flex justify-between"><span>Net income</span><span className="font-medium tabular-nums">{formatCurrency(breakdown.net, currency)}</span></div>
-              <div className="flex justify-between"><span>Total spend</span><span className="font-medium tabular-nums">{formatCurrency(totalSpent, currency)}</span></div>
-              {titheEnabled && <div className="flex justify-between"><span>Tithe set aside</span><span className="font-medium tabular-nums">{formatCurrency(breakdown.tithe, currency)}</span></div>}
-              <div className="flex justify-between"><span>Net worth</span><span className="font-medium tabular-nums">{formatCurrency(nw.net, currency)}</span></div>
+            <p>This locks the current month and produces a reconciliation snapshot. Next month auto-opens with your recurring budget lines pre-filled.</p>
+            <div className="rounded-xl border bg-muted/60 p-3 text-xs">
+              <Row label="Income" value={formatCurrency(m.income, currency)} />
+              <Row label="Total spend" value={formatCurrency(m.spent + m.fees, currency)} />
+              <Row label="Cash flow" value={formatCurrency(m.cashFlow, currency)} />
+              <Row label="Net worth" value={formatCurrency(m.netWorth.net, currency)} />
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="ghost" onClick={() => setConfirm(false)} disabled={closing}>Cancel</Button>
@@ -417,7 +424,7 @@ const COLORS = [
         <DialogContent>
           <DialogHeader><DialogTitle>Close {prev}?</DialogTitle></DialogHeader>
           <div className="space-y-3 text-sm">
-            <p>Generate the reconciliation snapshot for {prev} and lock it. You can always reopen and edit it later from the History page — that won't affect this month.</p>
+            <p>Generate the reconciliation snapshot for {prev} and lock it. You can reopen and edit it later from History — that won't affect this month.</p>
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="ghost" onClick={() => setClosePrev(false)} disabled={closing}>Cancel</Button>
               <Button onClick={() => handleClose(prev)} disabled={closing}>{closing ? "Closing…" : `Close ${prev}`}</Button>
@@ -429,11 +436,41 @@ const COLORS = [
   );
 }
 
+function Tile({ label, value, hint, icon, emphasis, tone }: {
+  label: string; value: string; hint?: string;
+  icon: React.ReactNode; emphasis?: boolean;
+  tone?: "success" | "warning" | "destructive";
+}) {
+  const toneClass =
+    tone === "success" ? "text-success"
+    : tone === "warning" ? "text-warning"
+    : tone === "destructive" ? "text-destructive"
+    : "";
+  return (
+    <div className={`card-hover rounded-2xl border p-3 shadow-card md:p-4 ${emphasis ? "bg-gradient-primary text-primary-foreground" : "bg-card"}`}>
+      <div className="flex items-center justify-between gap-2">
+        <span className={`text-[10px] font-semibold uppercase tracking-wide md:text-[11px] ${emphasis ? "opacity-85" : "text-muted-foreground"}`}>{label}</span>
+        <span className={emphasis ? "opacity-85" : "text-muted-foreground"}>{icon}</span>
+      </div>
+      <div className={`mt-1.5 truncate text-lg font-bold tabular-nums md:text-xl ${emphasis ? "" : toneClass}`}>{value}</div>
+      {hint && <div className={`mt-0.5 truncate text-[10px] md:text-[11px] ${emphasis ? "opacity-80" : "text-muted-foreground"}`}>{hint}</div>}
+    </div>
+  );
+}
+
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="text-lg font-semibold tabular-nums">{value}</div>
+      <div className="text-[11px] text-muted-foreground">{label}</div>
+      <div className="text-base font-bold tabular-nums md:text-lg">{value}</div>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between py-0.5">
+      <span>{label}</span><span className="font-semibold tabular-nums">{value}</span>
     </div>
   );
 }
@@ -442,7 +479,7 @@ function EmptyState({ label, to, cta, className = "" }: { label: string; to: str
   return (
     <div className={`flex h-full flex-col items-center justify-center rounded-xl border border-dashed py-8 text-center ${className}`}>
       <p className="text-sm text-muted-foreground">{label}</p>
-      <Link to={to} className="mt-2 text-sm font-medium text-primary hover:underline">{cta} →</Link>
+      <Link to={to} className="mt-2 text-sm font-semibold text-primary hover:underline">{cta} →</Link>
     </div>
   );
 }

@@ -19,7 +19,9 @@ const overview = [
 ] as const;
 
 const money = [
+  { title: "Money Tracker", url: "/transactions", icon: Receipt },
   { title: "Income", url: "/income-entries", icon: Coins },
+
   { title: "Budgets", url: "/budgets", icon: Wallet },
   { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Charity & Giving", url: "/giving", icon: Church },

@@ -72,13 +72,47 @@ export function groupForCategory(cat: string): string {
   return "Other";
 }
 
-export function healthScore(opts: { savingsRate: number; givingRate: number; budgetAdherence: number; debtRatio: number }) {
-  const s = Math.min(1, opts.savingsRate / 0.2) * 30;
-  const g = Math.min(1, opts.givingRate / 0.1) * 25;
-  const b = opts.budgetAdherence * 30;
-  const d = (1 - Math.min(1, opts.debtRatio / 0.4)) * 15;
-  return Math.round(s + g + b + d);
+export type HealthInputs = {
+  savingsRate: number;
+  givingRate: number;
+  budgetAdherence: number;
+  debtRatio: number;
+  /** Months of expenses covered by liquid balances. */
+  liquidityMonths?: number;
+};
+
+export function healthScore(opts: HealthInputs) {
+  const s = Math.min(1, Math.max(0, opts.savingsRate) / 0.2) * 30;
+  const g = Math.min(1, Math.max(0, opts.givingRate) / 0.1) * 15;
+  const b = Math.min(1, Math.max(0, opts.budgetAdherence)) * 25;
+  const d = (1 - Math.min(1, Math.max(0, opts.debtRatio) / 0.4)) * 15;
+  const l = Math.min(1, Math.max(0, opts.liquidityMonths ?? 0) / 3) * 15;
+  return Math.round(s + g + b + d + l);
 }
+
+/**
+ * A score is only meaningful once the user has the minimum data.
+ * Returns the list of missing pieces — empty means the score can be shown.
+ */
+export function healthScoreReadiness(opts: {
+  incomeEntries: number;
+  accounts: number;
+  expenses: number;
+}): string[] {
+  const missing: string[] = [];
+  if (opts.incomeEntries < 1) missing.push("record your income for the month");
+  if (opts.accounts < 1) missing.push("add at least one account");
+  if (opts.expenses < 1) missing.push("log some expenses");
+  return missing;
+}
+
+export function healthScoreBand(score: number): { label: string; tone: "success" | "info" | "warning" | "destructive" } {
+  if (score >= 80) return { label: "Excellent", tone: "success" };
+  if (score >= 60) return { label: "Healthy", tone: "info" };
+  if (score >= 40) return { label: "Needs attention", tone: "warning" };
+  return { label: "At risk", tone: "destructive" };
+}
+
 
 export function diversificationScore(streams: { amount: number }[]): number {
   const total = streams.reduce((s, x) => s + Math.max(0, x.amount), 0);
