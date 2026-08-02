@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useIncomeEntries, useProfile, useAccounts } from "@/lib/queries";
+import { useIncomeEntries, useProfile, useAccounts, type BudgetSplitRule } from "@/lib/queries";
 import { formatCurrency, isoLocalDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
