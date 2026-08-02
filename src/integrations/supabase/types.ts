@@ -122,6 +122,45 @@ export type Database = {
         }
         Relationships: []
       }
+      budget_split_rules: {
+        Row: {
+          active: boolean
+          base_type: string
+          category: string
+          created_at: string
+          id: string
+          month: string
+          notes: string | null
+          percentage: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          base_type?: string
+          category: string
+          created_at?: string
+          id?: string
+          month: string
+          notes?: string | null
+          percentage?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          base_type?: string
+          category?: string
+          created_at?: string
+          id?: string
+          month?: string
+          notes?: string | null
+          percentage?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       budgets: {
         Row: {
           archived_at: string | null
@@ -1071,6 +1110,10 @@ export type Database = {
     Functions: {
       apply_account_delta: {
         Args: { p_account: string; p_delta: number }
+        Returns: undefined
+      }
+      seed_budget_split_rules_for_month: {
+        Args: { p_target_month: string; p_user_id: string }
         Returns: undefined
       }
     }
