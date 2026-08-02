@@ -67,7 +67,8 @@ function IncomeEntries() {
       return;
     }
 
-    for (const rule of splitRules ?? []) {
+    for (const rule of ((splitRules ?? []) as unknown as BudgetSplitRule[])) {
+
       const pct = Number(rule.percentage ?? 0);
       if (!Number.isFinite(pct) || pct <= 0) continue;
       const baseAmount = rule.base_type === "disposable" ? disposableBase : incomeAmount;
