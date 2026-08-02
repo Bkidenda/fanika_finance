@@ -286,7 +286,7 @@ function Dashboard() {
             <h3 className="text-sm font-bold md:text-base">Income, spending & savings</h3>
             <p className="text-[11px] text-muted-foreground md:text-xs">Last 6 months</p>
           </div>
-          <Link to="/reports" className="text-xs font-semibold text-primary hover:underline">Reports</Link>
+          <Link to="/statements" className="text-xs font-semibold text-primary hover:underline">Reports</Link>
         </div>
         <div className="mt-4 h-60 w-full md:h-72">
           <ResponsiveContainer>

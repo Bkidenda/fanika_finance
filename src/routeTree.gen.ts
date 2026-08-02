@@ -20,6 +20,7 @@ import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AppTransactionsRouteImport } from './routes/_app/transactions'
 import { Route as AppTitheRouteImport } from './routes/_app/tithe'
 import { Route as AppSubscriptionsRouteImport } from './routes/_app/subscriptions'
 import { Route as AppStewardshipRouteImport } from './routes/_app/stewardship'
@@ -95,6 +96,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppTransactionsRoute = AppTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppTitheRoute = AppTitheRouteImport.update({
   id: '/tithe',
@@ -233,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/stewardship': typeof AppStewardshipRoute
   '/subscriptions': typeof AppSubscriptionsRoute
   '/tithe': typeof AppTitheRoute
+  '/transactions': typeof AppTransactionsRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesByTo {
@@ -266,6 +273,7 @@ export interface FileRoutesByTo {
   '/stewardship': typeof AppStewardshipRoute
   '/subscriptions': typeof AppSubscriptionsRoute
   '/tithe': typeof AppTitheRoute
+  '/transactions': typeof AppTransactionsRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesById {
@@ -301,6 +309,7 @@ export interface FileRoutesById {
   '/_app/stewardship': typeof AppStewardshipRoute
   '/_app/subscriptions': typeof AppSubscriptionsRoute
   '/_app/tithe': typeof AppTitheRoute
+  '/_app/transactions': typeof AppTransactionsRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRouteTypes {
@@ -336,6 +345,7 @@ export interface FileRouteTypes {
     | '/stewardship'
     | '/subscriptions'
     | '/tithe'
+    | '/transactions'
     | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/stewardship'
     | '/subscriptions'
     | '/tithe'
+    | '/transactions'
     | '/api/chat'
   id:
     | '__root__'
@@ -403,6 +414,7 @@ export interface FileRouteTypes {
     | '/_app/stewardship'
     | '/_app/subscriptions'
     | '/_app/tithe'
+    | '/_app/transactions'
     | '/api/chat'
   fileRoutesById: FileRoutesById
 }
@@ -498,6 +510,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/transactions': {
+      id: '/_app/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof AppTransactionsRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/tithe': {
       id: '/_app/tithe'
@@ -671,6 +690,7 @@ interface AppRouteChildren {
   AppStewardshipRoute: typeof AppStewardshipRoute
   AppSubscriptionsRoute: typeof AppSubscriptionsRoute
   AppTitheRoute: typeof AppTitheRoute
+  AppTransactionsRoute: typeof AppTransactionsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -695,6 +715,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppStewardshipRoute: AppStewardshipRoute,
   AppSubscriptionsRoute: AppSubscriptionsRoute,
   AppTitheRoute: AppTitheRoute,
+  AppTransactionsRoute: AppTransactionsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
