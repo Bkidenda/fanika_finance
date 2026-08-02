@@ -74,3 +74,7 @@ End-to-end pass with the browser: every route rendered at desktop/tablet/mobile,
 - Migrations expected: recurring-bill/category normalisation if gaps are found during the CRUD audit; no destructive schema changes.
 - `chart-colors.ts`, `src/lib/services/*`, `src/routes/_app/transactions.tsx`, and `src/routes/_app/reports.tsx` are new; existing module routes are restyled and kept.
 - Excel export adds one dependency (`xlsx`).
+
+## Blocking build error (fix first)
+
+`src/components/SignUpForm.tsx` has raw SQL (a `create table public.profiles` block plus RLS policies) pasted after the TypeScript code, and uses `React.FormEvent` without importing React. The build currently fails. Step one of the pass is deleting the stray SQL from that file and importing `FormEvent` from `react`.
