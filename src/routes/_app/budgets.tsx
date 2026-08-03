@@ -444,19 +444,24 @@ function Budgets() {
                     <div className="col-span-2 flex justify-end gap-1 md:col-span-1">
                       <button
                         title="Archive"
+                        aria-label={`Archive ${b.category}`}
                         onClick={() => updateField(b.id, { archived_at: new Date().toISOString() })}
                         className="text-muted-foreground hover:text-primary"
                       >
                         <Archive className="h-4 w-4" />
                       </button>
-                      <button
-                        title="Delete"
-                        onClick={() => removeLine(b.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <ConfirmDelete
+                        trigger={
+                          <button title="Delete" aria-label={`Delete ${b.category}`} className="text-muted-foreground hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        }
+                        title={`Delete "${b.category}"?`}
+                        description="This removes the budget line for this month. You can undo this right after deleting."
+                        onConfirm={() => removeLine({ id: b.id, category: b.category, limit_amount: Number(b.limit_amount), is_recurring: b.is_recurring, notes: b.notes ?? null })}
+                      />
                     </div>
+
                   </div>
                   <Progress value={pct} />
                   {over && <p className="text-xs text-destructive">Over budget by {formatCurrency(spent - Number(b.limit_amount), currency)}</p>}
