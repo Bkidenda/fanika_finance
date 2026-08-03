@@ -29,7 +29,8 @@ export const runAdvisor = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => AdvisorInput.parse(input))
   .handler(async ({ data, context }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI gateway not configured");
+    if (!apiKey) throw new Error("AI advisor is not configured yet. Please try again later.");
+
 
     const { supabase, userId } = context;
 
