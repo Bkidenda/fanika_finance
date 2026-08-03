@@ -72,13 +72,26 @@ function Advisor() {
   }
 
   const latest = insights.data?.[0];
+  const booting = profile.isLoading || insights.isLoading || expenses.isLoading || incomeEntries.isLoading;
+
+  if (booting) {
+    return (
+      <div className="space-y-6" role="status" aria-busy="true" aria-live="polite">
+        <span className="sr-only">Loading your financial review…</span>
+        <div className="h-16 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-36 animate-pulse rounded-2xl bg-muted" />
+        <div className="h-48 animate-pulse rounded-2xl bg-muted" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between">
         <div><p className="text-sm text-muted-foreground">Personalized financial review</p><h2 className="text-2xl font-semibold tracking-tight">AI Advisor</h2></div>
-        <Button onClick={runAnalysis} disabled={m.isPending}><Wand2 className="mr-1 h-4 w-4" />{m.isPending ? "Analyzing..." : "Run analysis"}</Button>
+        <Button onClick={runAnalysis} disabled={m.isPending} aria-busy={m.isPending} aria-label="Run AI financial analysis"><Wand2 className={`mr-1 h-4 w-4 ${m.isPending ? "animate-spin" : ""}`} />{m.isPending ? "Analyzing..." : "Run analysis"}</Button>
       </div>
+
 
       <div className="rounded-2xl border bg-gradient-hero p-6 text-primary-foreground shadow-elevated">
         <div className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-80"><Bot className="h-4 w-4" /> Snapshot</div>
