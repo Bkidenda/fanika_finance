@@ -325,28 +325,28 @@ function Dashboard() {
         <div className="rounded-2xl border bg-card p-4 shadow-card md:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold md:text-base">Upcoming bills</h3>
-              <p className="text-[11px] text-muted-foreground md:text-xs">Next scheduled charges</p>
+              <h3 className="text-sm font-bold md:text-base">Budget vs actual</h3>
+              <p className="text-[11px] text-muted-foreground md:text-xs">Largest categories this month</p>
             </div>
-            <Link to="/subscriptions" className="text-xs font-semibold text-primary hover:underline">Manage</Link>
+            <Link to="/budgets" className="text-xs font-semibold text-primary hover:underline">Manage</Link>
           </div>
-          {m.upcomingBills.length ? (
-            <ul className="mt-4 divide-y">
-              {m.upcomingBills.map((b) => (
-                <li key={b.id} className="flex items-center justify-between gap-3 py-2.5">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <CalendarClock className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-medium">{b.name}</div>
-                      <div className="text-[11px] text-muted-foreground">{b.due}</div>
-                    </div>
-                  </div>
-                  <div className="shrink-0 text-sm font-semibold tabular-nums">{formatCurrency(b.amount, currency)}</div>
-                </li>
-              ))}
-            </ul>
-          ) : <div className="mt-4"><EmptyState label="No upcoming bills" to="/subscriptions" cta="Add a subscription" /></div>}
+          <div className="mt-4 h-60 w-full">
+            {m.budgetVsActual.length ? (
+              <ResponsiveContainer>
+                <BarChart data={m.budgetVsActual} layout="vertical" margin={{ left: 4, right: 12, top: 4, bottom: 4 }}>
+                  <CartesianGrid horizontal={false} stroke={CHART_GRID_STROKE} />
+                  <XAxis type="number" tick={CHART_AXIS_TICK} tickFormatter={(v: number) => compactNumber(v)} />
+                  <YAxis type="category" dataKey="name" width={92} tick={CHART_AXIS_TICK} />
+                  <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Bar dataKey="budget" name="Budgeted" fill={chartColorByRank(1)} radius={[0, 6, 6, 0]} barSize={10} />
+                  <Bar dataKey="actual" name="Spent" fill={chartColorByRank(0)} radius={[0, 6, 6, 0]} barSize={10} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : <EmptyState label="No budget data yet" to="/budgets" cta="Create budgets" />}
+          </div>
         </div>
+
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
