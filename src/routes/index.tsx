@@ -54,7 +54,7 @@ function Home() {
               Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning. Fanika helps you make intentional financial decisions rooted in financial discipline, accountability, and long-term prosperity.
             </p>
             <p className="mt-3 hidden max-w-xl text-sm text-muted-foreground md:mt-4 md:block">
-              Start from your net take-home pay, automate tithes and giving, plan monthly budgets, track spending, manage debts, monitor investments, and stay aligned with your financial goals — all in one place.
+              Start from your net take-home pay, automate giving and commitments, plan monthly budgets, track spending, manage debts, monitor investments, and stay aligned with your financial goals — all in one place.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button size="lg" asChild>
