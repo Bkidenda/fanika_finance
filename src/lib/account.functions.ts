@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
 
 const USER_TABLES = [
   "account_transactions", "debt_payments", "expenses", "income_entries", "incomes",
@@ -44,6 +44,7 @@ export const deleteAccount = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ confirm: z.literal("DELETE") }).parse(input))
   .handler(async ({ context }) => {
     const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     for (const t of USER_TABLES) {
       await supabaseAdmin.from(t).delete().eq("user_id", userId);
     }
