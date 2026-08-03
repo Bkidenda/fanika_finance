@@ -140,12 +140,31 @@ function Budgets() {
     qc.invalidateQueries({ queryKey: ["budgets-all"] });
   }
 
-  async function removeLine(id: string) {
-    const { error } = await supabase.from("budgets").delete().eq("id", id);
+  async function removeLine(line: { id: string; category: string; limit_amount: number; is_recurring: boolean; notes: string | null }) {
+    const { error } = await supabase.from("budgets").delete().eq("id", line.id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["budgets"] });
     qc.invalidateQueries({ queryKey: ["budgets-all"] });
+    toast.success(`"${line.category}" removed`, {
+      action: {
+        label: "Undo",
+        onClick: async () => {
+          const { error: err } = await supabase.from("budgets").upsert(
+            {
+              user_id: user!.id, category: line.category, month,
+              limit_amount: Number(line.limit_amount), is_recurring: line.is_recurring, notes: line.notes,
+            },
+            { onConflict: "user_id,category,month" },
+          );
+          if (err) return toast.error("Couldn't restore this budget line.");
+          toast.success(`"${line.category}" restored`);
+          qc.invalidateQueries({ queryKey: ["budgets"] });
+          qc.invalidateQueries({ queryKey: ["budgets-all"] });
+        },
+      },
+    });
   }
+
 
   async function saveSplitRule(e: React.FormEvent) {
     e.preventDefault();
