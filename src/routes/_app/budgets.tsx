@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2, Archive, ChevronLeft, ChevronRight, Repeat } from "lucide-react";
 import { toast } from "sonner";
+import { ListSkeleton, EmptyState, ConfirmDelete } from "@/components/ui-states";
 
 export const Route = createFileRoute("/_app/budgets")({ component: Budgets });
 
