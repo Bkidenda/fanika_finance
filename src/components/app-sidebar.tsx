@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, Church, Crown,
+  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, Church, Crown, BarChart3,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -12,10 +12,14 @@ import { useProfile } from "@/lib/queries";
 const overview = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Calendar", url: "/calendar", icon: CalendarDays },
-  { title: "Insights", url: "/insights", icon: Sparkles },
-  { title: "AI Advisor", url: "/advisor", icon: Bot },
   { title: "History", url: "/history", icon: History },
   { title: "Statements", url: "/statements", icon: FileText },
+] as const;
+
+const insights = [
+  { title: "Insights", url: "/insights", icon: Sparkles },
+  { title: "AI Advisor", url: "/advisor", icon: Bot },
+  { title: "Reports", url: "/reports", icon: BarChart3 },
 ] as const;
 
 const money = [
@@ -84,6 +88,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         {renderGroup("Overview", overview)}
+        {renderGroup("Insights", insights)}
         {renderGroup("Money", money)}
         {renderGroup("Wealth", wealth)}
         {familyEnabled && (
