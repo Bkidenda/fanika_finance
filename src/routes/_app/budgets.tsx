@@ -409,7 +409,8 @@ function Budgets() {
       {/* Lines */}
       <div className="rounded-2xl border bg-card p-3 shadow-card md:p-6">
         {budgets.isLoading ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">Loading…</p>
+          <ListSkeleton rows={5} />
+
         ) : budgets.data?.length ? (
           <ul className="divide-y">
             {budgets.data.map((b) => {
@@ -471,11 +472,15 @@ function Budgets() {
             })}
           </ul>
         ) : (
-          <div className="py-10 text-center">
-            <p className="text-sm text-muted-foreground">No budget lines for {labelForMonth(month)} yet.</p>
-            <p className="mt-1 text-xs text-muted-foreground">Add your first line, or navigate to a prior month — new months auto-seed from the previous one.</p>
-          </div>
+          <EmptyState
+            icon={Plus}
+            title={`No budget lines for ${labelForMonth(month)}`}
+            description="Add your first line, or move to a prior month — new months auto-seed from the previous one."
+            action={{ label: "Add budget line", onClick: () => setOpen(true) }}
+            className="border-0"
+          />
         )}
+
       </div>
     </div>
   );
