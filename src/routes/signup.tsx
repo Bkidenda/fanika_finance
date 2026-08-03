@@ -70,7 +70,7 @@ function Signup() {
           <span className="font-semibold">Fanika</span>
         </Link>
         <h1 className="mt-6 text-2xl font-semibold tracking-tight">Create your account</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Start your stewardship journey today.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Start your financial discipline journey today.</p>
 
         <Button variant="outline" className="mt-6 w-full" onClick={google}>
           Continue with Google

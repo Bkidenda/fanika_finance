@@ -19,7 +19,7 @@ const STEPS = [
   {
     n: "01",
     t: "Set up your profile and accounts",
-    d: "Add your name, preferred currency, and decide whether tithe / giving should be auto-calculated and at what rate. Connect your bank, M-Pesa, SACCO, cash and investment accounts. Add any standing debts and subscriptions — these are global, not month-by-month.",
+    d: "Add your name, preferred currency, and decide whether giving / planned commitments should be auto-calculated and at what rate. Connect your bank, M-Pesa, SACCO, cash and investment accounts. Add any standing debts and subscriptions — these are global, not month-by-month.",
   },
   {
     n: "02",
@@ -34,7 +34,7 @@ const STEPS = [
   {
     n: "04",
     t: "Close the month — next month auto-opens",
-    d: "At month end, hit Close month. Fanika generates a reconciliation snapshot (income, expenses, savings rate, debt paid, tithe, net worth) and immediately opens the next month with your recurring lines pre-seeded so you can budget before the 1st. If you try to plan the next month while the current one is still open, you'll be prompted to close it first.",
+    d: "At month end, hit Close month. Fanika generates a reconciliation snapshot (income, expenses, savings rate, debt paid, giving, net worth) and immediately opens the next month with your recurring lines pre-seeded so you can budget before the 1st. If you try to plan the next month while the current one is still open, you'll be prompted to close it first.",
   },
   {
     n: "05",

@@ -6,7 +6,7 @@ export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
       { title: "Features — Fanika" },
-      { name: "description", content: "Net-income budgeting, optional automated tithe, recurring budget lines, multi-account net worth, debt planner, AI advisor with monthly history, financial calendar, monthly close, printable statements, devotionals." },
+      { name: "description", content: "Net-income budgeting, optional automated giving, recurring budget lines, multi-account net worth, debt planner, AI advisor with monthly history, financial calendar, monthly close, printable statements, daily insights." },
       { property: "og:title", content: "Features — Fanika" },
       { property: "og:description", content: "Every module in Fanika, from net-income budgeting to printable statements." },
     ],
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/features")({
 
 const MODULES = [
   { i: Coins, t: "Net-income first", d: "Start from your take-home pay in any currency. No country-specific payroll math — Fanika works wherever you live." },
-  { i: HandHeart, t: "Optional automatic tithe", d: "Turn tithe on if you want — pick the rate. Tithe is set aside before disposable income is calculated. Off by default; entirely your call." },
+  { i: HandHeart, t: "Optional automatic giving", d: "Turn on planned giving if you want — pick the rate. It's set aside before disposable income is calculated. Off by default; entirely your call." },
   { i: Wallet, t: "Budgets entered each month", d: "Income and budgets are entered fresh each month because life isn't standard. Standing categories (rent, insurance) are added once as recurring lines." },
   { i: Repeat, t: "Recurring budget lines", d: "Rent, insurance, school fees — set them once and they auto-seed every new month when you close the previous one." },
   { i: Receipt, t: "Expenses inside budgets", d: "Every expense lands inside an active budget category. Out-of-plan spending is flagged as an emergency, not silently absorbed." },
@@ -28,9 +28,9 @@ const MODULES = [
   { i: Calendar, t: "Financial calendar", d: "Mark dates with financial implications — bill due dates, expected income, debt deadlines, family obligations, planned giving." },
   { i: History, t: "Monthly close & next-month auto-open", d: "Close each month with a reconciliation snapshot. Next month auto-opens with only your recurring lines pre-filled, so fresh income and budgets stay deliberate." },
   { i: Bot, t: "AI advisor with history", d: "A grounded advisor that reads your current month plus the last three closed months and returns a 0-100 health score, trend commentary, and practical recommendations." },
-  { i: Sparkles, t: "Always-on AI assistant", d: "Floating chatbot that answers stewardship and finance questions anywhere in the app." },
+  { i: Sparkles, t: "Always-on AI assistant", d: "Floating chatbot that answers money-management and finance questions anywhere in the app." },
   { i: FileText, t: "Printable PDF statements", d: "Generate a monthly or quarterly account statement for your records — income, spend, top categories, accounts, debts, net worth, all on one page." },
-  { i: BookOpen, t: "Devotional layer", d: "Scripture and verified Ellen G. White reflections tied to your stewardship rhythm." },
+  { i: BookOpen, t: "Daily insights layer", d: "Short, verified financial insights and motivation tied to your monthly rhythm." },
   { i: Eraser, t: "Account control", d: "Clear your data, deactivate your account, or delete it permanently — your data, your call, no hoops." },
 ];
 
