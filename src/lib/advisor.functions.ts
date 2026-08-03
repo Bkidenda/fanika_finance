@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { extractJson } from "@/lib/advisor.server";
 
 const AdvisorInput = z.object({
   period: z.string().min(1).max(20),
