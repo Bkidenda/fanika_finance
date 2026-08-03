@@ -189,6 +189,11 @@ export function computeDashboard(i: DashboardInput): DashboardMetrics {
       .sort((a, b) => b.value - a.value),
     trend,
     upcomingBills,
+    budgetVsActual: i.budgets
+      .map((b) => ({ name: b.category, budget: Number(b.limit_amount), actual: byCat.get(b.category) ?? 0 }))
+      .filter((r) => r.budget > 0 || r.actual > 0)
+      .sort((a, b) => Math.max(b.budget, b.actual) - Math.max(a.budget, a.actual))
+      .slice(0, 6),
     goals,
     insights: insights.slice(0, 4),
   };
