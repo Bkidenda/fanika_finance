@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid,
-  AreaChart, Area, Legend,
+  AreaChart, Area, Legend, BarChart, Bar,
 } from "recharts";
 import { closeMonth } from "@/lib/close-month.functions";
 import { toast } from "sonner";
@@ -335,7 +335,7 @@ function Dashboard() {
               <ResponsiveContainer>
                 <BarChart data={m.budgetVsActual} layout="vertical" margin={{ left: 4, right: 12, top: 4, bottom: 4 }}>
                   <CartesianGrid horizontal={false} stroke={CHART_GRID_STROKE} />
-                  <XAxis type="number" tick={CHART_AXIS_TICK} tickFormatter={(v: number) => compactNumber(v)} />
+                  <XAxis type="number" tick={CHART_AXIS_TICK} tickFormatter={(v: number) => Intl.NumberFormat(undefined, { notation: "compact" }).format(v)} />
                   <YAxis type="category" dataKey="name" width={92} tick={CHART_AXIS_TICK} />
                   <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
