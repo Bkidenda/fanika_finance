@@ -37,7 +37,7 @@ const wealth = [
   { title: "Accounts", url: "/accounts", icon: Landmark },
   { title: "Investments", url: "/investments", icon: TrendingUp },
   { title: "Goals", url: "/goals", icon: Target },
-  { title: "Stewardship", url: "/stewardship", icon: BookOpen },
+  { title: "Daily Insights", url: "/stewardship", icon: BookOpen },
 ] as const;
 
 export function AppSidebar() {
@@ -81,7 +81,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="leading-tight">
               <div className="text-sm font-semibold">Fanika</div>
-              <div className="text-[11px] text-muted-foreground">Stewardship</div>
+              <div className="text-[11px] text-muted-foreground">Money management</div>
             </div>
           )}
         </Link>

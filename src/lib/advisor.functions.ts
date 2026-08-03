@@ -54,7 +54,7 @@ You analyze the user's CURRENT month snapshot plus their last 3 closed-month sna
 (1) a 0-100 financial health score,
 (2) a 2-3 sentence narrative summary that references TRENDS (e.g. "spending up vs prior 3-month average"),
 (3) 4-7 specific, actionable recommendations.
-Consider: family support obligations, subscription waste, debt risk, savings discipline, stewardship/giving.
+Consider: family support obligations, subscription waste, debt risk, savings discipline, and planned giving commitments.
 ${titheNote}
 Tone: warm, direct, never preachy. Currency: ${data.context.currency}.`;
 

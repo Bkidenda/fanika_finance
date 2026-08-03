@@ -241,7 +241,7 @@ function Dashboard() {
 
         <div className="rounded-2xl border bg-gradient-hero p-5 text-primary-foreground shadow-elevated md:p-6">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest opacity-80">
-            <BookOpen className="h-4 w-4" /> Today's stewardship
+            <BookOpen className="h-4 w-4" /> Today's money insight
           </div>
           {devo.data ? (
             <>
@@ -249,7 +249,7 @@ function Dashboard() {
               <p className="mt-1 text-xs opacity-80">— {devo.data.verse_reference}</p>
               <p className="mt-4 text-sm leading-relaxed opacity-90">"{devo.data.egw_quote}"</p>
               {devo.data.egw_source && <p className="mt-1 text-[11px] opacity-70">— {devo.data.egw_source}</p>}
-              <Link to="/stewardship" className="mt-4 inline-block text-xs font-semibold underline opacity-90">Open devotional →</Link>
+              <Link to="/stewardship" className="mt-4 inline-block text-xs font-semibold underline opacity-90">Open daily insights →</Link>
             </>
           ) : (
             <p className="mt-3 text-sm opacity-80">Loading today's reflection…</p>
