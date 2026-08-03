@@ -15,9 +15,9 @@ const TABS: readonly Tab[] = [
 ];
 
 const ACTIONS = [
-  { to: "/income-entries", label: "Add Income", icon: ArrowDownRight, color: "bg-[oklch(0.55_0.09_55)]/20 text-[oklch(0.85_0.06_65)] border-[oklch(0.55_0.09_55)]/40" },
-  { to: "/expenses", label: "Add Expense", icon: ArrowUpRight, color: "bg-[oklch(0.58_0.15_35)]/20 text-[oklch(0.82_0.10_45)] border-[oklch(0.58_0.15_35)]/40" },
-  { to: "/goals", label: "Update Goal", icon: Target, color: "bg-[oklch(0.68_0.12_60)]/20 text-[oklch(0.88_0.08_65)] border-[oklch(0.68_0.12_60)]/40" },
+  { to: "/income-entries", label: "Add Income", icon: ArrowDownRight, color: "bg-accent/20 text-accent-foreground border-accent/40" },
+  { to: "/expenses", label: "Add Expense", icon: ArrowUpRight, color: "bg-destructive/20 text-destructive border-destructive/40" },
+  { to: "/goals", label: "Update Goal", icon: Target, color: "bg-primary/20 text-primary border-primary/40" },
 
   { to: "/investments", label: "Log Investment", icon: TrendingUp, color: "bg-indigo-500/15 text-indigo-400 border-indigo-500/30" },
   { to: "/debts", label: "Log Payment", icon: CreditCard, color: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
@@ -43,7 +43,7 @@ export function MobileTabBar() {
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
         >
           <div className="absolute inset-x-0 bottom-24 px-6" onClick={(e) => e.stopPropagation()}>
-            <div className="mx-auto max-w-sm rounded-3xl border border-white/10 bg-[oklch(0.16_0.04_240)]/95 p-4 shadow-2xl backdrop-blur">
+            <div className="mx-auto max-w-sm rounded-3xl border border-white/10 bg-foreground/95 p-4 shadow-2xl backdrop-blur">
               <div className="grid grid-cols-3 gap-3">
                 {ACTIONS.map((a) => {
                   const Icon = a.icon;
@@ -71,14 +71,14 @@ export function MobileTabBar() {
         type="button"
         aria-label={open ? "Close quick actions" : "Open quick actions"}
         onClick={() => setOpen((v) => !v)}
-        className="fixed left-1/2 z-50 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full border border-white/15 bg-[oklch(0.55_0.18_175)] text-white shadow-[0_10px_30px_-8px_oklch(0.55_0.18_175/.7)] transition-transform md:hidden"
+        className="fixed left-1/2 z-50 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-full border border-white/15 bg-primary text-primary-foreground shadow-elevated transition-transform md:hidden"
         style={{ bottom: `calc(env(safe-area-inset-bottom, 0px) + 72px)` }}
       >
         <Plus className={`h-6 w-6 transition-transform ${open ? "rotate-45" : ""}`} strokeWidth={2.4} />
       </button>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 w-full border-t border-white/10 bg-[oklch(0.14_0.04_240)]/95 backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 w-full border-t border-white/10 bg-foreground/95 backdrop-blur md:hidden"
         style={{ paddingBottom: `max(env(safe-area-inset-bottom), 0.5rem)` }}
         aria-label="Primary"
       >
@@ -93,8 +93,8 @@ export function MobileTabBar() {
                     to={t.to}
                     className={`relative -mt-7 flex h-14 w-14 flex-col items-center justify-center rounded-full border text-[10px] font-medium transition ${
                       active
-                        ? "border-[oklch(0.55_0.18_175/.7)] bg-[oklch(0.20_0.05_240)] text-[oklch(0.82_0.16_175)] shadow-[0_10px_30px_-10px_oklch(0.55_0.18_175/.9)]"
-                        : "border-white/10 bg-[oklch(0.18_0.04_240)] text-white/60"
+                        ? "border-primary/70 bg-background text-primary shadow-elevated"
+                        : "border-white/10 bg-background/80 text-white/60"
                     }`}
                   >
                     <Icon className="h-5 w-5" strokeWidth={active ? 2.4 : 2} />
@@ -108,10 +108,10 @@ export function MobileTabBar() {
                 <Link
                   to={t.to}
                   className={`relative flex flex-1 flex-col items-center gap-0.5 px-1 pb-1.5 pt-2 text-[10px] font-medium transition ${
-                    active ? "text-[oklch(0.82_0.16_175)]" : "text-white/45 hover:text-white/80"
+                    active ? "text-primary-glow" : "text-white/45 hover:text-white/80"
                   }`}
                 >
-                  {active && <span className="absolute inset-x-3 top-0 h-[2px] rounded-full bg-[oklch(0.82_0.16_175)]" />}
+                  {active && <span className="absolute inset-x-3 top-0 h-[2px] rounded-full bg-primary-glow" />}
                   <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.4 : 1.8} />
                   <span className="leading-tight">{t.label}</span>
                 </Link>

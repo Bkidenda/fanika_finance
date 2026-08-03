@@ -60,7 +60,7 @@ function Login() {
         </h1>
 
         <p className="mt-1 text-sm text-muted-foreground">
-          Sign in to your stewardship dashboard.
+          Sign in to your Fanika dashboard.
         </p>
 
         <Button variant="outline" className="mt-6 w-full" onClick={google}>

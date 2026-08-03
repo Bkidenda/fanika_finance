@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2, Archive, ChevronLeft, ChevronRight, Repeat } from "lucide-react";
 import { toast } from "sonner";
+import { ListSkeleton, EmptyState, ConfirmDelete } from "@/components/ui-states";
 
 export const Route = createFileRoute("/_app/budgets")({ component: Budgets });
 
@@ -140,12 +141,31 @@ function Budgets() {
     qc.invalidateQueries({ queryKey: ["budgets-all"] });
   }
 
-  async function removeLine(id: string) {
-    const { error } = await supabase.from("budgets").delete().eq("id", id);
+  async function removeLine(line: { id: string; category: string; limit_amount: number; is_recurring: boolean; notes: string | null }) {
+    const { error } = await supabase.from("budgets").delete().eq("id", line.id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["budgets"] });
     qc.invalidateQueries({ queryKey: ["budgets-all"] });
+    toast.success(`"${line.category}" removed`, {
+      action: {
+        label: "Undo",
+        onClick: async () => {
+          const { error: err } = await supabase.from("budgets").upsert(
+            {
+              user_id: user!.id, category: line.category, month,
+              limit_amount: Number(line.limit_amount), is_recurring: line.is_recurring, notes: line.notes,
+            },
+            { onConflict: "user_id,category,month" },
+          );
+          if (err) return toast.error("Couldn't restore this budget line.");
+          toast.success(`"${line.category}" restored`);
+          qc.invalidateQueries({ queryKey: ["budgets"] });
+          qc.invalidateQueries({ queryKey: ["budgets-all"] });
+        },
+      },
+    });
   }
+
 
   async function saveSplitRule(e: React.FormEvent) {
     e.preventDefault();
@@ -389,7 +409,8 @@ function Budgets() {
       {/* Lines */}
       <div className="rounded-2xl border bg-card p-3 shadow-card md:p-6">
         {budgets.isLoading ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">Loading…</p>
+          <ListSkeleton rows={5} />
+
         ) : budgets.data?.length ? (
           <ul className="divide-y">
             {budgets.data.map((b) => {
@@ -425,19 +446,24 @@ function Budgets() {
                     <div className="col-span-2 flex justify-end gap-1 md:col-span-1">
                       <button
                         title="Archive"
+                        aria-label={`Archive ${b.category}`}
                         onClick={() => updateField(b.id, { archived_at: new Date().toISOString() })}
                         className="text-muted-foreground hover:text-primary"
                       >
                         <Archive className="h-4 w-4" />
                       </button>
-                      <button
-                        title="Delete"
-                        onClick={() => removeLine(b.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <ConfirmDelete
+                        trigger={
+                          <button title="Delete" aria-label={`Delete ${b.category}`} className="text-muted-foreground hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        }
+                        title={`Delete "${b.category}"?`}
+                        description="This removes the budget line for this month. You can undo this right after deleting."
+                        onConfirm={async () => { await removeLine({ id: b.id, category: b.category, limit_amount: Number(b.limit_amount), is_recurring: b.is_recurring, notes: b.notes ?? null }); }}
+                      />
                     </div>
+
                   </div>
                   <Progress value={pct} />
                   {over && <p className="text-xs text-destructive">Over budget by {formatCurrency(spent - Number(b.limit_amount), currency)}</p>}
@@ -446,11 +472,15 @@ function Budgets() {
             })}
           </ul>
         ) : (
-          <div className="py-10 text-center">
-            <p className="text-sm text-muted-foreground">No budget lines for {labelForMonth(month)} yet.</p>
-            <p className="mt-1 text-xs text-muted-foreground">Add your first line, or navigate to a prior month — new months auto-seed from the previous one.</p>
-          </div>
+          <EmptyState
+            icon={Plus}
+            title={`No budget lines for ${labelForMonth(month)}`}
+            description="Add your first line, or move to a prior month — new months auto-seed from the previous one."
+            action={{ label: "Add budget line", onClick: () => setOpen(true) }}
+            className="border-0"
+          />
         )}
+
       </div>
     </div>
   );

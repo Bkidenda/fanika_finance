@@ -8,7 +8,7 @@ const SUGGESTIONS = [
   "How does Fanika work?",
   "How do I close a month?",
   "Why does the system start from net income?",
-  "How is tithe calculated?",
+  "How is planned giving calculated?",
 ];
 
 export function AIChatbot() {

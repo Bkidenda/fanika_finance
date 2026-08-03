@@ -3,15 +3,16 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useDebts, useProfile, useAccounts } from "@/lib/queries";
+import { useDebts, useProfile, useAccounts, debtsCrud, type Debt } from "@/lib/queries";
 import { formatCurrency } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, CreditCard, HeartHandshake } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ListSkeleton, EmptyState, ConfirmDelete } from "@/components/ui-states";
+import { Plus, Trash2, Pencil, CreditCard, HeartHandshake } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/debts")({ component: Debts });
@@ -23,7 +24,11 @@ function Debts() {
   const debts = useDebts();
   const accounts = useAccounts();
   const currency = profile.data?.currency ?? "KES";
+  const removeMutation = debtsCrud.useRemove();
+  const restoreMutation = debtsCrud.useRestore();
+  const updateMutation = debtsCrud.useUpdate();
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Debt | null>(null);
   const [payOpen, setPayOpen] = useState<{ id: string; balance: number } | null>(null);
   const [payAmt, setPayAmt] = useState("");
   const [payAccount, setPayAccount] = useState<string>("");
@@ -33,9 +38,40 @@ function Debts() {
     interest_rate: "", monthly_payment: "", due_date: "", deposit_account_id: "",
   });
 
+  function resetForm() {
+    setF({ kind: "formal", name: "", creditor: "", principal: "", balance: "", interest_rate: "", monthly_payment: "", due_date: "", deposit_account_id: "" });
+  }
+  function openCreate() { setEditing(null); resetForm(); setOpen(true); }
+  function openEdit(d: Debt) {
+    setEditing(d);
+    setF({
+      kind: d.kind, name: d.name, creditor: d.creditor ?? "", principal: String(d.principal), balance: String(d.balance),
+      interest_rate: String(d.interest_rate), monthly_payment: String(d.monthly_payment), due_date: d.due_date ?? "", deposit_account_id: "",
+    });
+    setOpen(true);
+  }
+
   async function add(e: React.FormEvent) {
     e.preventDefault();
+    if (!f.name.trim()) return toast.error("Give this debt a name.");
     const isInformal = f.kind === "informal";
+    if (editing) {
+      const patch = {
+        kind: f.kind, name: f.name.trim(), creditor: f.creditor || null,
+        principal: Number(f.principal), balance: Number(f.balance || f.principal),
+        interest_rate: isInformal ? 0 : Number(f.interest_rate) || 0,
+        monthly_payment: isInformal ? 0 : Number(f.monthly_payment) || 0,
+        due_date: isInformal ? null : f.due_date || null,
+      };
+      try {
+        await updateMutation.mutateAsync({ id: editing.id, patch });
+        toast.success("Debt updated");
+        setOpen(false); setEditing(null); resetForm();
+      } catch (err: any) {
+        toast.error(err?.message ?? "Couldn't update this debt.");
+      }
+      return;
+    }
     if (!f.deposit_account_id) return toast.error("Pick an account to deposit the borrowed amount into.");
     const { error } = await supabase.from("debts").insert({
       user_id: user!.id, kind: f.kind, name: f.name, creditor: f.creditor || null,
@@ -49,7 +85,7 @@ function Debts() {
     if (error) return toast.error(error.message);
     toast.success(`Debt added — ${formatCurrency(Number(f.balance || f.principal), currency)} credited to the chosen account.`);
     setOpen(false);
-    setF({ kind: "formal", name: "", creditor: "", principal: "", balance: "", interest_rate: "", monthly_payment: "", due_date: "", deposit_account_id: "" });
+    resetForm();
     qc.invalidateQueries({ queryKey: ["debts"] });
     qc.invalidateQueries({ queryKey: ["accounts"] });
   }
@@ -68,7 +104,24 @@ function Debts() {
     setPayOpen(null); setPayAmt(""); setPayAccount("");
     toast.success("Payment recorded — expense logged and account adjusted.");
   }
-  async function remove(id: string) { await supabase.from("debts").delete().eq("id", id); qc.invalidateQueries({ queryKey: ["debts"] }); }
+  async function remove(d: Debt) {
+    try {
+      await removeMutation.mutateAsync(d.id);
+      toast.success(`"${d.name}" deleted`, {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            restoreMutation.mutate(d, {
+              onError: () => toast.error("Couldn't restore the debt."),
+              onSuccess: () => toast.success(`"${d.name}" restored`),
+            });
+          },
+        },
+      });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Couldn't delete this debt.");
+    }
+  }
 
   const active = (debts.data ?? []).filter((d) => !d.archived_at && Number(d.balance) > 0);
   const formal = active.filter((d) => d.kind !== "informal");
@@ -94,9 +147,22 @@ function Debts() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button size="sm" variant="outline" onClick={() => { setPayOpen({ id: d.id, balance: Number(d.balance) }); setPayAmt(""); setPayAccount(""); }}>Record payment</Button>
-            <button onClick={() => remove(d.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" aria-label={`Edit ${d.name}`} onClick={() => openEdit(d)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <ConfirmDelete
+              trigger={
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" aria-label={`Delete ${d.name}`}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              }
+              title={`Delete "${d.name}"?`}
+              description="This removes the debt record. You can undo this immediately after deleting."
+              busy={removeMutation.isPending}
+              onConfirm={() => remove(d)}
+            />
           </div>
         </div>
         <div className="mt-3 flex items-center justify-between text-sm">
@@ -112,10 +178,13 @@ function Debts() {
     <div className="space-y-6">
       <div className="flex items-end justify-between">
         <div><p className="text-sm text-muted-foreground">Repayment planning</p><h2 className="text-2xl font-semibold tracking-tight">Debts</h2></div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button><Plus className="mr-1 h-4 w-4" /> Add debt</Button></DialogTrigger>
+        <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setEditing(null); }}>
+          <DialogTrigger asChild><Button onClick={openCreate}><Plus className="mr-1 h-4 w-4" /> Add debt</Button></DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>New debt</DialogTitle></DialogHeader>
+            <DialogHeader>
+              <DialogTitle>{editing ? "Edit debt" : "New debt"}</DialogTitle>
+              <DialogDescription>{editing ? "Update this debt's details." : "Record a formal or informal debt and where the funds landed."}</DialogDescription>
+            </DialogHeader>
             <form onSubmit={add} className="space-y-3">
               <div className="space-y-1.5"><Label>Type</Label>
                 <Select value={f.kind} onValueChange={(v) => setF({ ...f, kind: v as "formal" | "informal" })}>
@@ -141,14 +210,18 @@ function Debts() {
                   <div className="space-y-1.5"><Label>Due date</Label><Input type="date" value={f.due_date} onChange={(e) => setF({ ...f, due_date: e.target.value })} /></div>
                 </div>
               )}
-              <div className="space-y-1.5"><Label>Deposit into account *</Label>
-                <Select value={f.deposit_account_id} onValueChange={(v) => setF({ ...f, deposit_account_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Which account receives the borrowed money?" /></SelectTrigger>
-                  <SelectContent>{(accounts.data ?? []).filter((a) => ["bank","mpesa","cash","sacco"].includes(a.type)).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
-                </Select>
-                <p className="text-[11px] text-muted-foreground">The outstanding balance is credited to this account immediately.</p>
-              </div>
-              <Button type="submit" className="w-full">Add</Button>
+              {!editing && (
+                <div className="space-y-1.5"><Label>Deposit into account *</Label>
+                  <Select value={f.deposit_account_id} onValueChange={(v) => setF({ ...f, deposit_account_id: v })}>
+                    <SelectTrigger><SelectValue placeholder="Which account receives the borrowed money?" /></SelectTrigger>
+                    <SelectContent>{(accounts.data ?? []).filter((a) => ["bank","mpesa","cash","sacco"].includes(a.type)).map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <p className="text-[11px] text-muted-foreground">The outstanding balance is credited to this account immediately.</p>
+                </div>
+              )}
+              <Button type="submit" className="w-full" disabled={updateMutation.isPending} aria-busy={updateMutation.isPending}>
+                {editing ? (updateMutation.isPending ? "Saving…" : "Save changes") : "Add"}
+              </Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -172,11 +245,20 @@ function Debts() {
           {informal.map(renderDebt)}
         </div>
       )}
-      {!active.length && <p className="rounded-xl border border-dashed py-10 text-center text-sm text-muted-foreground">No active debts. Settled debts are archived under History.</p>}
+      {debts.isLoading ? (
+        <ListSkeleton rows={3} />
+      ) : !active.length ? (
+        <EmptyState
+          icon={CreditCard}
+          title="No active debts"
+          description="Settled debts are archived under History. Add a debt to start tracking repayment."
+          action={{ label: "Add a debt", onClick: openCreate }}
+        />
+      ) : null}
 
       <Dialog open={!!payOpen} onOpenChange={(o) => !o && setPayOpen(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Record payment</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Record payment</DialogTitle><DialogDescription>Log a payment towards this debt; the balance and linked account update automatically.</DialogDescription></DialogHeader>
           <form onSubmit={recordPayment} className="space-y-3">
             <div className="space-y-1.5"><Label>Amount ({currency})</Label><Input type="number" step="0.01" required value={payAmt} onChange={(e) => setPayAmt(e.target.value)} /></div>
             <div className="space-y-1.5"><Label>Paid from account</Label>

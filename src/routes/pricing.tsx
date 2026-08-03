@@ -10,7 +10,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — Fanika" },
-      { name: "description", content: "Three simple tiers. Start free, upgrade for AI advisory and family-scale stewardship." },
+      { name: "description", content: "Three simple tiers. Start free, upgrade for AI advisory and family-scale money management." },
     ],
   }),
   component: Pricing,

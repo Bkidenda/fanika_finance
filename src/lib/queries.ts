@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { monthKey } from "@/lib/format";
@@ -403,4 +403,116 @@ export function useAllIncomeEntries() {
       return (data ?? []) as IncomeEntry[];
     },
   });
+}
+
+
+// ============= Generic optimistic CRUD hook factory =============
+// Used by Accounts/Goals/Debts/Investments/Budgets pages for consistent
+// optimistic create/update/delete + undo-restore behaviour.
+function makeCrud<T extends { id: string }>(table: string, keyFor: (uid?: string) => QueryKey) {
+  function useAdd() {
+    const { user } = useAuth();
+    const qc = useQueryClient();
+    const key = keyFor(user?.id);
+    return useMutation({
+      mutationFn: async (payload: Record<string, unknown>) => {
+        const { data, error } = await (supabase.from(table as never) as any).insert(payload).select().single();
+        if (error) throw error;
+        return data as unknown as T;
+      },
+      onMutate: async (payload: Record<string, unknown>) => {
+        await qc.cancelQueries({ queryKey: key });
+        const previous = qc.getQueryData<T[]>(key);
+        const optimistic = { ...payload, id: `temp-${Math.random().toString(36).slice(2)}` } as unknown as T;
+        qc.setQueryData<T[]>(key, (old) => (old ? [optimistic, ...old] : [optimistic]));
+        return { previous };
+      },
+      onError: (_err, _vars, ctx) => {
+        if (ctx?.previous) qc.setQueryData(key, ctx.previous);
+      },
+      onSettled: () => qc.invalidateQueries({ queryKey: key }),
+    });
+  }
+
+  function useUpdate() {
+    const { user } = useAuth();
+    const qc = useQueryClient();
+    const key = keyFor(user?.id);
+    return useMutation({
+      mutationFn: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
+        const { data, error } = await (supabase.from(table as never) as any).update(patch).eq("id", id).select().single();
+        if (error) throw error;
+        return data as unknown as T;
+      },
+      onMutate: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
+        await qc.cancelQueries({ queryKey: key });
+        const previous = qc.getQueryData<T[]>(key);
+        qc.setQueryData<T[]>(key, (old) => old?.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+        return { previous };
+      },
+      onError: (_err, _vars, ctx) => {
+        if (ctx?.previous) qc.setQueryData(key, ctx.previous);
+      },
+      onSettled: () => qc.invalidateQueries({ queryKey: key }),
+    });
+  }
+
+  function useRemove() {
+    const { user } = useAuth();
+    const qc = useQueryClient();
+    const key = keyFor(user?.id);
+    return useMutation({
+      mutationFn: async (id: string) => {
+        const { error } = await (supabase.from(table as never) as any).delete().eq("id", id);
+        if (error) throw error;
+        return id;
+      },
+      onMutate: async (id: string) => {
+        await qc.cancelQueries({ queryKey: key });
+        const previous = qc.getQueryData<T[]>(key);
+        qc.setQueryData<T[]>(key, (old) => old?.filter((r) => r.id !== id));
+        return { previous };
+      },
+      onError: (_err, _vars, ctx) => {
+        if (ctx?.previous) qc.setQueryData(key, ctx.previous);
+      },
+      onSettled: () => qc.invalidateQueries({ queryKey: key }),
+    });
+  }
+
+  // Re-inserts a previously deleted row (used for the "Undo" toast action).
+  function useRestore() {
+    const { user } = useAuth();
+    const qc = useQueryClient();
+    const key = keyFor(user?.id);
+    return useMutation({
+      mutationFn: async (row: T) => {
+        const { data, error } = await (supabase.from(table as never) as any).insert(row).select().single();
+        if (error) throw error;
+        return data as unknown as T;
+      },
+      onMutate: async (row: T) => {
+        await qc.cancelQueries({ queryKey: key });
+        const previous = qc.getQueryData<T[]>(key);
+        qc.setQueryData<T[]>(key, (old) => (old ? [row, ...old] : [row]));
+        return { previous };
+      },
+      onError: (_err, _vars, ctx) => {
+        if (ctx?.previous) qc.setQueryData(key, ctx.previous);
+      },
+      onSettled: () => qc.invalidateQueries({ queryKey: key }),
+    });
+  }
+
+  return { useAdd, useUpdate, useRemove, useRestore };
+}
+
+export const accountsCrud = makeCrud<Account>("accounts", (uid) => ["accounts", uid]);
+export const goalsCrud = makeCrud<Goal>("savings_goals", (uid) => ["goals", uid]);
+export const debtsCrud = makeCrud<Debt>("debts", (uid) => ["debts", uid]);
+export const investmentsCrud = makeCrud<Investment>("investments", (uid) => ["investments", uid]);
+
+/** Budget-line CRUD is month-scoped, so the query key must include the active month. */
+export function useBudgetLinesCrud(month: string) {
+  return makeCrud<Budget>("budgets", (uid) => ["budgets", uid, month]);
 }

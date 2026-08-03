@@ -4,6 +4,7 @@ import { computeBreakdown, healthScore } from "@/lib/finance";
 import { formatCurrency, formatPercent, monthKey } from "@/lib/format";
 import { Sparkles, AlertTriangle, CheckCircle2, TrendingUp, HandCoins } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
+import { SERIES_COLORS, CHART_GRID_STROKE, CHART_AXIS_TICK } from "@/lib/chart-colors";
 
 export const Route = createFileRoute("/_app/insights")({ component: Insights });
 
@@ -88,11 +89,11 @@ function Insights() {
         <div className="mt-4 h-72">
           <ResponsiveContainer>
             <LineChart data={trend}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="oklch(0.92 0.012 230)" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={CHART_GRID_STROKE} />
+              <XAxis dataKey="month" tick={CHART_AXIS_TICK} />
+              <YAxis tick={CHART_AXIS_TICK} />
               <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
-              <Line type="monotone" dataKey="spent" stroke="oklch(0.52 0.12 175)" strokeWidth={3} dot={{ r: 4 }} />
+              <Line type="monotone" dataKey="spent" stroke={SERIES_COLORS.spending} strokeWidth={3} dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

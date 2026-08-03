@@ -1,63 +1,110 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useInvestments, useProfile } from "@/lib/queries";
+import { useInvestments, useProfile, investmentsCrud, type Investment } from "@/lib/queries";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, TrendingUp, TrendingDown } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ListSkeleton, EmptyState, ConfirmDelete } from "@/components/ui-states";
+import { Plus, Trash2, Pencil, TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
 import { toast } from "sonner";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { chartColorByRank, rankByValue } from "@/lib/chart-colors";
 
 const TYPES = ["savings", "sacco", "stocks", "crypto", "bonds", "fixed_deposit", "business", "other"] as const;
 
 export const Route = createFileRoute("/_app/investments")({ component: Investments });
 
+type FormState = {
+  name: string; type: (typeof TYPES)[number]; institution: string;
+  amount_invested: string; current_value: string; start_date: string; notes: string;
+};
+const emptyForm: FormState = {
+  name: "", type: "savings", institution: "", amount_invested: "", current_value: "",
+  start_date: new Date().toISOString().slice(0, 10), notes: "",
+};
+
+function validate(f: FormState): string | null {
+  if (!f.name.trim()) return "Give this investment a name.";
+  const amt = Number(f.amount_invested);
+  if (!Number.isFinite(amt) || amt < 0) return "Amount invested must be zero or more.";
+  if (f.current_value !== "" && (!Number.isFinite(Number(f.current_value)) || Number(f.current_value) < 0)) return "Current value must be zero or more.";
+  return null;
+}
+
 function Investments() {
   const { user } = useAuth();
-  const qc = useQueryClient();
   const investments = useInvestments();
   const profile = useProfile();
   const currency = profile.data?.currency ?? "KES";
 
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    type: "savings" as (typeof TYPES)[number],
-    institution: "",
-    amount_invested: "",
-    current_value: "",
-    start_date: new Date().toISOString().slice(0, 10),
-    notes: "",
-  });
+  const addMutation = investmentsCrud.useAdd();
+  const updateMutation = investmentsCrud.useUpdate();
+  const removeMutation = investmentsCrud.useRemove();
+  const restoreMutation = investmentsCrud.useRestore();
 
-  async function save(e: React.FormEvent) {
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Investment | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
+
+  function openCreate() { setEditing(null); setForm(emptyForm); setOpen(true); }
+  function openEdit(i: Investment) {
+    setEditing(i);
+    setForm({
+      name: i.name, type: (i.type as (typeof TYPES)[number]) ?? "other", institution: i.institution ?? "",
+      amount_invested: String(i.amount_invested), current_value: String(i.current_value),
+      start_date: i.start_date ?? emptyForm.start_date, notes: i.notes ?? "",
+    });
+    setOpen(true);
+  }
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const { error } = await supabase.from("investments").insert({
-      user_id: user!.id,
-      name: form.name,
+    const err = validate(form);
+    if (err) return toast.error(err);
+    const payload = {
+      name: form.name.trim(),
       type: form.type,
-      institution: form.institution || null,
+      institution: form.institution.trim() || null,
       amount_invested: Number(form.amount_invested),
       current_value: Number(form.current_value || form.amount_invested),
       start_date: form.start_date,
-      notes: form.notes || null,
-    });
-    if (error) return toast.error(error.message);
-    toast.success("Investment added");
-    setOpen(false);
-    setForm({ ...form, name: "", institution: "", amount_invested: "", current_value: "", notes: "" });
-    qc.invalidateQueries({ queryKey: ["investments"] });
+      notes: form.notes.trim() || null,
+    };
+    try {
+      if (editing) {
+        await updateMutation.mutateAsync({ id: editing.id, patch: payload });
+        toast.success("Investment updated");
+      } else {
+        await addMutation.mutateAsync({ user_id: user!.id, ...payload });
+        toast.success("Investment added");
+      }
+      setOpen(false); setForm(emptyForm); setEditing(null);
+    } catch (err2: any) {
+      toast.error(err2?.message ?? "Something went wrong saving this investment.");
+    }
   }
 
-  async function remove(id: string) {
-    await supabase.from("investments").delete().eq("id", id);
-    qc.invalidateQueries({ queryKey: ["investments"] });
+  async function remove(i: Investment) {
+    try {
+      await removeMutation.mutateAsync(i.id);
+      toast.success(`"${i.name}" deleted`, {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            restoreMutation.mutate(i, {
+              onError: () => toast.error("Couldn't restore the investment."),
+              onSuccess: () => toast.success(`"${i.name}" restored`),
+            });
+          },
+        },
+      });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Couldn't delete this investment.");
+    }
   }
 
   const items = investments.data ?? [];
@@ -65,20 +112,25 @@ function Investments() {
   const totalValue = items.reduce((s, i) => s + Number(i.current_value), 0);
   const totalROI = totalInvested > 0 ? ((totalValue - totalInvested) / totalInvested) * 100 : 0;
 
-  const allocation = items.map((i) => ({ name: i.name, value: Number(i.current_value) }));
-  const COLORS = ["#0e9488", "#3b82f6", "#22c55e", "#f59e0b", "#a855f7", "#ec4899", "#14b8a6", "#64748b"];
+  const allocation = rankByValue(items.map((i) => ({ name: i.name, value: Number(i.current_value) })));
+  const busy = addMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between">
         <h2 className="text-2xl font-semibold tracking-tight">Investments</h2>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setEditing(null); }}>
           <DialogTrigger asChild>
-            <Button><Plus className="mr-1 h-4 w-4" /> Add asset</Button>
+            <Button onClick={openCreate}><Plus className="mr-1 h-4 w-4" /> Add asset</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Add investment</DialogTitle></DialogHeader>
-            <form onSubmit={save} className="space-y-3">
+            <DialogHeader>
+              <DialogTitle>{editing ? "Edit investment" : "Add investment"}</DialogTitle>
+              <DialogDescription>
+                {editing ? "Update this asset's value or details." : "Track a savings plan, SACCO share, stock, or other asset."}
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={submit} className="space-y-3">
               <div className="space-y-1.5">
                 <Label>Name</Label>
                 <Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -116,7 +168,9 @@ function Investments() {
                 <Label>Notes</Label>
                 <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
               </div>
-              <Button type="submit" className="w-full">Save</Button>
+              <Button type="submit" className="w-full" disabled={busy} aria-busy={busy}>
+                {busy ? "Saving…" : editing ? "Save changes" : "Save"}
+              </Button>
             </form>
           </DialogContent>
         </Dialog>
@@ -140,55 +194,83 @@ function Investments() {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border bg-card p-6 shadow-card">
-          <h3 className="font-semibold">Portfolio allocation</h3>
-          <div className="mt-4 h-72">
-            {allocation.length ? (
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie data={allocation} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} paddingAngle={2}>
-                    {allocation.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : <p className="flex h-full items-center justify-center text-sm text-muted-foreground">No assets yet</p>}
-          </div>
+      {investments.isLoading ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <ListSkeleton rows={1} className="[&>*]:h-72" />
+          <ListSkeleton rows={4} />
         </div>
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="min-w-0 rounded-2xl border bg-card p-6 shadow-card">
+            <h3 className="font-semibold">Portfolio allocation</h3>
+            <div className="mt-4 h-72">
+              {allocation.length ? (
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={allocation} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} paddingAngle={2}>
+                      {allocation.map((_, i) => <Cell key={i} fill={chartColorByRank(i)} />)}
+                    </Pie>
+                    <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : <p className="flex h-full items-center justify-center text-sm text-muted-foreground">No assets yet</p>}
+            </div>
+          </div>
 
-        <div className="rounded-2xl border bg-card p-6 shadow-card">
-          <h3 className="font-semibold">Assets</h3>
-          <div className="mt-3 divide-y">
-            {items.length ? items.map((i) => {
-              const roi = Number(i.amount_invested) > 0
-                ? ((Number(i.current_value) - Number(i.amount_invested)) / Number(i.amount_invested)) * 100
-                : 0;
-              return (
-                <div key={i.id} className="flex items-center justify-between py-3">
-                  <div>
-                    <div className="font-medium text-sm">{i.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {i.type.replace("_", " ")} · {i.institution || "—"}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 text-right">
-                    <div>
-                      <div className="text-sm font-medium tabular-nums">{formatCurrency(Number(i.current_value), currency)}</div>
-                      <div className={`text-xs tabular-nums ${roi >= 0 ? "text-success" : "text-destructive"}`}>
-                        {roi >= 0 ? "+" : ""}{formatPercent(roi)}
+          <div className="min-w-0 rounded-2xl border bg-card p-6 shadow-card">
+            <h3 className="font-semibold">Assets</h3>
+            {items.length ? (
+              <div className="mt-3 divide-y">
+                {items.map((i) => {
+                  const roi = Number(i.amount_invested) > 0
+                    ? ((Number(i.current_value) - Number(i.amount_invested)) / Number(i.amount_invested)) * 100
+                    : 0;
+                  return (
+                    <div key={i.id} className="flex items-center justify-between gap-2 py-3">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium">{i.name}</div>
+                        <div className="truncate text-xs text-muted-foreground">
+                          {i.type.replace("_", " ")} · {i.institution || "—"}
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2 text-right">
+                        <div>
+                          <div className="text-sm font-medium tabular-nums">{formatCurrency(Number(i.current_value), currency)}</div>
+                          <div className={`text-xs tabular-nums ${roi >= 0 ? "text-success" : "text-destructive"}`}>
+                            {roi >= 0 ? "+" : ""}{formatPercent(roi)}
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" aria-label={`Edit ${i.name}`} onClick={() => openEdit(i)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <ConfirmDelete
+                          trigger={
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" aria-label={`Delete ${i.name}`}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          }
+                          title={`Delete "${i.name}"?`}
+                          description="This removes the investment from your portfolio. You can undo this immediately after deleting."
+                          busy={removeMutation.isPending}
+                          onConfirm={() => remove(i)}
+                        />
                       </div>
                     </div>
-                    <button onClick={() => remove(i.id)} className="text-muted-foreground hover:text-destructive">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              );
-            }) : <p className="py-6 text-center text-sm text-muted-foreground">No investments yet</p>}
+                  );
+                })}
+              </div>
+            ) : (
+              <EmptyState
+                icon={PiggyBank}
+                title="No investments yet"
+                description="Add a savings plan, SACCO share, or other asset to track its growth over time."
+                action={{ label: "Add your first asset", onClick: openCreate }}
+                className="mt-3"
+              />
+            )}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

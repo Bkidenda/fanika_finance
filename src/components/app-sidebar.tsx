@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, Church, Crown,
+  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, Church, Crown, BarChart3,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -12,10 +12,14 @@ import { useProfile } from "@/lib/queries";
 const overview = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Calendar", url: "/calendar", icon: CalendarDays },
-  { title: "Insights", url: "/insights", icon: Sparkles },
-  { title: "AI Advisor", url: "/advisor", icon: Bot },
   { title: "History", url: "/history", icon: History },
   { title: "Statements", url: "/statements", icon: FileText },
+] as const;
+
+const insights = [
+  { title: "Insights", url: "/insights", icon: Sparkles },
+  { title: "AI Advisor", url: "/advisor", icon: Bot },
+  { title: "Reports", url: "/reports", icon: BarChart3 },
 ] as const;
 
 const money = [
@@ -33,7 +37,7 @@ const wealth = [
   { title: "Accounts", url: "/accounts", icon: Landmark },
   { title: "Investments", url: "/investments", icon: TrendingUp },
   { title: "Goals", url: "/goals", icon: Target },
-  { title: "Stewardship", url: "/stewardship", icon: BookOpen },
+  { title: "Daily Insights", url: "/stewardship", icon: BookOpen },
 ] as const;
 
 export function AppSidebar() {
@@ -77,13 +81,14 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="leading-tight">
               <div className="text-sm font-semibold">Fanika</div>
-              <div className="text-[11px] text-muted-foreground">Stewardship</div>
+              <div className="text-[11px] text-muted-foreground">Money management</div>
             </div>
           )}
         </Link>
       </SidebarHeader>
       <SidebarContent>
         {renderGroup("Overview", overview)}
+        {renderGroup("Insights", insights)}
         {renderGroup("Money", money)}
         {renderGroup("Wealth", wealth)}
         {familyEnabled && (

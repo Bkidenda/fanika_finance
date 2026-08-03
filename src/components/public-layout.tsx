@@ -9,7 +9,7 @@ const NAV = [
   { to: "/", label: "Home" },
   { to: "/features", label: "Features" },
   { to: "/how-it-works", label: "How it works" },
-  { to: "/stewardship-philosophy", label: "Stewardship" },
+  { to: "/stewardship-philosophy", label: "Our Philosophy" },
   { to: "/pricing", label: "Pricing" },
 ] as const;
 
@@ -39,7 +39,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
       {/* Floating navbar — links left, CTAs far right */}
       <header className="fixed inset-x-0 top-4 z-40 px-3">
-        <div className="mx-auto flex w-fit max-w-[calc(100vw-1.5rem)] items-center justify-between gap-3 rounded-full border border-white/15 bg-gradient-to-r from-[oklch(0.32_0.05_45)]/95 via-[oklch(0.42_0.07_50)]/95 to-[oklch(0.55_0.09_55)]/95 px-3 py-2 text-primary-foreground shadow-elevated backdrop-blur-xl md:gap-6 md:ml-auto md:mr-6">
+        <div className="mx-auto flex w-fit max-w-[calc(100vw-1.5rem)] items-center justify-between gap-3 rounded-full border border-white/15 bg-gradient-hero px-3 py-2 text-primary-foreground shadow-elevated backdrop-blur-xl md:gap-6 md:ml-auto md:mr-6">
           <nav className="hidden items-center gap-1 lg:flex">
 
             {NAV.map((n) => (
@@ -104,7 +104,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary"><Sprout className="h-4 w-4 text-primary-foreground" /></div>
               <span className="font-semibold">Fanika</span>
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">Personal finance, anchored in stewardship.</p>
+            <p className="mt-3 text-sm text-muted-foreground">Personal finance, anchored in discipline.</p>
           </div>
           <div>
             <div className="text-sm font-semibold">Product</div>
@@ -112,7 +112,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <li><Link to="/features" className="hover:text-foreground">Features</Link></li>
               <li><Link to="/how-it-works" className="hover:text-foreground">How it works</Link></li>
               <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
-              <li><Link to="/stewardship-philosophy" className="hover:text-foreground">Stewardship</Link></li>
+              <li><Link to="/stewardship-philosophy" className="hover:text-foreground">Our Philosophy</Link></li>
             </ul>
           </div>
           <div>
