@@ -51,7 +51,11 @@ function Advisor() {
   const familySupportRatio = b.net > 0 ? familyTotal / b.net : 0;
 
   function runAnalysis() {
-    if (receivedIncome === 0) { toast.error("Record at least one income entry this month before running analysis."); return; }
+    if (receivedIncome === 0 && monthlySpend === 0 && debtsTotal === 0 && portfolioValue === 0) {
+      toast.error("Record some income, expenses or accounts first so the advisor has data to review.");
+      return;
+    }
+
     m.mutate({
       data: {
         period: monthKey().slice(0, 7),
