@@ -460,7 +460,7 @@ function Budgets() {
                         }
                         title={`Delete "${b.category}"?`}
                         description="This removes the budget line for this month. You can undo this right after deleting."
-                        onConfirm={() => removeLine({ id: b.id, category: b.category, limit_amount: Number(b.limit_amount), is_recurring: b.is_recurring, notes: b.notes ?? null })}
+                        onConfirm={async () => { await removeLine({ id: b.id, category: b.category, limit_amount: Number(b.limit_amount), is_recurring: b.is_recurring, notes: b.notes ?? null }); }}
                       />
                     </div>
 
