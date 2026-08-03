@@ -90,8 +90,8 @@ function Insights() {
           <ResponsiveContainer>
             <LineChart data={trend}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={CHART_GRID_STROKE} />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
+              <XAxis dataKey="month" tick={CHART_AXIS_TICK} />
+              <YAxis tick={CHART_AXIS_TICK} />
               <Tooltip formatter={(v: number) => formatCurrency(v, currency)} />
               <Line type="monotone" dataKey="spent" stroke={SERIES_COLORS.spending} strokeWidth={3} dot={{ r: 4 }} />
             </LineChart>
