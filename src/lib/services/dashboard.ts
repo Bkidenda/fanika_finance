@@ -49,6 +49,7 @@ export type DashboardMetrics = {
   allocation: { name: string; value: number }[];
   trend: TrendPoint[];
   upcomingBills: { id: string; name: string; amount: number; due: string }[];
+  budgetVsActual: { name: string; budget: number; actual: number }[];
   goals: { id: string; name: string; current: number; target: number; pct: number }[];
   insights: { tone: "success" | "warning" | "info"; text: string }[];
 };
