@@ -108,18 +108,34 @@ ${JSON.stringify(history, null, 2)}`;
       }),
     });
 
-    if (res.status === 429) throw new Error("Rate limited — try again in a moment.");
-    if (res.status === 402) throw new Error("AI credits exhausted. Add funds in Settings → Workspace → Usage.");
-    if (!res.ok) throw new Error(`AI gateway error: ${res.status}`);
+    if (res.status === 429) throw new Error("The advisor is busy right now — try again in a moment.");
+    if (res.status === 402) throw new Error("AI credits exhausted. Top up usage to run new reports.");
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      console.error("AI advisor gateway error", res.status, detail.slice(0, 500));
+      throw new Error("The advisor could not complete this analysis. Please try again.");
+    }
 
-    const json = await res.json();
-    const call = json?.choices?.[0]?.message?.tool_calls?.[0];
-    if (!call) throw new Error("AI returned no structured report");
-    const parsed = JSON.parse(call.function.arguments) as {
-      score: number;
-      summary: string;
-      recommendations: Array<{ kind: string; text: string }>;
+    const json = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string | null; tool_calls?: Array<{ function: { arguments: string } }> } }>;
     };
+    const msg = json.choices?.[0]?.message;
+    const raw = msg?.tool_calls?.[0]?.function?.arguments ?? extractJson(msg?.content ?? "");
+    if (!raw) throw new Error("The advisor returned an empty report. Please try again.");
+
+    let parsed: { score: number; summary: string; recommendations: Array<{ kind: string; text: string }> };
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      throw new Error("The advisor returned an unreadable report. Please try again.");
+    }
+    parsed.score = Math.max(0, Math.min(100, Math.round(Number(parsed.score) || 0)));
+    parsed.summary = String(parsed.summary ?? "").slice(0, 2000) || "No summary available.";
+    parsed.recommendations = (Array.isArray(parsed.recommendations) ? parsed.recommendations : [])
+      .filter((r) => r && typeof r.text === "string")
+      .map((r) => ({ kind: ["warn", "good", "info", "action"].includes(r.kind) ? r.kind : "info", text: r.text }))
+      .slice(0, 8);
+
 
     const { data: row, error } = await supabase
       .from("ai_insights")
