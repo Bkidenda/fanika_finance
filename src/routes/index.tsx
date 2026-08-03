@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark, Sparkles, Calendar, Eye, HandHeart, Bot, Target } from "lucide-react";
 import { PublicLayout } from "@/components/public-layout";
 import { useAuth } from "@/hooks/use-auth";
-import heroImg from "@/assets/hero-dashboard.jpg";
+import heroImg from "@/assets/hero-app.jpg";
 
 const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
@@ -12,12 +12,12 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Fanika — Manage Money with Purpose. Build Wealth with Discipline." },
-      { name: "description", content: "Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning — rooted in stewardship." },
+      { name: "description", content: "Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning — built on financial discipline." },
       { property: "og:title", content: "Fanika — Manage Money with Purpose" },
-      { property: "og:description", content: "Personal finance OS for disciplined stewards. Budgets, debts, investments, devotionals." },
-      { property: "og:url", content: "https://nurusteward.lovable.app/" },
+      { property: "og:description", content: "Personal finance OS for serious money managers. Budgets, debts, investments, daily insights." },
+      { property: "og:url", content: "https://fanikasteward.lovable.app/" },
     ],
-    links: [{ rel: "canonical", href: "https://nurusteward.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://fanikasteward.lovable.app/" }],
   }),
   component: Home,
 });
@@ -44,14 +44,14 @@ function Home() {
         <div className="grid items-center gap-6 md:gap-10 lg:grid-cols-[1.1fr_1fr]">
           <div className="duration-700 animate-in fade-in slide-in-from-left-4">
             <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-card">
-              <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Stewardship-first finance
+              <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Discipline-first finance
             </span>
             <h1 className="mt-4 text-balance text-3xl font-semibold leading-[1.05] tracking-tight md:mt-5 md:text-5xl lg:text-6xl">
               Manage Money with <span className="text-gradient-primary">Purpose</span>.<br />
               Build Wealth with <span className="text-gradient-primary">Discipline</span>.
             </h1>
             <p className="mt-4 max-w-xl text-sm text-muted-foreground md:mt-5 md:text-lg">
-              Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning. Fanika helps you make intentional financial decisions rooted in stewardship, accountability, and long-term prosperity.
+              Your complete personal finance operating system for budgeting, giving, saving, investing, debt management, and financial planning. Fanika helps you make intentional financial decisions rooted in financial discipline, accountability, and long-term prosperity.
             </p>
             <p className="mt-3 hidden max-w-xl text-sm text-muted-foreground md:mt-4 md:block">
               Start from your net take-home pay, automate tithes and giving, plan monthly budgets, track spending, manage debts, monitor investments, and stay aligned with your financial goals — all in one place.
@@ -77,8 +77,8 @@ function Home() {
 
           <div className="relative">
             <div aria-hidden className="pointer-events-none absolute -left-8 -top-8 h-24 w-24 rounded-3xl bg-gradient-primary opacity-25 blur-2xl animate-pulse" />
-            <div aria-hidden className="pointer-events-none absolute -right-6 top-16 h-28 w-28 rounded-full bg-[oklch(0.68_0.12_60)] opacity-30 blur-3xl animate-pulse [animation-delay:600ms]" />
-            <div aria-hidden className="pointer-events-none absolute -bottom-6 right-12 h-32 w-32 rounded-3xl bg-[oklch(0.78_0.10_65)] opacity-25 blur-3xl animate-pulse [animation-delay:1200ms]" />
+            <div aria-hidden className="pointer-events-none absolute -right-6 top-16 h-28 w-28 rounded-full bg-accent opacity-30 blur-3xl animate-pulse [animation-delay:600ms]" />
+            <div aria-hidden className="pointer-events-none absolute -bottom-6 right-12 h-32 w-32 rounded-3xl bg-secondary opacity-40 blur-3xl animate-pulse [animation-delay:1200ms]" />
 
             {/* Floating chips */}
             <div className="pointer-events-none absolute -right-3 top-20 z-10 hidden rounded-2xl border bg-card/95 px-3 py-2 text-xs shadow-elevated backdrop-blur delay-200 duration-700 animate-in fade-in slide-in-from-right-4 md:block">
@@ -114,7 +114,7 @@ function Home() {
         <div className="mt-8 grid gap-4 md:mt-12 md:gap-5 md:grid-cols-2 lg:grid-cols-4">
           {[
             { i: Eye, t: "Financial Clarity", d: "Know exactly where your money comes from, where it goes, and how every decision impacts your future." },
-            { i: HandHeart, t: "Faithful Stewardship", d: "Prioritize tithes, offerings, generosity, and purpose-driven financial planning before allocating the rest of your income." },
+            { i: HandHeart, t: "Purposeful Allocation", d: "Prioritize giving, planned commitments, and purpose-driven financial planning before allocating the rest of your income." },
             { i: Bot, t: "Automated Planning", d: "Create realistic budgets automatically based on your income, commitments, and financial priorities." },
             { i: Target, t: "Wealth Building", d: "Track savings, investments, emergency funds, and long-term financial goals from a single dashboard." },
           ].map((f) => (
@@ -130,7 +130,7 @@ function Home() {
       {/* MODULES */}
       <section className="mx-auto max-w-7xl px-6 py-12">
         <div className="text-center">
-          <h2 className="text-3xl font-semibold tracking-tight">Built for disciplined stewards</h2>
+          <h2 className="text-3xl font-semibold tracking-tight">Built for disciplined households</h2>
           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">Everything you need to see, govern, and grow your finances — without spreadsheets.</p>
         </div>
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -140,7 +140,7 @@ function Home() {
             { i: PiggyBank, t: "Debt & subscription control", d: "Track formal loans and informal lending. Watch subscriptions before they pile up." },
             { i: TrendingUp, t: "Investments & goals", d: "Portfolio ROI, savings goals, and diversification scoring for every income stream." },
             { i: Sparkles, t: "AI advisor + chatbot", d: "Monthly analysis with actionable recommendations, plus an always-on assistant." },
-            { i: BookOpen, t: "Daily stewardship", d: "Scripture and short, verified quotations to ground every financial decision." },
+            { i: BookOpen, t: "Daily money insights", d: "Short, verified insights and motivation to ground every financial decision." },
           ].map((f) => (
             <div key={f.t} className="rounded-2xl border bg-card p-6 shadow-card transition hover:shadow-elevated">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-primary"><f.i className="h-5 w-5" /></div>
@@ -155,18 +155,18 @@ function Home() {
       <section className="mx-auto max-w-5xl px-6 py-16">
         <div className="rounded-3xl border bg-card p-10 shadow-card">
           <p className="text-sm font-medium text-primary">About</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight">Stewardship made operational.</h2>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight">Financial discipline made operational.</h2>
           <div className="prose prose-neutral mt-6 max-w-none text-muted-foreground">
-            <p>Fanika exists for the household that wants to take faithful stewardship seriously — not as a Sunday idea, but as a daily operating system.</p>
+            <p>Fanika exists for the household that wants to take money management seriously — not as an occasional resolution, but as a daily operating system.</p>
             <p>We started by asking: what would personal finance look like if tithing wasn't an afterthought, if family obligations were budgeted instead of guessed, and if every shilling — or dollar, or rupee — was visible across every account?</p>
-            <p>The answer is what you see here. Budgets that group around how real households actually spend. A monthly close so the past is reconciled before the next month begins. And devotional context, because numbers without wisdom is just spreadsheets.</p>
+            <p>The answer is what you see here. Budgets that group around how real households actually spend. A monthly close so the past is reconciled before the next month begins. And daily financial insights & motivation, because numbers without context is just spreadsheets.</p>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-5xl px-6 py-20">
         <div className="rounded-3xl border bg-gradient-hero p-10 text-center text-primary-foreground shadow-elevated">
-          <h2 className="text-3xl font-semibold tracking-tight">Ready to take stewardship seriously?</h2>
+          <h2 className="text-3xl font-semibold tracking-tight">Ready to take your finances seriously?</h2>
           <p className="mx-auto mt-3 max-w-xl opacity-90">Create your free account and bring every shilling into the light.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button size="lg" variant="secondary" asChild>
