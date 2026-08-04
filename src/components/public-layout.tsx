@@ -140,7 +140,7 @@ export function PublicLayout({ children, dark = false }: { children: React.React
               <li><a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 hover:text-foreground"><Phone className="h-3.5 w-3.5" /> {PHONE_DISPLAY}</a></li>
               <li><a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-foreground"><MessageCircle className="h-3.5 w-3.5" /> WhatsApp</a></li>
             </ul>
-            <ContactForm />
+            <ContactForm dark={dark} />
           </div>
         </div>
         <div className="border-t py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Fanika</div>
