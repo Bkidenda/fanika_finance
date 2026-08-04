@@ -80,7 +80,7 @@ export function PublicLayout({ children, dark = false }: { children: React.React
           </button>
         </div>
         {open && (
-          <div className="mx-auto mt-2 max-w-3xl rounded-2xl border bg-card p-3 shadow-elevated lg:hidden">
+          <div className={`mx-auto mt-2 max-w-3xl rounded-2xl border p-3 shadow-elevated lg:hidden ${dark ? "border-ink-line bg-ink-soft" : "bg-card"}`}>
             <nav className="flex flex-col gap-1">
               {NAV.map((n) => (
                 <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className={`rounded-md px-3 py-2 text-sm ${path === n.to ? "bg-secondary font-medium text-primary" : "text-muted-foreground"}`}>
