@@ -150,7 +150,7 @@ export function PublicLayout({ children, dark = false }: { children: React.React
   );
 }
 
-function ContactForm() {
+function ContactForm({ dark = false }: { dark?: boolean }) {
   const [name, setName] = useState("");
   const [msg, setMsg] = useState("");
   function submit(e: React.FormEvent) {
@@ -158,11 +158,15 @@ function ContactForm() {
     const body = `Hi Brian,%0D%0A%0D%0A${encodeURIComponent(msg)}%0D%0A%0D%0A— ${encodeURIComponent(name || "Fanika visitor")}`;
     window.location.href = `mailto:${EMAIL}?subject=Question%20from%20Fanika&body=${body}`;
   }
+  const field = dark
+    ? "w-full rounded-md border border-ink-line bg-ink px-2 py-1.5 text-xs text-ink-fg placeholder:text-ink-muted"
+    : "w-full rounded-md border bg-background px-2 py-1.5 text-xs";
   return (
     <form onSubmit={submit} className="mt-4 space-y-2">
-      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="w-full rounded-md border bg-background px-2 py-1.5 text-xs" />
-      <textarea value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Ask a question…" rows={3} className="w-full rounded-md border bg-background px-2 py-1.5 text-xs" />
-      <button type="submit" className="w-full rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90">Send</button>
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className={field} />
+      <textarea value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Ask a question…" rows={3} className={field} />
+      <button type="submit" className={`magnetic w-full rounded-md px-3 py-1.5 text-xs font-medium hover:opacity-90 ${dark ? "bg-gold text-ink" : "bg-primary text-primary-foreground"}`}>Send</button>
+
     </form>
   );
 }
