@@ -19,13 +19,14 @@ const PHONE_TEL = "+254708096833";
 const WHATSAPP_URL = "https://wa.me/254708096833";
 const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
-export function PublicLayout({ children }: { children: React.ReactNode }) {
+export function PublicLayout({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
   const { user } = useAuth();
   const path = useRouterState({ select: (r) => r.location.pathname });
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-surface">
+    <div className={`min-h-screen overflow-x-hidden ${dark ? "bg-ink text-ink-fg" : "bg-gradient-surface"}`}>
+
 
       {/* Fixed wordmark, top-left, NOT part of floating pill */}
       <div className="fixed left-6 top-5 z-50">
