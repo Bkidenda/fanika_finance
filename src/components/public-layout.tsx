@@ -62,18 +62,19 @@ export function PublicLayout({ children, dark = false }: { children: React.React
           </nav>
 
           <div className="hidden items-center gap-1.5 lg:flex">
-            <Button asChild size="sm" variant="ghost" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground">
+            <Button asChild size="sm" variant="ghost" className={dark ? "magnetic text-ink-fg hover:bg-gold/10 hover:text-gold-soft" : "magnetic text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"}>
               <a href={DEMO_MAILTO}><Calendar className="mr-1 h-3.5 w-3.5" /> Book demo</a>
             </Button>
             {user ? (
-              <Button asChild size="sm" variant="secondary"><Link to="/dashboard">Open app</Link></Button>
+              <Button asChild size="sm" variant="secondary" className={dark ? "magnetic bg-gold text-ink hover:bg-gold-soft" : "magnetic"}><Link to="/dashboard">Open app</Link></Button>
             ) : (
               <>
-                <Button asChild size="sm" variant="ghost" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"><Link to="/login">Sign in</Link></Button>
-                <Button asChild size="sm" variant="secondary"><Link to="/signup">Get started</Link></Button>
+                <Button asChild size="sm" variant="ghost" className={dark ? "magnetic text-ink-fg hover:bg-gold/10 hover:text-gold-soft" : "magnetic text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"}><Link to="/login">Sign in</Link></Button>
+                <Button asChild size="sm" variant="secondary" className={dark ? "magnetic bg-gold text-ink hover:bg-gold-soft" : "magnetic"}><Link to="/signup">Get started</Link></Button>
               </>
             )}
           </div>
+
           <button className="rounded-full px-3 py-1.5 lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
