@@ -107,7 +107,7 @@ export function PublicLayout({ children, dark = false }: { children: React.React
 
       <main>{children}</main>
 
-      <footer id="contact" className="mt-24 hidden border-t bg-card md:block">
+      <footer id="contact" className={`mt-24 hidden border-t md:block ${dark ? "border-ink-line bg-ink-soft" : "bg-card"}`}>
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
