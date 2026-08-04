@@ -29,8 +29,9 @@ export const runAdvisor = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => AdvisorInput.parse(input))
   .handler(async ({ data, context }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env['LOVABLE_API_KEY'];
     if (!apiKey) throw new Error("AI advisor is not configured yet. Please try again later.");
+
 
 
     const { supabase, userId } = context;
