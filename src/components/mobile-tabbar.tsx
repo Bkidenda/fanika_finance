@@ -8,7 +8,7 @@ import {
 type Tab = { to: string; label: string; icon: typeof LayoutDashboard; center?: boolean };
 const TABS: readonly Tab[] = [
   { to: "/income-entries", label: "Income", icon: Coins },
-  { to: "/expenses", label: "Expenses", icon: Receipt },
+  { to: "/transactions", label: "Money", icon: Receipt },
   { to: "/dashboard", label: "Home", icon: LayoutDashboard, center: true },
   { to: "/budgets", label: "Budget", icon: Wallet },
   { to: "/accounts", label: "Accounts", icon: Landmark },
@@ -16,12 +16,12 @@ const TABS: readonly Tab[] = [
 
 const ACTIONS = [
   { to: "/income-entries", label: "Add Income", icon: ArrowDownRight, color: "bg-accent/20 text-accent-foreground border-accent/40" },
-  { to: "/expenses", label: "Add Expense", icon: ArrowUpRight, color: "bg-destructive/20 text-destructive border-destructive/40" },
+  { to: "/transactions", label: "Add Expense", icon: ArrowUpRight, color: "bg-destructive/20 text-destructive border-destructive/40" },
   { to: "/goals", label: "Update Goal", icon: Target, color: "bg-primary/20 text-primary border-primary/40" },
 
   { to: "/investments", label: "Log Investment", icon: TrendingUp, color: "bg-indigo-500/15 text-indigo-400 border-indigo-500/30" },
   { to: "/debts", label: "Log Payment", icon: CreditCard, color: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
-  { to: "/statements", label: "Statements", icon: FileText, color: "bg-purple-500/15 text-purple-400 border-purple-500/30" },
+  { to: "/reports", label: "Statements", icon: FileText, color: "bg-purple-500/15 text-purple-400 border-purple-500/30" },
 ] as const;
 
 export function MobileTabBar() {

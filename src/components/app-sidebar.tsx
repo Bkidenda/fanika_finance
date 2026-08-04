@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, FileText, Church, Crown, BarChart3,
+  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, Church, Crown, BarChart3,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -13,13 +13,12 @@ const overview = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Calendar", url: "/calendar", icon: CalendarDays },
   { title: "History", url: "/history", icon: History },
-  { title: "Statements", url: "/statements", icon: FileText },
 ] as const;
 
 const insights = [
   { title: "Insights", url: "/insights", icon: Sparkles },
   { title: "AI Advisor", url: "/advisor", icon: Bot },
-  { title: "Reports", url: "/reports", icon: BarChart3 },
+  { title: "Reports & Statements", url: "/reports", icon: BarChart3 },
 ] as const;
 
 const money = [
@@ -27,7 +26,6 @@ const money = [
   { title: "Income", url: "/income-entries", icon: Coins },
 
   { title: "Budgets", url: "/budgets", icon: Wallet },
-  { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Charity & Giving", url: "/giving", icon: Church },
   { title: "Subscriptions", url: "/subscriptions", icon: Repeat },
   { title: "Debts", url: "/debts", icon: CreditCard },
