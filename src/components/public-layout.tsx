@@ -19,18 +19,22 @@ const PHONE_TEL = "+254708096833";
 const WHATSAPP_URL = "https://wa.me/254708096833";
 const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
-export function PublicLayout({ children }: { children: React.ReactNode }) {
+export function PublicLayout({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
   const { user } = useAuth();
   const path = useRouterState({ select: (r) => r.location.pathname });
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-surface">
+    <div className={`min-h-screen overflow-x-hidden ${dark ? "bg-ink text-ink-fg" : "bg-gradient-surface"}`}>
+
 
       {/* Fixed wordmark, top-left, NOT part of floating pill */}
       <div className="fixed left-6 top-5 z-50">
-        <Link to="/" className="flex items-center gap-2 rounded-2xl bg-card/95 px-3 py-2 shadow-card ring-1 ring-border backdrop-blur">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary text-primary-foreground">
+        <Link
+          to="/"
+          className={`magnetic flex items-center gap-2 rounded-2xl px-3 py-2 shadow-card ring-1 backdrop-blur ${dark ? "bg-ink-soft/90 ring-ink-line" : "bg-card/95 ring-border"}`}
+        >
+          <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${dark ? "bg-gradient-to-br from-gold-soft to-gold text-ink" : "bg-gradient-primary text-primary-foreground"}`}>
             <Sprout className="h-4 w-4" />
           </div>
           <span className="font-semibold tracking-tight">Fanika</span>
@@ -39,38 +43,44 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
       {/* Floating navbar — links left, CTAs far right */}
       <header className="fixed inset-x-0 top-4 z-40 px-3">
-        <div className="mx-auto flex w-fit max-w-[calc(100vw-1.5rem)] items-center justify-between gap-3 rounded-full border border-white/15 bg-gradient-hero px-3 py-2 text-primary-foreground shadow-elevated backdrop-blur-xl md:gap-6 md:ml-auto md:mr-6">
+        <div className={`mx-auto flex w-fit max-w-[calc(100vw-1.5rem)] items-center justify-between gap-3 rounded-full border px-3 py-2 shadow-elevated backdrop-blur-xl md:gap-6 md:ml-auto md:mr-6 ${dark ? "border-ink-line bg-ink-soft/80 text-ink-fg" : "border-white/15 bg-gradient-hero text-primary-foreground"}`}>
           <nav className="hidden items-center gap-1 lg:flex">
 
             {NAV.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
-                className={`rounded-full px-3 py-1.5 text-sm transition ${path === n.to ? "bg-white/20 font-medium" : "text-primary-foreground/85 hover:bg-white/10"}`}
+                className={`magnetic rounded-full px-3 py-1.5 text-sm transition ${
+                  path === n.to
+                    ? dark ? "bg-gold/15 font-medium text-gold-soft" : "bg-white/20 font-medium"
+                    : dark ? "text-ink-muted hover:bg-gold/10 hover:text-ink-fg" : "text-primary-foreground/85 hover:bg-white/10"
+                }`}
               >
                 {n.label}
               </Link>
             ))}
           </nav>
+
           <div className="hidden items-center gap-1.5 lg:flex">
-            <Button asChild size="sm" variant="ghost" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground">
+            <Button asChild size="sm" variant="ghost" className={dark ? "magnetic text-ink-fg hover:bg-gold/10 hover:text-gold-soft" : "magnetic text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"}>
               <a href={DEMO_MAILTO}><Calendar className="mr-1 h-3.5 w-3.5" /> Book demo</a>
             </Button>
             {user ? (
-              <Button asChild size="sm" variant="secondary"><Link to="/dashboard">Open app</Link></Button>
+              <Button asChild size="sm" variant="secondary" className={dark ? "magnetic bg-gold text-ink hover:bg-gold-soft" : "magnetic"}><Link to="/dashboard">Open app</Link></Button>
             ) : (
               <>
-                <Button asChild size="sm" variant="ghost" className="text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"><Link to="/login">Sign in</Link></Button>
-                <Button asChild size="sm" variant="secondary"><Link to="/signup">Get started</Link></Button>
+                <Button asChild size="sm" variant="ghost" className={dark ? "magnetic text-ink-fg hover:bg-gold/10 hover:text-gold-soft" : "magnetic text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"}><Link to="/login">Sign in</Link></Button>
+                <Button asChild size="sm" variant="secondary" className={dark ? "magnetic bg-gold text-ink hover:bg-gold-soft" : "magnetic"}><Link to="/signup">Get started</Link></Button>
               </>
             )}
           </div>
+
           <button className="rounded-full px-3 py-1.5 lg:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
         {open && (
-          <div className="mx-auto mt-2 max-w-3xl rounded-2xl border bg-card p-3 shadow-elevated lg:hidden">
+          <div className={`mx-auto mt-2 max-w-3xl rounded-2xl border p-3 shadow-elevated lg:hidden ${dark ? "border-ink-line bg-ink-soft" : "bg-card"}`}>
             <nav className="flex flex-col gap-1">
               {NAV.map((n) => (
                 <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className={`rounded-md px-3 py-2 text-sm ${path === n.to ? "bg-secondary font-medium text-primary" : "text-muted-foreground"}`}>
@@ -97,7 +107,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
       <main>{children}</main>
 
-      <footer id="contact" className="mt-24 hidden border-t bg-card md:block">
+      <footer id="contact" className={`mt-24 hidden border-t md:block ${dark ? "border-ink-line bg-ink-soft" : "bg-card"}`}>
         <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
@@ -130,7 +140,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <li><a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 hover:text-foreground"><Phone className="h-3.5 w-3.5" /> {PHONE_DISPLAY}</a></li>
               <li><a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-foreground"><MessageCircle className="h-3.5 w-3.5" /> WhatsApp</a></li>
             </ul>
-            <ContactForm />
+            <ContactForm dark={dark} />
           </div>
         </div>
         <div className="border-t py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Fanika</div>
@@ -140,7 +150,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ContactForm() {
+function ContactForm({ dark = false }: { dark?: boolean }) {
   const [name, setName] = useState("");
   const [msg, setMsg] = useState("");
   function submit(e: React.FormEvent) {
@@ -148,11 +158,15 @@ function ContactForm() {
     const body = `Hi Brian,%0D%0A%0D%0A${encodeURIComponent(msg)}%0D%0A%0D%0A— ${encodeURIComponent(name || "Fanika visitor")}`;
     window.location.href = `mailto:${EMAIL}?subject=Question%20from%20Fanika&body=${body}`;
   }
+  const field = dark
+    ? "w-full rounded-md border border-ink-line bg-ink px-2 py-1.5 text-xs text-ink-fg placeholder:text-ink-muted"
+    : "w-full rounded-md border bg-background px-2 py-1.5 text-xs";
   return (
     <form onSubmit={submit} className="mt-4 space-y-2">
-      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="w-full rounded-md border bg-background px-2 py-1.5 text-xs" />
-      <textarea value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Ask a question…" rows={3} className="w-full rounded-md border bg-background px-2 py-1.5 text-xs" />
-      <button type="submit" className="w-full rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90">Send</button>
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className={field} />
+      <textarea value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Ask a question…" rows={3} className={field} />
+      <button type="submit" className={`magnetic w-full rounded-md px-3 py-1.5 text-xs font-medium hover:opacity-90 ${dark ? "bg-gold text-ink" : "bg-primary text-primary-foreground"}`}>Send</button>
+
     </form>
   );
 }

@@ -38,7 +38,7 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY;
+        const apiKey = process.env['LOVABLE_API_KEY'];
         if (!apiKey) return new Response("AI gateway not configured", { status: 500 });
 
         let parsed;
@@ -50,9 +50,10 @@ export const Route = createFileRoute("/api/chat")({
 
         const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
-          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+          headers: { "Lovable-API-Key": apiKey, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: "google/gemini-3.6-flash",
+
             messages: [
               { role: "system", content: SYSTEM },
               ...parsed.messages,
