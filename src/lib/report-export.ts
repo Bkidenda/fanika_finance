@@ -30,15 +30,53 @@ export async function exportCsv(rows: ReportRow[], fileBase: string) {
   }
 }
 
-export async function exportExcel(sections: { title: string; rows: ReportRow[] }[], fileBase: string) {
+export async function exportExcel(
+  sections: { title: string; rows: ReportRow[] }[],
+  fileBase: string,
+  metadata?: { entity: string; period: string; currency: string }
+) {
   try {
     const XLSX = await import("xlsx");
     const wb = XLSX.utils.book_new();
+
     sections.forEach((s) => {
-      const data = [["Label", "Value", "Secondary"], ...s.rows.map((r) => [r.label, r.value, r.secondary ?? ""])];
+      // Header and metadata rows
+      const data: any[][] = [
+        ["FANIKA FINANCIAL REPORT"],
+        [s.title.toUpperCase()],
+      ];
+
+      if (metadata) {
+        data.push([metadata.entity]);
+        data.push([`Period: ${metadata.period} | Currency: ${metadata.currency}`]);
+      }
+      
+      data.push([]); // Spacer
+      data.push(["Item", "Amount", metadata?.secondaryLabel ?? ""]);
+
+      s.rows.forEach((r) => {
+        data.push([r.label, r.value, r.secondary ?? ""]);
+      });
+
       const ws = XLSX.utils.aoa_to_sheet(data);
+      
+      // Basic formatting for Accounting style: Number format and column widths
+      ws["!cols"] = [{ wch: 45 }, { wch: 20 }, { wch: 20 }];
+      
+      // Apply number format to numeric cells in column B (index 1) and C (index 2)
+      // Standard accounting format: #,##0.00
+      Object.keys(ws).forEach((key) => {
+        if (key.startsWith("B") || key.startsWith("C")) {
+          const cell = ws[key];
+          if (cell && typeof cell.v === "number") {
+            cell.z = "#,##0.00";
+          }
+        }
+      });
+
       XLSX.utils.book_append_sheet(wb, ws, s.title.slice(0, 31) || "Sheet");
     });
+
     const out = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     downloadBlob(new Blob([out], { type: "application/octet-stream" }), `${fileBase}.xlsx`);
     toast.success("Excel workbook exported");
