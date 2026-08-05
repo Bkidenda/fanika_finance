@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -27,6 +27,28 @@ function Subs() {
     name: "", amount: "", cycle: "monthly" as "weekly" | "monthly" | "quarterly" | "annual",
     next_charge: "", category: "Subscriptions", account_id: "",
   });
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    async function renewDueSubscriptions() {
+      const { data, error } = await supabase.rpc("process_due_subscriptions");
+      if (cancelled) return;
+      if (error) {
+        toast.error("Automatic subscription renewal could not be completed.");
+        return;
+      }
+      if (Number(data) > 0) {
+        toast.success(`${data} subscription ${Number(data) === 1 ? "payment was" : "payments were"} recorded.`);
+        qc.invalidateQueries({ queryKey: ["subscriptions"] });
+        qc.invalidateQueries({ queryKey: ["expenses"] });
+        qc.invalidateQueries({ queryKey: ["expenses-all"] });
+        qc.invalidateQueries({ queryKey: ["accounts"] });
+      }
+    }
+    renewDueSubscriptions();
+    return () => { cancelled = true; };
+  }, [qc, user]);
 
   async function add(e: React.FormEvent) {
     e.preventDefault();

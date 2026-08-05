@@ -38,6 +38,12 @@ export async function exportExcel(
   try {
     const XLSX = await import("xlsx");
     const wb = XLSX.utils.book_new();
+    wb.Props = {
+      Title: `Fanika financial statements — ${metadata?.period ?? "Financial report"}`,
+      Subject: "Personal financial statements",
+      Author: "Fanika",
+      Company: "Fanika",
+    };
 
     sections.forEach((s) => {
       // Header and metadata rows
@@ -69,7 +75,7 @@ export async function exportExcel(
         if (key.startsWith("B") || key.startsWith("C")) {
           const cell = ws[key];
           if (cell && typeof cell.v === "number") {
-            cell.z = "#,##0.00";
+            cell.z = "#,##0.00;[Red](#,##0.00);-";
           }
         }
       });

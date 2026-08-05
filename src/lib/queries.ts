@@ -89,6 +89,7 @@ export type Subscription = {
   id: string; name: string; category: string; amount: number;
   cycle: "weekly" | "monthly" | "quarterly" | "annual";
   next_charge: string | null; active: boolean; notes: string | null;
+  account_id: string | null; last_charged: string | null;
 };
 
 export type Debt = {

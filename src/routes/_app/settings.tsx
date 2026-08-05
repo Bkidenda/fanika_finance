@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { UserCircle, LogOut, ShieldAlert, Eraser, PowerOff, Trash2, HandHeart, Smartphone, Crown, Home } from "lucide-react";
+import { UserCircle, LogOut, ShieldAlert, Eraser, PowerOff, Trash2, HandHeart, Smartphone, Crown, Home, History } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -194,8 +194,10 @@ function ProfilePage() {
       </form>
 
       <div className="rounded-2xl border bg-card p-6 shadow-card">
-        <h3 className="font-semibold">Session</h3>
-        <div className="mt-4">
+        <h3 className="font-semibold">Account activity</h3>
+        <p className="mt-1 text-xs text-muted-foreground">Review closed-month snapshots or manage this session.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button asChild variant="outline"><Link to="/history"><History className="mr-1 h-4 w-4" /> Financial history</Link></Button>
           <Button variant="outline" onClick={signOut}><LogOut className="mr-1 h-4 w-4" /> Sign out</Button>
         </div>
       </div>

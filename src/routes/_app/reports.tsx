@@ -450,7 +450,6 @@ function StatementsTab() {
     exportCsv(meta.rows, `${fileBase}-${tab}`);
   }
   function handleExcel() {
-  function handleExcel() {
     exportExcel(
       [
         { title: "Income Statement", rows: incomeRows },
@@ -460,7 +459,6 @@ function StatementsTab() {
       fileBase,
       { entity: who, period: range.label, currency }
     );
-  }
   }
   async function handleEmail() {
     const meta = statementMeta[tab];

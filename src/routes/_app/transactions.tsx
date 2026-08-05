@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useAllExpenses, useAllIncomeEntries, useProfile, useBudgets, useAccounts } from "@/lib/queries";
 import { DEFAULT_BUDGET_CATEGORIES } from "@/lib/finance";
-import { formatCurrency, isoLocalDate } from "@/lib/format";
+import { formatCurrency, isoLocalDate, monthKey } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -76,6 +76,7 @@ function TransactionsPage() {
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | Kind>("all");
+  const [dateScope, setDateScope] = useState<"month" | "all">("month");
 
   // --- Add expense dialog state ---
   const [open, setOpen] = useState(false);
@@ -219,20 +220,22 @@ function TransactionsPage() {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
+    const currentMonth = monthKey().slice(0, 7);
     return rows
+      .filter((r) => dateScope === "all" || r.date.startsWith(currentMonth))
       .filter((r) => filter === "all" || r.kind === filter)
       .filter((r) => !q || r.category.toLowerCase().includes(q) || r.description?.toLowerCase().includes(q) || r.payment_method?.toLowerCase().includes(q));
-  }, [rows, filter, search]);
+  }, [rows, dateScope, filter, search]);
 
-  const totalIn = rows.filter((r) => r.kind === "income").reduce((s, r) => s + r.amount, 0);
-  const totalOut = rows.filter((r) => r.kind === "expense").reduce((s, r) => s + r.amount + r.fee, 0);
+  const totalIn = filtered.filter((r) => r.kind === "income").reduce((s, r) => s + r.amount, 0);
+  const totalOut = filtered.filter((r) => r.kind === "expense").reduce((s, r) => s + r.amount + r.fee, 0);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">Money Tracker</h2>
-          <p className="text-xs text-muted-foreground">The unified income + expense ledger. Record any date — early-paid May salary spent in June stays in May's books.</p>
+          <p className="text-xs text-muted-foreground">The unified income + expense ledger, showing this month by default.</p>
         </div>
         <div className="flex items-center gap-2">
           <Dialog open={incomeOpen} onOpenChange={setIncomeOpen}>
@@ -329,13 +332,21 @@ function TransactionsPage() {
             <Search className="h-4 w-4 text-muted-foreground" />
             <input placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
           </div>
-          <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-            <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="income">Income</TabsTrigger>
-              <TabsTrigger value="expense">Expenses</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex flex-wrap gap-2">
+            <Tabs value={dateScope} onValueChange={(v) => setDateScope(v as typeof dateScope)}>
+              <TabsList>
+                <TabsTrigger value="month">This month</TabsTrigger>
+                <TabsTrigger value="all">All time</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+              <TabsList>
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="income">Income</TabsTrigger>
+                <TabsTrigger value="expense">Expenses</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </div>
         {loading ? (
           <p className="py-10 text-center text-sm text-muted-foreground">Loading transactions…</p>
