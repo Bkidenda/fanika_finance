@@ -33,7 +33,7 @@ export async function exportCsv(rows: ReportRow[], fileBase: string) {
 export async function exportExcel(
   sections: { title: string; rows: ReportRow[] }[],
   fileBase: string,
-  metadata?: { entity: string; period: string; currency: string }
+  metadata?: { entity: string; period: string; currency: string; secondaryLabel?: string }
 ) {
   try {
     const XLSX = await import("xlsx");

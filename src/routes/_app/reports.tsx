@@ -450,6 +450,7 @@ function StatementsTab() {
     exportCsv(meta.rows, `${fileBase}-${tab}`);
   }
   function handleExcel() {
+  function handleExcel() {
     exportExcel(
       [
         { title: "Income Statement", rows: incomeRows },
@@ -457,7 +458,9 @@ function StatementsTab() {
         { title: "Cash Flow", rows: cashRows },
       ],
       fileBase,
+      { entity: who, period: range.label, currency }
     );
+  }
   }
   async function handleEmail() {
     const meta = statementMeta[tab];
@@ -835,8 +838,8 @@ function ReportsTab() {
   const allSections = REPORT_TABS.map((t) => sectionsFor[t.id]);
 
   function handleCsv() {
-    const rows = sectionsFor[tab].rows;
-    exportCsv(rows, `fanika-${tab}-${label.replace(/\s+/g, "-").toLowerCase()}`);
+  function handleExcel() {
+    exportExcel(allSections, `fanika-reports-${label.replace(/\s+/g, "-").toLowerCase()}`, { entity: who, period: label, currency });
   }
   function handleExcel() {
     exportExcel(allSections, `fanika-reports-${label.replace(/\s+/g, "-").toLowerCase()}`);
