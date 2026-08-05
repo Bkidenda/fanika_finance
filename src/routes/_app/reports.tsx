@@ -838,8 +838,8 @@ function ReportsTab() {
   const allSections = REPORT_TABS.map((t) => sectionsFor[t.id]);
 
   function handleCsv() {
-  function handleExcel() {
-    exportExcel(allSections, `fanika-reports-${label.replace(/\s+/g, "-").toLowerCase()}`, { entity: who, period: label, currency });
+    const meta = sectionsFor[tab];
+    exportCsv(meta.rows, `fanika-${tab}-${label.replace(/\s+/g, "-").toLowerCase()}`);
   }
   function handleExcel() {
     exportExcel(allSections, `fanika-reports-${label.replace(/\s+/g, "-").toLowerCase()}`);
