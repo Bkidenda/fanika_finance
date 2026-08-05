@@ -1112,6 +1112,7 @@ export type Database = {
         Args: { p_account: string; p_delta: number }
         Returns: undefined
       }
+      process_due_subscriptions: { Args: never; Returns: number }
       seed_budget_split_rules_for_month: {
         Args: { p_target_month: string; p_user_id: string }
         Returns: undefined
