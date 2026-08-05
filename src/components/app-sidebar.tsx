@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, Receipt, TrendingUp, Target, BookOpen, Sparkles,
-  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, History, CalendarDays, Church, Crown, BarChart3,
+  UserCircle, Sprout, Landmark, Repeat, CreditCard, Coins, Bot, CalendarDays, Church, Crown, BarChart3,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -12,7 +12,6 @@ import { useProfile } from "@/lib/queries";
 const overview = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Calendar", url: "/calendar", icon: CalendarDays },
-  { title: "History", url: "/history", icon: History },
 ] as const;
 
 const insights = [
