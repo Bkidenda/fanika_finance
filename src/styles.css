@@ -55,7 +55,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 :root {
@@ -201,6 +201,18 @@
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+  .bg-finance-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--primary) 5%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--primary) 5%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 96%);
+  }
+  .pulse-primary { animation: pulse-primary 2600ms ease-in-out infinite; }
+  @keyframes pulse-primary {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 28%, transparent); }
+    50% { box-shadow: 0 0 0 10px color-mix(in oklab, var(--primary) 0%, transparent); }
   }
 }
 
