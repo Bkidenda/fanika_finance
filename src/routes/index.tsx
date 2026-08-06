@@ -130,25 +130,25 @@ function Home() {
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
             <Reveal>
-              <p className="text-sm font-medium text-gold">The financial journey</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink-fg md:text-4xl">
-                Watch a month settle itself.
+               <p className="text-sm font-semibold text-primary">Connected financial operations</p>
+               <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground md:text-4xl">
+                 Watch your financial picture update itself.
               </h2>
-              <p className="mt-4 max-w-lg text-ink-muted">
-                Income lands, giving is set aside, debts step down, savings compound. Fanika keeps the whole
-                ledger reconciled as it happens — no spreadsheet, no month-end panic.
+               <p className="mt-4 max-w-lg text-muted-foreground">
+                 Income arrives, bills are paid, debts step down and savings grow. Fanika keeps the whole
+                 picture reconciled as activity happens — no spreadsheet, no month-end scramble.
               </p>
             </Reveal>
             <Stagger className="mt-8 space-y-4" delay={0.1}>
               {[
-                ["Giving computed before disposable income", "var(--gold)"],
-                ["Debt repayments post to loan, account and expenses at once", "var(--clay)"],
-                ["Recurring lines carry forward; one-off lines reset to zero", "var(--leaf)"],
-                ["Monthly close snapshots the past and opens the next month", "var(--slate-blue)"],
+                 ["Recurring commitments renew on schedule", "var(--chart-3)"],
+                 ["Debt repayments update the loan, account and expense ledger", "var(--chart-4)"],
+                 ["Recurring budgets carry forward while one-off amounts reset", "var(--primary)"],
+                 ["Monthly close preserves the past and opens the next plan", "var(--chart-2)"],
               ].map(([t, c]) => (
                 <motion.div key={t} variants={staggerItem} className="flex items-start gap-3">
                   <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: c }} />
-                  <p className="text-sm text-ink-fg">{t}</p>
+                   <p className="text-sm text-foreground">{t}</p>
                 </motion.div>
               ))}
             </Stagger>
@@ -162,8 +162,8 @@ function Home() {
       {/* ─── DAY IN THE LIFE ──────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-20">
         <Reveal className="text-center">
-          <p className="text-sm font-medium text-gold">A day with Fanika</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink-fg md:text-4xl">Four moves, one ledger.</h2>
+           <p className="text-sm font-semibold text-primary">A day with Fanika</p>
+           <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground md:text-4xl">Four moves, one financial picture.</h2>
         </Reveal>
         <Reveal className="mt-10" delay={0.08}>
           <JourneyTabs />
@@ -173,12 +173,12 @@ function Home() {
       {/* ─── LIVE CALCULATOR ─────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-20">
         <Reveal className="text-center">
-          <p className="text-sm font-medium text-gold">Try it right here</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink-fg md:text-4xl">
-            See how giving, savings and debt payoff land on your income.
+           <p className="text-sm font-semibold text-primary">Try it right here</p>
+           <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground md:text-4xl">
+             See how savings, commitments and debt payoff fit your income.
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-ink-muted">
-            Move the sliders. The donut redistributes live — gold for giving, slate for savings, clay for debt, emerald for living and goals.
+           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+             Move the sliders and see your plan redistribute live across commitments, savings, debt and everyday spending.
           </p>
         </Reveal>
         <Reveal className="mt-10" delay={0.08} scale={0.98}>
@@ -189,25 +189,25 @@ function Home() {
       {/* ─── MODULES ─────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-20">
         <Reveal className="text-center">
-          <h2 className="text-3xl font-semibold tracking-tight text-ink-fg md:text-4xl">Built for disciplined households</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-ink-muted">Everything you need to see, govern and grow your finances — without spreadsheets.</p>
+           <h2 className="text-3xl font-semibold tracking-normal text-foreground md:text-4xl">Built for complete financial control</h2>
+           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">Everything you need to plan, monitor and grow your finances — without spreadsheets.</p>
         </Reveal>
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {[
-            { i: Wallet, t: "Budgets & money tracker", d: "Plan by category, log income and spending in one ledger, and flag what didn't fit the plan.", c: "var(--leaf)" },
-            { i: Landmark, t: "Unified accounts", d: "Bank, mobile money, SACCO and cash in a single net-worth view that updates as you transact.", c: "var(--slate-blue)" },
-            { i: PiggyBank, t: "Debt & subscription control", d: "Track formal loans and informal lending, and catch subscriptions before they pile up.", c: "var(--clay)" },
-            { i: TrendingUp, t: "Investments & goals", d: "Portfolio ROI, savings goals and diversification scoring across every income stream.", c: "var(--gold)" },
-            { i: Sparkles, t: "AI advisor + assistant", d: "Monthly analysis with trend-aware recommendations, plus an always-on chat assistant.", c: "var(--gold-soft)" },
-            { i: BookOpen, t: "Reports & statements", d: "Income statement, balance sheet and cash flow — download as PDF, Excel or CSV, or have them emailed.", c: "var(--leaf)" },
+             { i: Wallet, t: "Budgets & money tracker", d: "Plan by category, log income and spending in one ledger, and spot variance early.", c: "var(--primary)" },
+             { i: Landmark, t: "Unified accounts", d: "Bank, mobile money, SACCO and cash in a single net-worth view that updates as you transact.", c: "var(--chart-2)" },
+             { i: PiggyBank, t: "Debt & subscription control", d: "Track formal and informal loans, automate payments and stay ahead of renewals.", c: "var(--chart-3)" },
+             { i: TrendingUp, t: "Investments & goals", d: "Monitor portfolio performance, savings goals and diversification across every account.", c: "var(--chart-4)" },
+             { i: Sparkles, t: "AI advisor + assistant", d: "Get monthly analysis with trend-aware recommendations, plus an always-on finance assistant.", c: "var(--chart-3)" },
+             { i: BookOpen, t: "Reports & statements", d: "Income statement, balance sheet and cash flow — export as PDF, Excel or CSV, or send by email.", c: "var(--primary)" },
           ].map((f, i) => (
             <Reveal key={f.t} delay={(i % 3) * 0.06}>
-              <TiltCard className="h-full rounded-2xl border border-ink-line bg-ink-soft/70 p-6 transition hover:border-gold/35">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "color-mix(in oklab, var(--ink-fg) 6%, transparent)", color: f.c }}>
+               <TiltCard className="h-full rounded-2xl border bg-card p-6 shadow-card transition hover:border-primary/25">
+                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted" style={{ color: f.c }}>
                   <f.i className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 font-semibold text-ink-fg">{f.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{f.d}</p>
+                 <h3 className="mt-4 font-semibold text-foreground">{f.t}</h3>
+                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.d}</p>
               </TiltCard>
             </Reveal>
           ))}
@@ -217,13 +217,13 @@ function Home() {
       {/* ─── ABOUT ───────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-4 py-16 md:px-6">
         <Reveal>
-          <div className="rounded-3xl border border-ink-line bg-ink-soft/70 p-8 md:p-10">
-            <p className="text-sm font-medium text-gold">About</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink-fg">Financial discipline, made operational.</h2>
-            <div className="mt-6 space-y-4 text-ink-muted">
-              <p>Fanika exists for the household that treats money management as a daily operating system, not an annual resolution.</p>
-              <p>We asked a simple question: what would personal finance look like if giving wasn't an afterthought, if family obligations were budgeted instead of guessed, and if every shilling was visible across every account?</p>
-              <p>The answer is this ledger — budgets shaped around how households actually spend, a monthly close that reconciles the past before the next month opens, and daily insight so numbers carry context.</p>
+           <div className="rounded-3xl border bg-card p-8 shadow-card md:p-10">
+             <p className="text-sm font-semibold text-primary">About Fanika</p>
+             <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground">Financial discipline, made practical.</h2>
+             <div className="mt-6 space-y-4 text-muted-foreground">
+               <p>Fanika is built for people who want money management to be a dependable operating habit, not an annual resolution.</p>
+               <p>Every account, obligation and goal belongs in one understandable system, so decisions are based on the full picture rather than incomplete balances.</p>
+               <p>Monthly planning, reconciliation and daily insight work together to keep your numbers current and your next action clear.</p>
             </div>
           </div>
         </Reveal>
@@ -232,16 +232,16 @@ function Home() {
       {/* ─── CTA ─────────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-5xl px-4 pb-24 md:px-6">
         <Reveal scale={0.98}>
-          <div className="relative overflow-hidden rounded-3xl border border-gold/25 bg-gradient-harvest p-10 text-center shadow-elevated">
-            <div aria-hidden className="absolute inset-0 bg-ledger-grid opacity-50" />
+           <div className="relative overflow-hidden rounded-3xl border border-primary/15 bg-primary p-10 text-center shadow-elevated">
+             <div aria-hidden className="absolute inset-0 bg-finance-grid opacity-20" />
             <div className="relative">
-              <h2 className="text-3xl font-semibold tracking-tight text-ink-fg">Ready to take your finances seriously?</h2>
-              <p className="mx-auto mt-3 max-w-xl text-ink-muted">Create your free account and bring every shilling into the light.</p>
+               <h2 className="text-3xl font-semibold tracking-normal text-primary-foreground">Ready for a clearer financial picture?</h2>
+               <p className="mx-auto mt-3 max-w-xl text-primary-foreground/75">Create your free account and bring every account, plan and goal into one place.</p>
               <div className="mt-7 flex flex-wrap justify-center gap-3">
-                <Button asChild size="lg" className="magnetic pulse-gold bg-gold text-ink hover:bg-gold-soft">
+                 <Button asChild size="lg" variant="secondary" className="magnetic pulse-primary">
                   <Link to="/signup">Get started — it's free <ArrowRight className="ml-1 h-4 w-4" /></Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="magnetic border-ink-line bg-ink-soft/60 text-ink-fg hover:bg-gold/10 hover:text-gold-soft">
+                 <Button asChild size="lg" variant="outline" className="magnetic border-primary-foreground/25 bg-primary-foreground/5 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
                   <a href={DEMO_MAILTO}><Calendar className="mr-1 h-4 w-4" /> Book a free demo</a>
                 </Button>
               </div>
