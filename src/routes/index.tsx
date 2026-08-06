@@ -1,29 +1,29 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { useEffect } from "react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark,
-  Sparkles, Calendar, Eye, HandHeart, Bot, Target,
+  Sparkles, Calendar, Eye, Bot, Target, LockKeyhole, CircleCheck,
 } from "lucide-react";
 import { PublicLayout } from "@/components/public-layout";
 import { useAuth } from "@/hooks/use-auth";
-import { HeroCanvas } from "@/components/landing/hero-canvas";
 import { Reveal, Stagger, staggerItem, CountUp, ScrollProgress } from "@/components/landing/motion";
 import { TiltCard } from "@/components/landing/tilt-card";
 import { JourneyTabs } from "@/components/landing/journey-tabs";
 import { LedgerMockup } from "@/components/landing/ledger-mockup";
 import { AllocationCalculator } from "@/components/landing/allocation-calculator";
+import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Fanika — Manage Money with Purpose. Build Wealth with Discipline." },
-      { name: "description", content: "A living financial dashboard for budgeting, giving, saving, investing and debt payoff — built on discipline, not guesswork." },
-      { property: "og:title", content: "Fanika — Manage Money with Purpose" },
-      { property: "og:description", content: "Personal finance OS for serious money managers. Budgets, debts, investments, daily insights." },
+      { title: "Fanika — Intelligent Personal Finance" },
+      { name: "description", content: "Plan budgets, track cash flow, manage debt and grow your net worth from one intelligent personal finance platform." },
+      { property: "og:title", content: "Fanika — Intelligent Personal Finance" },
+      { property: "og:description", content: "See every account, budget, debt and goal in one clear financial picture." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://fanikasteward.lovable.app/" },
@@ -36,12 +36,6 @@ export const Route = createFileRoute("/")({
 function Home() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const reduced = useReducedMotion();
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
-  const fgY = useTransform(scrollYProgress, [0, 1], ["0%", "-6%"]);
-  const bgFade = useTransform(scrollYProgress, [0, 1], [1, 0.35]);
 
   useEffect(() => {
     if (loading) return;
@@ -51,103 +45,80 @@ function Home() {
   }, [user, loading, navigate]);
 
   return (
-    <PublicLayout dark>
+    <PublicLayout>
       <ScrollProgress />
 
       {/* ─── HERO ─────────────────────────────────────────────────────────── */}
-      <section ref={heroRef} className="relative isolate overflow-hidden">
-        <motion.div
-          aria-hidden
-          style={reduced ? undefined : { y: bgY, opacity: bgFade }}
-          className="pointer-events-none absolute inset-0 -z-10"
-        >
-          <div className="absolute inset-0 bg-gradient-harvest" />
-          <div className="absolute inset-0 bg-ledger-grid opacity-60" />
-          <HeroCanvas className="absolute inset-0 h-full w-full" />
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-ink" />
-        </motion.div>
-
-        <motion.div
-          style={reduced ? undefined : { y: fgY }}
-          className="mx-auto max-w-5xl px-4 pb-24 pt-10 text-center md:px-6 md:pb-36 md:pt-16"
-        >
-          <Stagger className="flex flex-col items-center">
+      <section className="relative isolate overflow-hidden border-b bg-background">
+        <div aria-hidden className="absolute inset-0 -z-10 bg-finance-grid opacity-70" />
+        <div className="mx-auto grid min-h-[calc(100svh-6rem)] max-w-7xl items-center gap-10 px-4 pb-16 pt-8 md:px-6 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14 lg:pb-20 lg:pt-12">
+          <Stagger className="flex flex-col items-start text-left">
             <motion.span
               variants={staggerItem}
-              className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-xs font-medium text-gold-soft"
+              className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary"
             >
-              <ShieldCheck className="h-3.5 w-3.5" /> Discipline-first finance
+              <Sparkles className="h-3.5 w-3.5" /> Intelligent money management
             </motion.span>
 
             <motion.h1
               variants={staggerItem}
-              className="mt-6 text-balance text-4xl font-semibold leading-[1.03] tracking-tight text-ink-fg md:text-6xl lg:text-7xl"
+              className="mt-6 max-w-xl text-balance text-4xl font-bold leading-[1.05] tracking-normal text-foreground md:text-6xl"
             >
-              Manage money with <span className="text-gradient-gold">purpose</span>.
-            </motion.h1>
-            <motion.h1
-              variants={staggerItem}
-              className="text-balance text-4xl font-semibold leading-[1.03] tracking-tight text-ink-fg md:text-6xl lg:text-7xl"
-            >
-              Build wealth with <span className="text-gradient-gold">discipline</span>.
+              Know where your money is. Decide where it goes next.
             </motion.h1>
 
-            <motion.p variants={staggerItem} className="mt-6 max-w-2xl text-base leading-relaxed text-ink-muted md:text-lg">
-              One living dashboard for income, giving, budgets, debt payoff, savings and investments —
-              so every shilling is accounted for before it's spent.
+            <motion.p variants={staggerItem} className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+              Fanika brings your accounts, budgets, debts, investments and goals into one clear financial picture — with timely insight that helps you act with confidence.
             </motion.p>
 
-            <motion.div variants={staggerItem} className="mt-9 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" className="magnetic pulse-gold bg-gold text-ink hover:bg-gold-soft">
+            <motion.div variants={staggerItem} className="mt-8 flex flex-wrap items-center gap-3">
+              <Button asChild size="lg" className="magnetic pulse-primary">
                 <Link to="/signup">Start free <ArrowRight className="ml-1 h-4 w-4" /></Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="magnetic border-ink-line bg-ink-soft/60 text-ink-fg hover:bg-gold/10 hover:text-gold-soft">
+              <Button asChild size="lg" variant="outline" className="magnetic bg-card/80">
                 <a href={DEMO_MAILTO}><Calendar className="mr-1 h-4 w-4" /> Book a free demo</a>
-              </Button>
-              <Button asChild size="lg" variant="ghost" className="magnetic text-ink-muted hover:bg-gold/10 hover:text-ink-fg">
-                <Link to="/how-it-works">See how it works</Link>
               </Button>
             </motion.div>
 
-            <motion.div variants={staggerItem} className="mt-10 grid w-full max-w-3xl grid-cols-2 gap-4 md:grid-cols-4">
-              {[
-                { l: "Tracked monthly", v: 4200000, prefix: "KES ", c: "var(--leaf)" },
-                { l: "Given with intent", v: 386000, prefix: "KES ", c: "var(--gold)" },
-                { l: "Debt paid down", v: 912000, prefix: "KES ", c: "var(--clay)" },
-                { l: "Goals on track", v: 214, prefix: "", c: "var(--slate-blue)" },
-              ].map((s) => (
-                <div key={s.l} className="rounded-2xl border border-ink-line bg-ink-soft/60 p-4 backdrop-blur">
-                  <div className="text-lg font-semibold tabular-nums md:text-xl" style={{ color: s.c }}>
-                    <CountUp to={s.v} prefix={s.prefix} />
-                  </div>
-                  <div className="mt-1 text-[11px] uppercase tracking-wider text-ink-muted">{s.l}</div>
-                </div>
-              ))}
+            <motion.div variants={staggerItem} className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <span className="flex items-center gap-2"><CircleCheck className="h-4 w-4 text-primary" /> Start without a credit card</span>
+              <span className="flex items-center gap-2"><LockKeyhole className="h-4 w-4 text-info" /> Private by design</span>
             </motion.div>
           </Stagger>
-        </motion.div>
+
+          <Reveal x={28} y={0} className="relative">
+            <div className="absolute -inset-5 -z-10 rounded-3xl bg-primary/5 blur-2xl" />
+            <div className="overflow-hidden rounded-2xl border bg-card p-2 shadow-elevated md:p-3">
+              <img src={heroDashboard} alt="Fanika dashboard showing net worth, budgets, savings, spending and accounts" className="aspect-square w-full rounded-xl object-cover" fetchPriority="high" />
+            </div>
+            <div className="absolute -bottom-5 left-4 flex items-center gap-3 rounded-xl border bg-card/95 px-4 py-3 shadow-card backdrop-blur md:left-[-1.5rem]">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><TrendingUp className="h-4 w-4" /></span>
+              <span><strong className="block text-sm">One live financial view</strong><span className="text-xs text-muted-foreground">Accounts to goals, always reconciled</span></span>
+            </div>
+          </Reveal>
+        </div>
       </section>
 
       {/* ─── WHY FANIKA ───────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
         <Reveal className="text-center">
-          <p className="text-sm font-medium text-gold">Why Fanika?</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink-fg md:text-4xl">Finance that serves your purpose.</h2>
+          <p className="text-sm font-semibold text-primary">Why Fanika?</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground md:text-4xl">A clearer way to run your financial life.</h2>
         </Reveal>
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {[
-            { i: Eye, t: "Financial clarity", d: "Know exactly where money comes from, where it goes, and what each decision costs your future.", c: "var(--leaf)" },
-            { i: HandHeart, t: "Purposeful allocation", d: "Giving and fixed commitments are settled first — what remains is genuinely disposable.", c: "var(--gold)" },
-            { i: Bot, t: "Automated planning", d: "Budgets seed themselves from your income, recurring lines and live commitments each month.", c: "var(--slate-blue)" },
-            { i: Target, t: "Wealth building", d: "Savings, investments, emergency fund and goals roll into one net-worth line.", c: "var(--clay)" },
+            { i: Eye, t: "Complete visibility", d: "See income, spending, balances and liabilities together, without stitching together spreadsheets.", c: "var(--primary)" },
+            { i: Wallet, t: "Smarter allocation", d: "Plan recurring commitments and flexible spending before money leaves your accounts.", c: "var(--chart-3)" },
+            { i: Bot, t: "Timely intelligence", d: "Turn current activity and financial history into practical, trend-aware recommendations.", c: "var(--chart-2)" },
+            { i: Target, t: "Measurable progress", d: "Track savings, investments, debt reduction and goals in one net-worth view.", c: "var(--chart-4)" },
           ].map((f, i) => (
             <Reveal key={f.t} delay={i * 0.06}>
-              <TiltCard className="h-full rounded-2xl border border-ink-line bg-ink-soft/70 p-6 transition hover:border-gold/35">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "color-mix(in oklab, var(--ink-fg) 6%, transparent)", color: f.c }}>
+               <TiltCard className="h-full rounded-2xl border bg-card p-6 shadow-card transition hover:border-primary/25">
+                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted" style={{ color: f.c }}>
                   <f.i className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 font-semibold text-ink-fg">{f.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{f.d}</p>
+                 <h3 className="mt-4 font-semibold text-foreground">{f.t}</h3>
+                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.d}</p>
               </TiltCard>
             </Reveal>
           ))}
