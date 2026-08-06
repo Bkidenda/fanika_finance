@@ -9,7 +9,7 @@ const NAV = [
   { to: "/", label: "Home" },
   { to: "/features", label: "Features" },
   { to: "/how-it-works", label: "How it works" },
-  { to: "/stewardship-philosophy", label: "Our Philosophy" },
+  { to: "/stewardship-philosophy", label: "Our approach" },
   { to: "/pricing", label: "Pricing" },
 ] as const;
 
@@ -43,7 +43,7 @@ export function PublicLayout({ children, dark = false }: { children: React.React
 
       {/* Floating navbar — links left, CTAs far right */}
       <header className="fixed inset-x-0 top-4 z-40 px-3">
-        <div className={`mx-auto flex w-fit max-w-[calc(100vw-1.5rem)] items-center justify-between gap-3 rounded-full border px-3 py-2 shadow-elevated backdrop-blur-xl md:gap-6 md:ml-auto md:mr-6 ${dark ? "border-ink-line bg-ink-soft/80 text-ink-fg" : "border-white/15 bg-gradient-hero text-primary-foreground"}`}>
+        <div className={`mx-auto flex w-fit max-w-[calc(100vw-1.5rem)] items-center justify-between gap-3 rounded-full border px-3 py-2 shadow-elevated backdrop-blur-xl md:gap-6 md:ml-auto md:mr-6 ${dark ? "border-ink-line bg-ink-soft/80 text-ink-fg" : "border-border bg-card/90 text-foreground"}`}>
           <nav className="hidden items-center gap-1 lg:flex">
 
             {NAV.map((n) => (
@@ -53,7 +53,7 @@ export function PublicLayout({ children, dark = false }: { children: React.React
                 className={`magnetic rounded-full px-3 py-1.5 text-sm transition ${
                   path === n.to
                     ? dark ? "bg-gold/15 font-medium text-gold-soft" : "bg-white/20 font-medium"
-                    : dark ? "text-ink-muted hover:bg-gold/10 hover:text-ink-fg" : "text-primary-foreground/85 hover:bg-white/10"
+                     : dark ? "text-ink-muted hover:bg-gold/10 hover:text-ink-fg" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
                 {n.label}
@@ -62,14 +62,14 @@ export function PublicLayout({ children, dark = false }: { children: React.React
           </nav>
 
           <div className="hidden items-center gap-1.5 lg:flex">
-            <Button asChild size="sm" variant="ghost" className={dark ? "magnetic text-ink-fg hover:bg-gold/10 hover:text-gold-soft" : "magnetic text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"}>
+            <Button asChild size="sm" variant="ghost" className={dark ? "magnetic text-ink-fg hover:bg-gold/10 hover:text-gold-soft" : "magnetic"}>
               <a href={DEMO_MAILTO}><Calendar className="mr-1 h-3.5 w-3.5" /> Book demo</a>
             </Button>
             {user ? (
               <Button asChild size="sm" variant="secondary" className={dark ? "magnetic bg-gold text-ink hover:bg-gold-soft" : "magnetic"}><Link to="/dashboard">Open app</Link></Button>
             ) : (
               <>
-                <Button asChild size="sm" variant="ghost" className={dark ? "magnetic text-ink-fg hover:bg-gold/10 hover:text-gold-soft" : "magnetic text-primary-foreground hover:bg-white/15 hover:text-primary-foreground"}><Link to="/login">Sign in</Link></Button>
+                <Button asChild size="sm" variant="ghost" className={dark ? "magnetic text-ink-fg hover:bg-gold/10 hover:text-gold-soft" : "magnetic"}><Link to="/login">Sign in</Link></Button>
                 <Button asChild size="sm" variant="secondary" className={dark ? "magnetic bg-gold text-ink hover:bg-gold-soft" : "magnetic"}><Link to="/signup">Get started</Link></Button>
               </>
             )}
@@ -114,7 +114,7 @@ export function PublicLayout({ children, dark = false }: { children: React.React
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary"><Sprout className="h-4 w-4 text-primary-foreground" /></div>
               <span className="font-semibold">Fanika</span>
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">Personal finance, anchored in discipline.</p>
+            <p className="mt-3 text-sm text-muted-foreground">Personal finance, made clear and actionable.</p>
           </div>
           <div>
             <div className="text-sm font-semibold">Product</div>
@@ -122,7 +122,7 @@ export function PublicLayout({ children, dark = false }: { children: React.React
               <li><Link to="/features" className="hover:text-foreground">Features</Link></li>
               <li><Link to="/how-it-works" className="hover:text-foreground">How it works</Link></li>
               <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
-              <li><Link to="/stewardship-philosophy" className="hover:text-foreground">Our Philosophy</Link></li>
+              <li><Link to="/stewardship-philosophy" className="hover:text-foreground">Our approach</Link></li>
             </ul>
           </div>
           <div>
