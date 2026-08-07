@@ -3,14 +3,14 @@ const U = (id: string, w = 1600) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
 
 export const IMG = {
-  heroLedger: U("photo-1554224155-6726b3ff858f", 1800),
-  dashboard: U("photo-1460925895917-afdab827c52f"),
+  heroLedger: U("photo-1460925895917-afdab827c52f", 1800),
+  dashboard: U("photo-1551288049-bebda4e38f71"),
   planning: U("photo-1450101499163-c8848c66ca85"),
-  desk: U("photo-1543286386-713bdd548da4"),
-  charts: U("photo-1551288049-bebda4e38f71"),
-  receipts: U("photo-1579621970563-ebec7560ff3e"),
-  growth: U("photo-1554224154-26032ffc0d07"),
-  team: U("photo-1521737604893-d14cc237f11d"),
+  desk: U("photo-1554260570-9140fd3b7614"),
+  charts: U("photo-1543286386-713bdd548da4"),
+  receipts: U("photo-1554260570-9140fd3b7614"),
+  growth: U("photo-1611348586804-61bf6c080437"),
+  team: U("photo-1522071820081-009f0129c71c"),
   meeting: U("photo-1600880292203-757bb62b4baf"),
   savings: U("photo-1591696205602-2f950c417cb9"),
   reports: U("photo-1526304640581-d334cdbbf45e"),
