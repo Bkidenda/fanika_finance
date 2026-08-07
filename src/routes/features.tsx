@@ -47,14 +47,16 @@ function Features() {
     <PublicLayout>
       {/* IMAGE HERO BAND */}
       <section className="relative isolate">
-        <img src={IMG.charts} alt="Financial dashboards and charts" className="h-[320px] w-full object-cover md:h-[380px]" />
-        <div className="absolute inset-0 bg-foreground/45" />
+        <img src={IMG.planning} alt="Reviewing a monthly financial plan" className="h-[320px] w-full object-cover md:h-[380px]" />
+        <div className="absolute inset-0 bg-black/65" />
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-background md:text-5xl">Features</h1>
-          <p className="mt-3 max-w-xl text-sm text-background/85 md:text-base">
+          <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">Features</h1>
+          <p className="mt-3 max-w-xl text-sm text-white/85 md:text-base">
             Every module connects to the next, so your numbers always reconcile.
           </p>
-          <Link to="/signup" className="mt-6"><BtnPrimary>Start free</BtnPrimary></Link>
+          <Link to="/signup" className="mt-6">
+            <span className="inline-flex items-center justify-center rounded-lg bg-background px-5 py-3 text-sm font-semibold text-foreground transition hover:opacity-90">Start free</span>
+          </Link>
         </div>
       </section>
 
