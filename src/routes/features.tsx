@@ -1,56 +1,132 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PublicLayout } from "@/components/public-layout";
-import { Wallet, Landmark, Receipt, TrendingUp, Target, CreditCard, Repeat, BookOpen, Bot, Sparkles, History, Calendar, Coins, HandHeart, Scale, FileText, Eraser } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Wallet, Landmark, CreditCard, Repeat, Target, FileText, Bot, CalendarDays } from "lucide-react";
+import { PublicLayout, BtnPrimary, BtnSecondary, SectionHeading, DEMO_URL } from "@/components/public-layout";
+import { IMG } from "@/lib/site-images";
 
 export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
-      { title: "Features — Fanika" },
-      { name: "description", content: "Net-income budgeting, optional automated giving, recurring budget lines, multi-account net worth, debt planner, AI advisor with monthly history, financial calendar, monthly close, printable statements, daily insights." },
-      { property: "og:title", content: "Features — Fanika" },
-      { property: "og:description", content: "Every module in Fanika, from net-income budgeting to printable statements." },
+      { title: "Features — Fanika personal finance platform" },
+      { name: "description", content: "Monthly budgeting, unified accounts, debt planner, subscriptions, savings goals, AI advisory and printable statements — every Fanika module explained." },
+      { property: "og:title", content: "Features — Fanika personal finance platform" },
+      { property: "og:description", content: "Budgets, accounts, debt, goals, reports and AI advisory in one connected system." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: IMG.charts },
+      { name: "twitter:image", content: IMG.charts },
     ],
   }),
   component: Features,
 });
 
 const MODULES = [
-  { i: Coins, t: "Net-income first", d: "Start from your take-home pay in any currency. No country-specific payroll math — Fanika works wherever you live." },
-  { i: HandHeart, t: "Optional automatic giving", d: "Turn on planned giving if you want — pick the rate. It's set aside before disposable income is calculated. Off by default; entirely your call." },
-  { i: Wallet, t: "Budgets entered each month", d: "Income and budgets are entered fresh each month because life isn't standard. Standing categories (rent, insurance) are added once as recurring lines." },
-  { i: Repeat, t: "Recurring budget lines", d: "Rent, insurance, school fees — set them once and they auto-seed every new month when you close the previous one." },
-  { i: Receipt, t: "Expenses inside budgets", d: "Every expense lands inside an active budget category. Out-of-plan spending is flagged as an emergency, not silently absorbed." },
-  { i: Landmark, t: "Unified accounts", d: "Bank, M-Pesa, SACCO, cash, investment. Balances auto-update with every recorded expense, payment or income receipt." },
-  { i: Scale, t: "Net worth tracking", d: "Assets minus liabilities, refreshed live. Cash + investments − debts, with full audit history." },
-  { i: CreditCard, t: "Debt planner", d: "Formal loans (rate, monthly, due date) and informal lending from family & friends — track both, schedule payments." },
-  { i: Repeat, t: "Subscriptions watchdog", d: "Catch silent recurring drains. Monthly cost, annual projection, pause/resume any time." },
-  { i: Target, t: "Savings goals", d: "Visual progress bars for every goal, with target date and current balance." },
-  { i: Calendar, t: "Financial calendar", d: "Mark dates with financial implications — bill due dates, expected income, debt deadlines, family obligations, planned giving." },
-  { i: History, t: "Monthly close & next-month auto-open", d: "Close each month with a reconciliation snapshot. Next month auto-opens with only your recurring lines pre-filled, so fresh income and budgets stay deliberate." },
-  { i: Bot, t: "AI advisor with history", d: "A grounded advisor that reads your current month plus the last three closed months and returns a 0-100 health score, trend commentary, and practical recommendations." },
-  { i: Sparkles, t: "Always-on AI assistant", d: "Floating chatbot that answers money-management and finance questions anywhere in the app." },
-  { i: FileText, t: "Printable PDF statements", d: "Generate a monthly or quarterly account statement for your records — income, spend, top categories, accounts, debts, net worth, all on one page." },
-  { i: BookOpen, t: "Daily insights layer", d: "Short, verified financial insights and motivation tied to your monthly rhythm." },
-  { i: Eraser, t: "Account control", d: "Clear your data, deactivate your account, or delete it permanently — your data, your call, no hoops." },
+  { img: IMG.planning, t: "Budgets", d: "Plan by category each month. Recurring lines carry forward, one-off amounts reset.", featured: true },
+  { img: IMG.receipts, t: "Money tracker", d: "Income and expenses in one timestamped ledger, grouped by week." },
+  { img: IMG.dashboard, t: "Accounts & net worth", d: "Bank, mobile money, SACCO and cash in one live balance sheet." },
+];
+
+const MODULES_2 = [
+  { img: IMG.savings, t: "Savings & goals", d: "Progress bars, target dates and contributions tracked per goal." },
+  { img: IMG.reports, t: "Reports & statements", d: "Income statement, balance sheet and cash flow — PDF, Excel or CSV." },
+  { img: IMG.family, t: "Family Suite", d: "Shared budgets, member allowances, chores and joint net worth." },
+];
+
+const CAPABILITIES = [
+  { i: Wallet, t: "Monthly planning", d: "Enter income as it arrives and budget before the month begins." },
+  { i: Landmark, t: "Unified accounts", d: "Balances update automatically with every entry, transfer or fee." },
+  { i: CreditCard, t: "Debt planner", d: "Formal loans and informal borrowing, with repayments that post everywhere at once." },
+  { i: Repeat, t: "Subscriptions", d: "Auto-renewal on the due date, with the expense and account debit logged." },
+  { i: Target, t: "Savings goals", d: "Set targets, watch funding progress, adjust without breaking the plan." },
+  { i: CalendarDays, t: "Financial calendar", d: "Mark any date with a financial implication and get ahead of it." },
+  { i: Bot, t: "AI advisor", d: "A health score, trend commentary and next actions from your own history." },
+  { i: FileText, t: "Statements", d: "Monthly, quarterly and annual documents branded and ready to print." },
 ];
 
 function Features() {
   return (
     <PublicLayout>
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="max-w-3xl">
-          <p className="text-sm font-medium text-primary">Features</p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">Every module you need to run a household.</h1>
-          <p className="mt-4 text-lg text-muted-foreground">Fanika is a personal finance OS, not a tracker. Each module connects to the next so your numbers always reconcile — fresh income each month, standing lines carried forward, accounts live, statements printable.</p>
+      {/* IMAGE HERO BAND */}
+      <section className="relative isolate">
+        <img src={IMG.charts} alt="Financial dashboards and charts" className="h-[320px] w-full object-cover md:h-[380px]" />
+        <div className="absolute inset-0 bg-foreground/45" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-background md:text-5xl">Features</h1>
+          <p className="mt-3 max-w-xl text-sm text-background/85 md:text-base">
+            Every module connects to the next, so your numbers always reconcile.
+          </p>
+          <Link to="/signup" className="mt-6"><BtnPrimary>Start free</BtnPrimary></Link>
         </div>
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {MODULES.map((m) => (
-            <div key={m.t} className="rounded-2xl border bg-card p-6 shadow-card">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-primary"><m.i className="h-5 w-5" /></div>
+      </section>
+
+      {/* ALTERNATING SPLITS */}
+      <section className="mx-auto max-w-6xl px-6 pt-16 md:pt-20">
+        <div className="grid items-center gap-10 md:grid-cols-2">
+          <div>
+            <SectionHeading>One ledger, always current</SectionHeading>
+            <p className="mt-3 text-sm text-muted-foreground md:text-base">
+              Log an expense, a transfer or a debt repayment once. The budget, the account balance and
+              your net worth all move together — no reconciliation weekend required.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link to="/how-it-works"><BtnPrimary>How it works</BtnPrimary></Link>
+              <a href={DEMO_URL}><BtnSecondary>Book a demo</BtnSecondary></a>
+            </div>
+          </div>
+          <img src={IMG.desk} alt="Planning a budget with notes and a calculator" className="aspect-[4/3] w-full rounded-xl object-cover" loading="lazy" />
+        </div>
+
+        <div className="mt-16 grid items-center gap-10 md:mt-20 md:grid-cols-2">
+          <img src={IMG.meeting} alt="Reviewing financial reports together" className="aspect-[4/3] w-full rounded-xl object-cover md:order-1" loading="lazy" />
+          <div className="md:order-2">
+            <SectionHeading>Advice grounded in your numbers</SectionHeading>
+            <p className="mt-3 text-sm text-muted-foreground md:text-base">
+              The advisor reads your current month plus recent closed months and returns a health score,
+              what changed, and the two or three moves worth making next.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link to="/pricing"><BtnPrimary>See plans</BtnPrimary></Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* MODULE GRID */}
+      <section className="mx-auto max-w-6xl px-6 pt-20 md:pt-24">
+        <SectionHeading>The modules</SectionHeading>
+        <div className="mt-8 grid gap-8 md:grid-cols-3">
+          {[...MODULES, ...MODULES_2].map((m) => (
+            <article key={m.t}>
+              <img src={m.img} alt={m.t} className="aspect-[4/3] w-full rounded-xl object-cover" loading="lazy" />
               <h3 className="mt-4 font-semibold">{m.t}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{m.d}</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{m.d}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* CAPABILITY LIST */}
+      <section className="mx-auto max-w-6xl px-6 pt-20 md:pt-24">
+        <SectionHeading>Capabilities at a glance</SectionHeading>
+        <div className="mt-8 grid gap-8 sm:grid-cols-2">
+          {CAPABILITIES.map((c) => (
+            <div key={c.t}>
+              <c.i className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              <h3 className="mt-3 font-semibold">{c.t}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{c.d}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mt-20 bg-muted md:mt-24">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-14 md:flex-row md:items-center md:justify-between">
+          <SectionHeading>Bring it all into one place.</SectionHeading>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/signup"><BtnPrimary>Create account</BtnPrimary></Link>
+            <Link to="/pricing">
+              <span className="inline-flex items-center justify-center rounded-lg bg-background px-5 py-3 text-sm font-semibold transition hover:opacity-90">View pricing</span>
+            </Link>
+          </div>
         </div>
       </section>
     </PublicLayout>
