@@ -1,37 +1,57 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
-import {
-  ArrowRight, ShieldCheck, PiggyBank, TrendingUp, BookOpen, Wallet, Landmark,
-  Sparkles, Calendar, Eye, Bot, Target, LockKeyhole, CircleCheck,
-} from "lucide-react";
-import { PublicLayout } from "@/components/public-layout";
+import { Globe, UserCircle, Lock, CalendarDays } from "lucide-react";
+import { PublicLayout, BtnPrimary, BtnSecondary, SectionHeading, DEMO_URL } from "@/components/public-layout";
 import { useAuth } from "@/hooks/use-auth";
-import { Reveal, Stagger, staggerItem, CountUp, ScrollProgress } from "@/components/landing/motion";
-import { TiltCard } from "@/components/landing/tilt-card";
-import { JourneyTabs } from "@/components/landing/journey-tabs";
-import { LedgerMockup } from "@/components/landing/ledger-mockup";
-import { AllocationCalculator } from "@/components/landing/allocation-calculator";
-import heroDashboard from "@/assets/hero-dashboard.jpg";
-
-const DEMO_MAILTO = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
+import { IMG } from "@/lib/site-images";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Fanika — Intelligent Personal Finance" },
-      { name: "description", content: "Plan budgets, track cash flow, manage debt and grow your net worth from one intelligent personal finance platform." },
-      { property: "og:title", content: "Fanika — Intelligent Personal Finance" },
-      { property: "og:description", content: "See every account, budget, debt and goal in one clear financial picture." },
+      { title: "Fanika — Personal finance, all in one clear view" },
+      { name: "description", content: "Plan budgets before the month starts, track income and spending, manage debt and watch your net worth grow — from one personal finance platform." },
+      { property: "og:title", content: "Fanika — Personal finance, all in one clear view" },
+      { property: "og:description", content: "Every account, budget, debt and goal in one reconciled financial picture." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://fanikasteward.lovable.app/" },
+      { property: "og:image", content: IMG.heroLedger },
+      { name: "twitter:image", content: IMG.heroLedger },
     ],
     links: [{ rel: "canonical", href: "https://fanikasteward.lovable.app/" }],
   }),
   component: Home,
 });
+
+const CARDS = [
+  { img: IMG.planning, t: "Plan the month ahead", d: "Build next month's budget before it starts. Recurring lines like rent carry forward automatically." },
+  { img: IMG.receipts, t: "Track every shilling", d: "Log income and expenses in one ledger. Balances, budgets and net worth update as you go." },
+  { img: IMG.growth, t: "Grow what's left", d: "Savings goals, investments and debt payoff tracked together in a single net-worth view." },
+];
+
+const SPLIT = [
+  ["A live financial picture", "Bank, mobile money, SACCO and cash in one balance sheet that reconciles itself after every entry."],
+  ["Debt that actually goes down", "Record a repayment once — the loan, the account and the expense ledger all update together."],
+  ["Reports you can hand over", "Monthly, quarterly and annual statements exported as PDF, Excel or CSV, or emailed to you."],
+];
+
+const SECONDARY = [
+  { img: IMG.family, t: "Built for households", d: "Share budgets, assign allowances and plan family obligations together on the Family Suite." },
+  { img: IMG.laptop, t: "Guidance, not guesswork", d: "The AI advisor reads your current month and recent history, then returns a health score and clear next steps." },
+];
+
+const QUOTES = [
+  { q: "I finally know what's actually left after commitments.", n: "Achieng' O.", d: "Nairobi" },
+  { q: "Closing the month takes five minutes instead of a weekend.", n: "Peter M.", d: "Small business owner" },
+  { q: "The debt tracker paid for itself in the first month.", n: "Wanjiru K.", d: "Teacher" },
+];
+
+const PROOF = [
+  { i: Globe, t: "Multi-currency", d: "Track and convert across currencies with daily rates." },
+  { i: UserCircle, t: "Yours to control", d: "Export, deactivate or permanently delete your data any time." },
+  { i: Lock, t: "Private by design", d: "Row-level security so only you can read your records." },
+  { i: CalendarDays, t: "Financial calendar", d: "Mark bill dates, expected income and deadlines that matter." },
+];
 
 function Home() {
   const navigate = useNavigate();
@@ -46,208 +66,117 @@ function Home() {
 
   return (
     <PublicLayout>
-      <ScrollProgress />
-
-      {/* ─── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative isolate overflow-hidden border-b bg-background">
-        <div aria-hidden className="absolute inset-0 -z-10 bg-finance-grid opacity-70" />
-        <div className="mx-auto grid min-h-[calc(100svh-6rem)] max-w-7xl items-center gap-10 px-4 pb-16 pt-8 md:px-6 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14 lg:pb-20 lg:pt-12">
-          <Stagger className="flex flex-col items-start text-left">
-            <motion.span
-              variants={staggerItem}
-              className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary"
-            >
-              <Sparkles className="h-3.5 w-3.5" /> Intelligent money management
-            </motion.span>
-
-            <motion.h1
-              variants={staggerItem}
-              className="mt-6 max-w-xl text-balance text-4xl font-bold leading-[1.05] tracking-normal text-foreground md:text-6xl"
-            >
-              Know where your money is. Decide where it goes next.
-            </motion.h1>
-
-            <motion.p variants={staggerItem} className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              Fanika brings your accounts, budgets, debts, investments and goals into one clear financial picture — with timely insight that helps you act with confidence.
-            </motion.p>
-
-            <motion.div variants={staggerItem} className="mt-8 flex flex-wrap items-center gap-3">
-              <Button asChild size="lg" className="magnetic pulse-primary">
-                <Link to="/signup">Start free <ArrowRight className="ml-1 h-4 w-4" /></Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="magnetic bg-card/80">
-                <a href={DEMO_MAILTO}><Calendar className="mr-1 h-4 w-4" /> Book a free demo</a>
-              </Button>
-            </motion.div>
-
-            <motion.div variants={staggerItem} className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              <span className="flex items-center gap-2"><CircleCheck className="h-4 w-4 text-primary" /> Start without a credit card</span>
-              <span className="flex items-center gap-2"><LockKeyhole className="h-4 w-4 text-info" /> Private by design</span>
-            </motion.div>
-          </Stagger>
-
-          <Reveal x={28} y={0} className="relative">
-            <div className="absolute -inset-5 -z-10 rounded-3xl bg-primary/5 blur-2xl" />
-            <div className="overflow-hidden rounded-2xl border bg-card p-2 shadow-elevated md:p-3">
-              <img src={heroDashboard} alt="Fanika dashboard showing net worth, budgets, savings, spending and accounts" className="aspect-square w-full rounded-xl object-cover" fetchPriority="high" />
-            </div>
-            <div className="absolute -bottom-5 left-4 flex items-center gap-3 rounded-xl border bg-card/95 px-4 py-3 shadow-card backdrop-blur md:left-[-1.5rem]">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary"><TrendingUp className="h-4 w-4" /></span>
-              <span><strong className="block text-sm">One live financial view</strong><span className="text-xs text-muted-foreground">Accounts to goals, always reconciled</span></span>
-            </div>
-          </Reveal>
+      {/* HERO */}
+      <section className="mx-auto max-w-6xl px-6 pt-14 md:pt-20">
+        <h1 className="text-5xl font-bold tracking-tight md:text-6xl">Fanika</h1>
+        <p className="mt-4 max-w-xl text-base text-muted-foreground md:text-lg">
+          Know where your money is and decide where it goes next. Budgets, accounts, debt and goals
+          in one clear financial picture.
+        </p>
+        <div className="mt-7 flex flex-wrap items-center gap-3">
+          <Link to="/signup"><BtnPrimary>Start free</BtnPrimary></Link>
+          <a href={DEMO_URL}><BtnSecondary>Book a demo</BtnSecondary></a>
         </div>
+
+        <img
+          src={IMG.heroLedger}
+          alt="Reviewing a monthly household budget on paper beside a laptop"
+          className="mt-12 aspect-[16/7] w-full rounded-xl object-cover"
+          fetchPriority="high"
+        />
       </section>
 
-      {/* ─── WHY FANIKA ───────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
-        <Reveal className="text-center">
-          <p className="text-sm font-semibold text-primary">Why Fanika?</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground md:text-4xl">A clearer way to run your financial life.</h2>
-        </Reveal>
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {[
-            { i: Eye, t: "Complete visibility", d: "See income, spending, balances and liabilities together, without stitching together spreadsheets.", c: "var(--primary)" },
-            { i: Wallet, t: "Smarter allocation", d: "Plan recurring commitments and flexible spending before money leaves your accounts.", c: "var(--chart-3)" },
-            { i: Bot, t: "Timely intelligence", d: "Turn current activity and financial history into practical, trend-aware recommendations.", c: "var(--chart-2)" },
-            { i: Target, t: "Measurable progress", d: "Track savings, investments, debt reduction and goals in one net-worth view.", c: "var(--chart-4)" },
-          ].map((f, i) => (
-            <Reveal key={f.t} delay={i * 0.06}>
-               <TiltCard className="h-full rounded-2xl border bg-card p-6 shadow-card transition hover:border-primary/25">
-                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted" style={{ color: f.c }}>
-                  <f.i className="h-5 w-5" />
-                </div>
-                 <h3 className="mt-4 font-semibold text-foreground">{f.t}</h3>
-                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.d}</p>
-              </TiltCard>
-            </Reveal>
+      {/* THREE CARDS */}
+      <section className="mx-auto max-w-6xl px-6 pt-20 md:pt-24">
+        <SectionHeading>How Fanika works</SectionHeading>
+        <div className="mt-8 grid gap-8 md:grid-cols-3">
+          {CARDS.map((c) => (
+            <article key={c.t}>
+              <img src={c.img} alt={c.t} className="aspect-[4/3] w-full rounded-xl object-cover" loading="lazy" />
+              <h3 className="mt-4 font-semibold">{c.t}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{c.d}</p>
+            </article>
           ))}
         </div>
       </section>
 
-      {/* ─── SCROLL STORY: the ledger demonstrates itself ─────────────────── */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
+      {/* SPLIT SECTION */}
+      <section className="mx-auto max-w-6xl px-6 pt-20 md:pt-24">
+        <div className="grid items-center gap-12 md:grid-cols-2">
           <div>
-            <Reveal>
-               <p className="text-sm font-semibold text-primary">Connected financial operations</p>
-               <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground md:text-4xl">
-                 Watch your financial picture update itself.
-              </h2>
-               <p className="mt-4 max-w-lg text-muted-foreground">
-                 Income arrives, bills are paid, debts step down and savings grow. Fanika keeps the whole
-                 picture reconciled as activity happens — no spreadsheet, no month-end scramble.
-              </p>
-            </Reveal>
-            <Stagger className="mt-8 space-y-4" delay={0.1}>
-              {[
-                 ["Recurring commitments renew on schedule", "var(--chart-3)"],
-                 ["Debt repayments update the loan, account and expense ledger", "var(--chart-4)"],
-                 ["Recurring budgets carry forward while one-off amounts reset", "var(--primary)"],
-                 ["Monthly close preserves the past and opens the next plan", "var(--chart-2)"],
-              ].map(([t, c]) => (
-                <motion.div key={t} variants={staggerItem} className="flex items-start gap-3">
-                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: c }} />
-                   <p className="text-sm text-foreground">{t}</p>
-                </motion.div>
+            <SectionHeading>Everything reconciles</SectionHeading>
+            <div className="mt-8 space-y-7">
+              {SPLIT.map(([t, d]) => (
+                <div key={t}>
+                  <h3 className="font-semibold">{t}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{d}</p>
+                </div>
               ))}
-            </Stagger>
+            </div>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link to="/features"><BtnPrimary>See features</BtnPrimary></Link>
+              <Link to="/pricing"><BtnSecondary>View pricing</BtnSecondary></Link>
+            </div>
           </div>
-          <Reveal x={24} y={0}>
-            <LedgerMockup />
-          </Reveal>
+          <img src={IMG.dashboard} alt="Financial dashboard with charts on a laptop screen" className="aspect-[4/3] w-full rounded-xl object-cover" loading="lazy" />
         </div>
       </section>
 
-      {/* ─── DAY IN THE LIFE ──────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-20">
-        <Reveal className="text-center">
-           <p className="text-sm font-semibold text-primary">A day with Fanika</p>
-           <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground md:text-4xl">Four moves, one financial picture.</h2>
-        </Reveal>
-        <Reveal className="mt-10" delay={0.08}>
-          <JourneyTabs />
-        </Reveal>
-      </section>
-
-      {/* ─── LIVE CALCULATOR ─────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-20">
-        <Reveal className="text-center">
-           <p className="text-sm font-semibold text-primary">Try it right here</p>
-           <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground md:text-4xl">
-             See how savings, commitments and debt payoff fit your income.
-          </h2>
-           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-             Move the sliders and see your plan redistribute live across commitments, savings, debt and everyday spending.
-          </p>
-        </Reveal>
-        <Reveal className="mt-10" delay={0.08} scale={0.98}>
-          <AllocationCalculator />
-        </Reveal>
-      </section>
-
-      {/* ─── MODULES ─────────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-20">
-        <Reveal className="text-center">
-           <h2 className="text-3xl font-semibold tracking-normal text-foreground md:text-4xl">Built for complete financial control</h2>
-           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">Everything you need to plan, monitor and grow your finances — without spreadsheets.</p>
-        </Reveal>
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {[
-             { i: Wallet, t: "Budgets & money tracker", d: "Plan by category, log income and spending in one ledger, and spot variance early.", c: "var(--primary)" },
-             { i: Landmark, t: "Unified accounts", d: "Bank, mobile money, SACCO and cash in a single net-worth view that updates as you transact.", c: "var(--chart-2)" },
-             { i: PiggyBank, t: "Debt & subscription control", d: "Track formal and informal loans, automate payments and stay ahead of renewals.", c: "var(--chart-3)" },
-             { i: TrendingUp, t: "Investments & goals", d: "Monitor portfolio performance, savings goals and diversification across every account.", c: "var(--chart-4)" },
-             { i: Sparkles, t: "AI advisor + assistant", d: "Get monthly analysis with trend-aware recommendations, plus an always-on finance assistant.", c: "var(--chart-3)" },
-             { i: BookOpen, t: "Reports & statements", d: "Income statement, balance sheet and cash flow — export as PDF, Excel or CSV, or send by email.", c: "var(--primary)" },
-          ].map((f, i) => (
-            <Reveal key={f.t} delay={(i % 3) * 0.06}>
-               <TiltCard className="h-full rounded-2xl border bg-card p-6 shadow-card transition hover:border-primary/25">
-                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted" style={{ color: f.c }}>
-                  <f.i className="h-5 w-5" />
-                </div>
-                 <h3 className="mt-4 font-semibold text-foreground">{f.t}</h3>
-                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.d}</p>
-              </TiltCard>
-            </Reveal>
+      {/* TWO CARDS */}
+      <section className="mx-auto max-w-6xl px-6 pt-20 md:pt-24">
+        <SectionHeading>Made for real life</SectionHeading>
+        <div className="mt-8 grid gap-8 md:grid-cols-2">
+          {SECONDARY.map((c) => (
+            <article key={c.t}>
+              <img src={c.img} alt={c.t} className="aspect-[16/10] w-full rounded-xl object-cover" loading="lazy" />
+              <h3 className="mt-4 font-semibold">{c.t}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{c.d}</p>
+            </article>
           ))}
         </div>
       </section>
 
-      {/* ─── ABOUT ───────────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-5xl px-4 py-16 md:px-6">
-        <Reveal>
-           <div className="rounded-3xl border bg-card p-8 shadow-card md:p-10">
-             <p className="text-sm font-semibold text-primary">About Fanika</p>
-             <h2 className="mt-3 text-3xl font-semibold tracking-normal text-foreground">Financial discipline, made practical.</h2>
-             <div className="mt-6 space-y-4 text-muted-foreground">
-               <p>Fanika is built for people who want money management to be a dependable operating habit, not an annual resolution.</p>
-               <p>Every account, obligation and goal belongs in one understandable system, so decisions are based on the full picture rather than incomplete balances.</p>
-               <p>Monthly planning, reconciliation and daily insight work together to keep your numbers current and your next action clear.</p>
+      {/* PROOF POINTS */}
+      <section className="mx-auto max-w-6xl px-6 pt-20 md:pt-24">
+        <SectionHeading>Why people stay</SectionHeading>
+        <div className="mt-8 grid gap-8 sm:grid-cols-2">
+          {PROOF.map((p) => (
+            <div key={p.t}>
+              <p.i className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              <h3 className="mt-3 font-semibold">{p.t}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.d}</p>
             </div>
-          </div>
-        </Reveal>
+          ))}
+        </div>
       </section>
 
-      {/* ─── CTA ─────────────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-5xl px-4 pb-24 md:px-6">
-        <Reveal scale={0.98}>
-           <div className="relative overflow-hidden rounded-3xl border border-primary/15 bg-primary p-10 text-center shadow-elevated">
-             <div aria-hidden className="absolute inset-0 bg-finance-grid opacity-20" />
-            <div className="relative">
-               <h2 className="text-3xl font-semibold tracking-normal text-primary-foreground">Ready for a clearer financial picture?</h2>
-               <p className="mx-auto mt-3 max-w-xl text-primary-foreground/75">Create your free account and bring every account, plan and goal into one place.</p>
-              <div className="mt-7 flex flex-wrap justify-center gap-3">
-                 <Button asChild size="lg" variant="secondary" className="magnetic pulse-primary">
-                  <Link to="/signup">Get started — it's free <ArrowRight className="ml-1 h-4 w-4" /></Link>
-                </Button>
-                 <Button asChild size="lg" variant="outline" className="magnetic border-primary-foreground/25 bg-primary-foreground/5 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
-                  <a href={DEMO_MAILTO}><Calendar className="mr-1 h-4 w-4" /> Book a free demo</a>
-                </Button>
-              </div>
-            </div>
+      {/* TESTIMONIALS */}
+      <section className="mx-auto max-w-6xl px-6 pt-20 md:pt-24">
+        <SectionHeading>What people say</SectionHeading>
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          {QUOTES.map((q) => (
+            <figure key={q.n} className="rounded-xl border border-border p-6">
+              <blockquote className="text-sm font-medium">“{q.q}”</blockquote>
+              <figcaption className="mt-6">
+                <div className="text-sm font-semibold">{q.n}</div>
+                <div className="text-xs text-muted-foreground">{q.d}</div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA BAND */}
+      <section className="mt-20 bg-muted md:mt-24">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-14 md:flex-row md:items-center md:justify-between">
+          <SectionHeading>Ready for a clearer financial picture?</SectionHeading>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/signup"><BtnPrimary>Get started</BtnPrimary></Link>
+            <a href={DEMO_URL}>
+              <span className="inline-flex items-center justify-center rounded-lg bg-background px-5 py-3 text-sm font-semibold text-foreground transition hover:opacity-90">Book a demo</span>
+            </a>
           </div>
-        </Reveal>
+        </div>
       </section>
     </PublicLayout>
   );
