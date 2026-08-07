@@ -8,7 +8,7 @@ export const IMG = {
   planning: U("photo-1450101499163-c8848c66ca85"),
   desk: U("photo-1554260570-9140fd3b7614"),
   charts: U("photo-1543286386-713bdd548da4"),
-  receipts: U("photo-1554260570-9140fd3b7614"),
+  receipts: U("photo-1633158829585-23ba8f7c8caf"),
   growth: U("photo-1611348586804-61bf6c080437"),
   team: U("photo-1522071820081-009f0129c71c"),
   meeting: U("photo-1600880292203-757bb62b4baf"),
