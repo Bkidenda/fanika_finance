@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X, Facebook, Linkedin, Youtube, Instagram } from "lucide-react";
+import { Menu, X, Facebook, Linkedin, Youtube, Instagram, Sprout } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { AIChatbot } from "@/components/ai-chatbot";
@@ -15,26 +15,49 @@ export const EMAIL = "bkidenda@gmail.com";
 export const PHONE_DISPLAY = "+254 708 096 833";
 export const DEMO_URL = "https://calendly.com/bkidenda/30min?back=1&month=2026-06";
 
-/** Editorial primary button (template style: solid near-black). */
+/** Primary action — sage brand pill. */
 export function BtnPrimary({ className = "", children }: { className?: string; children: React.ReactNode }) {
   return (
-    <span className={`inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-5 py-3 text-sm font-semibold text-background transition hover:opacity-90 ${className}`}>
+    <span
+      className={`inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-card transition hover:bg-primary-dark ${className}`}
+    >
       {children}
     </span>
   );
 }
 
-/** Editorial secondary button (template style: light grey). */
+/** Secondary action — soft sage pill. */
 export function BtnSecondary({ className = "", children }: { className?: string; children: React.ReactNode }) {
   return (
-    <span className={`inline-flex items-center justify-center gap-2 rounded-lg bg-muted px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-border ${className}`}>
+    <span
+      className={`inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary hover:text-secondary-foreground ${className}`}
+    >
+      {children}
+    </span>
+  );
+}
+
+export function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3.5 py-1.5 text-xs font-semibold tracking-wide text-secondary-foreground">
       {children}
     </span>
   );
 }
 
 export function SectionHeading({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <h2 className={`text-3xl font-bold tracking-tight md:text-4xl ${className}`}>{children}</h2>;
+  return <h2 className={`text-3xl font-semibold tracking-tight md:text-[2.6rem] md:leading-[1.1] ${className}`}>{children}</h2>;
+}
+
+export function Wordmark({ className = "" }: { className?: string }) {
+  return (
+    <span className={`inline-flex items-center gap-2 ${className}`}>
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+        <Sprout className="h-4 w-4" />
+      </span>
+      <span className="text-base font-semibold tracking-tight">Fanika</span>
+    </span>
+  );
 }
 
 export function PublicLayout({ children }: { children: React.ReactNode; dark?: boolean }) {
@@ -44,45 +67,75 @@ export function PublicLayout({ children }: { children: React.ReactNode; dark?: b
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="text-base font-bold tracking-tight">Fanika</Link>
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 md:px-6">
+          <Link to="/" aria-label="Fanika home"><Wordmark /></Link>
 
-          <nav className="hidden items-center gap-7 md:flex">
+          <nav className="hidden items-center gap-1 rounded-full border border-border bg-card/70 p-1 lg:flex">
             {NAV.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
-                className={`text-sm transition ${path === n.to ? "font-semibold text-foreground" : "font-medium text-muted-foreground hover:text-foreground"}`}
+                className={`rounded-full px-4 py-2 text-sm transition ${
+                  path === n.to
+                    ? "bg-secondary font-semibold text-secondary-foreground"
+                    : "font-medium text-muted-foreground hover:text-foreground"
+                }`}
               >
                 {n.label}
               </Link>
             ))}
-            <Link to={user ? "/dashboard" : "/signup"}>
-              <BtnPrimary className="px-4 py-2">{user ? "Open app" : "Get started"}</BtnPrimary>
-            </Link>
           </nav>
 
-          <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
+          <div className="hidden items-center gap-2 md:flex">
+            {!user && (
+              <Link to="/login">
+                <span className="rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
+                  Sign in
+                </span>
+              </Link>
+            )}
+            <Link to={user ? "/dashboard" : "/signup"}>
+              <BtnPrimary className="px-5 py-2.5">{user ? "Open app" : "Get started free"}</BtnPrimary>
+            </Link>
+          </div>
+
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border md:hidden"
+            onClick={() => setOpen(!open)}
+            aria-label="Menu"
+            aria-expanded={open}
+          >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
 
         {open && (
-          <div className="border-t border-border/60 bg-background px-6 py-3 md:hidden">
+          <div className="border-t border-border/60 bg-background px-5 py-3 md:hidden">
             <nav className="flex flex-col">
               {NAV.map((n) => (
-                <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="py-2 text-sm font-medium text-muted-foreground">
+                <Link
+                  key={n.to}
+                  to={n.to}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-2 py-2.5 text-sm font-medium text-muted-foreground"
+                >
                   {n.label}
                 </Link>
               ))}
               <div className="mt-3 flex gap-2 border-t border-border/60 pt-3">
                 {user ? (
-                  <Link to="/dashboard" className="flex-1" onClick={() => setOpen(false)}><BtnPrimary className="w-full">Open app</BtnPrimary></Link>
+                  <Link to="/dashboard" className="flex-1" onClick={() => setOpen(false)}>
+                    <BtnPrimary className="w-full">Open app</BtnPrimary>
+                  </Link>
                 ) : (
                   <>
-                    <Link to="/login" className="flex-1" onClick={() => setOpen(false)}><BtnSecondary className="w-full">Sign in</BtnSecondary></Link>
-                    <Link to="/signup" className="flex-1" onClick={() => setOpen(false)}><BtnPrimary className="w-full">Get started</BtnPrimary></Link>
+                    <Link to="/login" className="flex-1" onClick={() => setOpen(false)}>
+                      <BtnSecondary className="w-full">Sign in</BtnSecondary>
+                    </Link>
+                    <Link to="/signup" className="flex-1" onClick={() => setOpen(false)}>
+                      <BtnPrimary className="w-full">Get started</BtnPrimary>
+                    </Link>
                   </>
                 )}
               </div>
@@ -93,18 +146,29 @@ export function PublicLayout({ children }: { children: React.ReactNode; dark?: b
 
       <main>{children}</main>
 
-      <footer id="contact" className="mt-24 border-t border-border/60">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-2">
+      <footer id="contact" className="mt-24 border-t border-border/60 bg-surface-soft">
+        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-2 md:px-6">
           <div>
-            <div className="text-base font-bold tracking-tight">Fanika</div>
-            <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-              Personal finance, made clear and actionable.
+            <Wordmark />
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              Personal finance for African households — clear, calm and always reconciled.
             </p>
-            <div className="mt-8 flex items-center gap-4 text-muted-foreground">
-              <a href="https://facebook.com" aria-label="Facebook" className="hover:text-foreground"><Facebook className="h-4 w-4" /></a>
-              <a href="https://linkedin.com" aria-label="LinkedIn" className="hover:text-foreground"><Linkedin className="h-4 w-4" /></a>
-              <a href="https://youtube.com" aria-label="YouTube" className="hover:text-foreground"><Youtube className="h-4 w-4" /></a>
-              <a href="https://instagram.com" aria-label="Instagram" className="hover:text-foreground"><Instagram className="h-4 w-4" /></a>
+            <div className="mt-8 flex items-center gap-3 text-muted-foreground">
+              {[
+                { href: "https://facebook.com", label: "Facebook", Icon: Facebook },
+                { href: "https://linkedin.com", label: "LinkedIn", Icon: Linkedin },
+                { href: "https://youtube.com", label: "YouTube", Icon: Youtube },
+                { href: "https://instagram.com", label: "Instagram", Icon: Instagram },
+              ].map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card transition hover:text-foreground"
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              ))}
             </div>
           </div>
 
@@ -129,7 +193,7 @@ export function PublicLayout({ children }: { children: React.ReactNode; dark?: b
               <div className="text-sm font-semibold">Company</div>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/about" className="hover:text-foreground">About</Link></li>
-                <li><a href={`mailto:${EMAIL}`} className="hover:text-foreground">{EMAIL}</a></li>
+                <li><a href={`mailto:${EMAIL}`} className="break-all hover:text-foreground">{EMAIL}</a></li>
                 <li><a href="tel:+254708096833" className="hover:text-foreground">{PHONE_DISPLAY}</a></li>
               </ul>
             </div>
@@ -144,7 +208,7 @@ export function PublicLayout({ children }: { children: React.ReactNode; dark?: b
   );
 }
 
-/** Template contact form — emails the team via the visitor's mail client. */
+/** Contact form — opens the visitor's mail client with a prefilled enquiry. */
 export function ContactForm() {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -157,7 +221,8 @@ export function ContactForm() {
     window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent("Enquiry from Fanika")}&body=${encodeURIComponent(body)}`;
   }
 
-  const field = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus:border-foreground";
+  const field =
+    "w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus:border-primary";
 
   return (
     <form onSubmit={submit} className="mt-6 space-y-4">
@@ -179,7 +244,7 @@ export function ContactForm() {
         <span className="text-xs font-semibold">Your message</span>
         <textarea required rows={5} value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Enter your question or message" className={`mt-1.5 ${field}`} />
       </label>
-      <button type="submit" className="w-full rounded-lg bg-foreground px-5 py-3 text-sm font-semibold text-background transition hover:opacity-90">
+      <button type="submit" className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-dark">
         Submit
       </button>
     </form>
