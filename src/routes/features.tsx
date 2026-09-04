@@ -54,7 +54,7 @@ const SPLITS = [
       "Fund a goal straight from a paycheque, watch the progress ring move, and reschedule a target date without breaking the rest of the plan.",
     screen: <ScreenGoals />,
   },
-] as const;
+] satisfies { eyebrow: string; title: string; body: string; screen: React.ReactNode; flip?: boolean }[];
 
 const CAPABILITIES = [
   { i: Wallet, t: "Monthly planning", d: "Enter income as it arrives and budget before the month begins." },
