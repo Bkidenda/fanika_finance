@@ -59,7 +59,7 @@ export const BUDGET_CATEGORY_GROUPS = {
     "School fees", "Emergency family support",
   ],
   Lifestyle: ["Subscriptions", "Personal care", "Entertainment", "Dining out", "Clothing"],
-  Financial: ["Insurance", "Loans / Debt repayment", "Savings", "Investments", "Charity & Giving"],
+  Financial: ["Insurance", "Loans / Debt repayment", "Savings", "Investments", "Giving"],
   Other: ["Miscellaneous"],
 } as const;
 

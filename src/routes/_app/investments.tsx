@@ -16,7 +16,7 @@ import { chartColorByRank, rankByValue } from "@/lib/chart-colors";
 
 const TYPES = ["savings", "sacco", "stocks", "crypto", "bonds", "fixed_deposit", "business", "other"] as const;
 
-export const Route = createFileRoute("/_app/investments")({ component: Investments });
+export const Route = createFileRoute("/_app/investments")({ head: () => ({ meta: [{ title: "Investments — Fanika" }] }), component: Investments });
 
 type FormState = {
   name: string; type: (typeof TYPES)[number]; institution: string;

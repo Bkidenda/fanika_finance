@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/family")({ component: FamilyGate });
+export const Route = createFileRoute("/_app/family")({ head: () => ({ meta: [{ title: "Family — Fanika" }] }), component: FamilyGate });
 
 function FamilyGate() {
   const profile = useProfile();

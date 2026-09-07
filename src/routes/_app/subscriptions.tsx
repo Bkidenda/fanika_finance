@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Trash2, Repeat } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/subscriptions")({ component: Subs });
+export const Route = createFileRoute("/_app/subscriptions")({ head: () => ({ meta: [{ title: "Subscriptions — Fanika" }] }), component: Subs });
 
 function Subs() {
   const { user } = useAuth();

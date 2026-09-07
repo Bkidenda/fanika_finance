@@ -24,14 +24,14 @@ const TITLES: Record<string, string> = {
   "/expenses": "Expenses",
   "/transactions": "Money Tracker",
   "/giving": "Charity & Giving",
-  "/tithe": "Charity & Giving",
+  
   "/subscriptions": "Subscriptions",
   "/debts": "Debts",
   "/accounts": "Accounts",
   "/investments": "Investments",
   "/goals": "Goals",
   "/family": "Family Suite",
-  "/stewardship": "Stewardship",
+  "/stewardship": "Daily Reflections",
   "/settings": "My Profile",
 };
 

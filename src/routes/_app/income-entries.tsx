@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Trash2, ArrowDownToLine, HandHeart } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/income-entries")({ component: IncomeEntries });
+export const Route = createFileRoute("/_app/income-entries")({ head: () => ({ meta: [{ title: "Income Entries — Fanika" }] }), component: IncomeEntries });
 
 const SOURCES = ["Salary", "Freelance", "Consultancy", "Business", "Rental", "Side hustle", "Dividends", "Gift", "Other"];
 
@@ -135,7 +135,7 @@ function IncomeEntries() {
                 </Select>
               </div>
               <div className="flex items-center justify-between rounded-xl border p-3">
-                <div className="flex items-center gap-2"><HandHeart className="h-4 w-4 text-primary" /><Label className="cursor-pointer">Apply tithe / giving to this income</Label></div>
+                <div className="flex items-center gap-2"><HandHeart className="h-4 w-4 text-primary" /><Label className="cursor-pointer">Apply giving to this income</Label></div>
                 <Switch checked={f.tithe_on} onCheckedChange={(v) => setF({ ...f, tithe_on: v })} />
               </div>
               <div className="space-y-1.5"><Label>Notes</Label><Input value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} /></div>
@@ -164,7 +164,7 @@ function IncomeEntries() {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <span>Tithe</span>
+                    <span>Giving</span>
                     <Switch checked={!!e.tithe_on} onCheckedChange={(v) => toggleTithe(e.id, v)} />
                   </div>
                   <span className="tabular-nums font-medium">{formatCurrency(Number(e.amount), currency)}</span>

@@ -31,7 +31,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const Route = createFileRoute("/_app/reports")({
+export const Route = createFileRoute("/_app/reports")({ 
   head: () => ({
     meta: [
       { title: "Reports & Statements — Fanika" },

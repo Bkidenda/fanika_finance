@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, ChevronLeft, ChevronRight, Trash2, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/calendar")({ component: CalendarPage });
+export const Route = createFileRoute("/_app/calendar")({ head: () => ({ meta: [{ title: "Calendar — Fanika" }] }), component: CalendarPage });
 
 type FinEvent = {
   id: string;

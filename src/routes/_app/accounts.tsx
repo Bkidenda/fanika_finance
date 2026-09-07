@@ -15,7 +15,7 @@ import { ListSkeleton, EmptyState, ConfirmDelete } from "@/components/ui-states"
 import { Plus, Trash2, Pencil, Landmark, ArrowLeftRight, Scale, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/accounts")({ component: Accounts });
+export const Route = createFileRoute("/_app/accounts")({ head: () => ({ meta: [{ title: "Accounts — Fanika" }] }), component: Accounts });
 
 const TYPES = [
   { v: "bank", l: "Bank" }, { v: "mpesa", l: "M-Pesa" }, { v: "cash", l: "Cash" },

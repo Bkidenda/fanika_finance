@@ -3,9 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, Heart, Sparkles, ShieldCheck } from "lucide-react";
 
-export const Route = createFileRoute("/_app/stewardship")({ component: Stewardship });
+export const Route = createFileRoute("/_app/stewardship")({ head: () => ({ meta: [{ title: "Daily Reflections — Fanika" }] }), component: Reflections });
 
-function Stewardship() {
+function Reflections() {
   const { data: list } = useQuery({
     queryKey: ["devotionals-all"],
     queryFn: async () => {
@@ -23,8 +23,8 @@ function Stewardship() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm text-muted-foreground">Daily stewardship</p>
-        <h2 className="text-2xl font-semibold tracking-tight">Word & wisdom for your finances</h2>
+        <p className="text-sm text-muted-foreground">Daily reflections</p>
+        <h2 className="text-2xl font-semibold tracking-tight">Daily money reflections & wisdom</h2>
       </div>
 
       <div className="flex items-start gap-2 rounded-xl border bg-secondary/40 p-3 text-xs text-muted-foreground">
