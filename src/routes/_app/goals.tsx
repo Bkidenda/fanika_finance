@@ -12,7 +12,7 @@ import { ListSkeleton, EmptyState, ConfirmDelete } from "@/components/ui-states"
 import { Plus, Trash2, Pencil, Target } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/goals")({ component: Goals });
+export const Route = createFileRoute("/_app/goals")({ head: () => ({ meta: [{ title: "Goals — Fanika" }] }), component: Goals });
 
 type FormState = { name: string; target: string; current: string; deadline: string };
 const emptyForm: FormState = { name: "", target: "", current: "", deadline: "" };

@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Trash2, HandHeart, Church } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/giving")({ component: GivingPage });
+export const Route = createFileRoute("/_app/giving")({ head: () => ({ meta: [{ title: "Charity export const Route = createFileRoute("/_app/giving")({ Giving — Fanika" }] }), component: GivingPage });
 
 const OFFERING_CATEGORIES = [
   "Tithe", "Offering", "Church Development", "Church Lunch",
@@ -100,7 +100,7 @@ function GivingPage() {
     if (error) return toast.error(error.message);
     toast.success(
       f.category === "Tithe"
-        ? "Tithe recorded — account balances unchanged (tithe is pre-disposable)"
+        ? "Giving recorded — account balances unchanged (tithe is pre-disposable)"
         : `${f.category} recorded — account debited and logged in expenses`
     );
     setOpen(false);
@@ -170,15 +170,15 @@ function GivingPage() {
         </div>
         {titheEnabled && (
           <div className="rounded-2xl border bg-card p-4 shadow-card">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground"><HandHeart className="h-3.5 w-3.5" /> Tithe due ({Math.round(titheRate * 100)}%)</div>
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-muted-foreground"><HandHeart className="h-3.5 w-3.5" /> Giving due ({Math.round(titheRate * 100)}%)</div>
             <div className="mt-2 text-xl font-semibold tabular-nums md:text-2xl">{formatCurrency(titheBudget, currency)}</div>
           </div>
         )}
         <div className="rounded-2xl border bg-card p-4 shadow-card">
-          <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Tithe paid</div>
+          <div className="text-[11px] uppercase tracking-widest text-muted-foreground">Giving paid</div>
           <div className="mt-2 text-xl font-semibold tabular-nums md:text-2xl">{formatCurrency(tithePaid, currency)}</div>
           {titheEnabled && (
-            <div className={`text-[11px] ${titheOutstanding > 0 ? "text-amber-700" : "text-success"}`}>
+            <div className={`text-[11px] ${titheOutstanding > 0 ? "text-warning" : "text-success"}`}>
               {titheOutstanding > 0 ? `Outstanding ${formatCurrency(titheOutstanding, currency)}` : "Fully paid"}
             </div>
           )}

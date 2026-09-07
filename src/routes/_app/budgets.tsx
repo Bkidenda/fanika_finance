@@ -17,7 +17,7 @@ import { Plus, Trash2, Archive, ChevronLeft, ChevronRight, Repeat } from "lucide
 import { toast } from "sonner";
 import { ListSkeleton, EmptyState, ConfirmDelete } from "@/components/ui-states";
 
-export const Route = createFileRoute("/_app/budgets")({ component: Budgets });
+export const Route = createFileRoute("/_app/budgets")({ head: () => ({ meta: [{ title: "Budgets — Fanika" }] }), component: Budgets });
 
 function firstOfMonthISO(d: Date) {
   const y = d.getFullYear();

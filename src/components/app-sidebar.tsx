@@ -34,7 +34,7 @@ const wealth = [
   { title: "Accounts", url: "/accounts", icon: Landmark },
   { title: "Investments", url: "/investments", icon: TrendingUp },
   { title: "Goals", url: "/goals", icon: Target },
-  { title: "Daily Insights", url: "/stewardship", icon: BookOpen },
+  { title: "Daily Reflections", url: "/stewardship", icon: BookOpen },
 ] as const;
 
 export function AppSidebar() {
@@ -96,7 +96,7 @@ export function AppSidebar() {
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={path === "/family"}>
                     <Link to="/family" onClick={closeAfterNav} className="flex items-center gap-3">
-                      <Crown className="h-4 w-4 text-[oklch(0.7_0.15_60)]" />
+                      <Crown className="h-4 w-4 text-amber-500" />
                       {!collapsed && <span>Family Hub</span>}
                     </Link>
                   </SidebarMenuButton>

@@ -25,7 +25,7 @@ import {
 import { closeMonth } from "@/lib/close-month.functions";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/dashboard")({ component: Dashboard });
+export const Route = createFileRoute("/_app/dashboard")({ head: () => ({ meta: [{ title: "Dashboard — Fanika" }] }), component: Dashboard });
 
 function Dashboard() {
   const profile = useProfile();
@@ -69,8 +69,8 @@ function Dashboard() {
       deductions: deductions.data ?? [],
       allExpenses: allExpenses.data ?? [],
       allIncome: allIncome.data ?? [],
-      titheEnabled: !!profile.data?.tithe_enabled,
-      titheRate: profile.data?.tithe_rate ?? 0.1,
+      givingEnabled: !!profile.data?.tithe_enabled,
+      givingRate: profile.data?.tithe_rate ?? 0.1,
       period,
     }),
     [incomeEntries.data, expenses.data, budgets.data, accounts.data, debts.data,
@@ -249,7 +249,7 @@ function Dashboard() {
               <p className="mt-1 text-xs opacity-80">— {devo.data.verse_reference}</p>
               <p className="mt-4 text-sm leading-relaxed opacity-90">"{devo.data.egw_quote}"</p>
               {devo.data.egw_source && <p className="mt-1 text-[11px] opacity-70">— {devo.data.egw_source}</p>}
-              <Link to="/stewardship" className="mt-4 inline-block text-xs font-semibold underline opacity-90">Open daily insights →</Link>
+              <Link to="/stewardship" className="mt-4 inline-block text-xs font-semibold underline opacity-90">Open daily reflections →</Link>
             </>
           ) : (
             <p className="mt-3 text-sm opacity-80">Loading today's reflection…</p>

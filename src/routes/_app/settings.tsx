@@ -16,7 +16,7 @@ import { UserCircle, LogOut, ShieldAlert, Eraser, PowerOff, Trash2, HandHeart, S
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/settings")({ component: ProfilePage });
+export const Route = createFileRoute("/_app/settings")({ head: () => ({ meta: [{ title: "Settings — Fanika" }] }), component: ProfilePage });
 
 function ProfilePage() {
   const { user, signOut } = useAuth();
@@ -152,14 +152,14 @@ function ProfilePage() {
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold">Automatic tithe / giving</div>
-                  <p className="text-xs text-muted-foreground">Computes tithe before disposable income is calculated. Record actual tithe payments on the Tithe page — they are tracked but don't reduce account balances (deducted pre-disposable).</p>
+                  <div className="font-semibold">Automatic giving</div>
+                  <p className="text-xs text-muted-foreground">Computes giving before disposable income is calculated. Record actual tithe payments on the Tithe page — they are tracked but don't reduce account balances (deducted pre-disposable).</p>
                 </div>
                 <Switch checked={titheEnabled} onCheckedChange={setTitheEnabled} />
               </div>
               {titheEnabled && (
                 <div className="mt-4 grid max-w-xs gap-1.5">
-                  <Label>Tithe rate (%)</Label>
+                  <Label>Giving rate (%)</Label>
                   <Input type="number" min="0" max="100" step="0.5" value={titheRate} onChange={(e) => setTitheRate(e.target.value)} />
                 </div>
               )}

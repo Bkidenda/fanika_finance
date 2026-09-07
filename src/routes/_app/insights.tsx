@@ -6,7 +6,7 @@ import { Sparkles, AlertTriangle, CheckCircle2, TrendingUp, HandCoins } from "lu
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
 import { SERIES_COLORS, CHART_GRID_STROKE, CHART_AXIS_TICK } from "@/lib/chart-colors";
 
-export const Route = createFileRoute("/_app/insights")({ component: Insights });
+export const Route = createFileRoute("/_app/insights")({ head: () => ({ meta: [{ title: "Insights — Fanika" }] }), component: Insights });
 
 function Insights() {
   const profile = useProfile();
@@ -60,7 +60,7 @@ function Insights() {
     insights.push({ kind: "good", text: `Strong savings rate of ${formatPercent(savingsRate * 100)} — great discipline.` });
   }
   if (givingRate >= 0.1) {
-    insights.push({ kind: "good", text: "Consistent tithing pattern detected. Faithful stewardship." });
+    insights.push({ kind: "good", text: "Consistent giving pattern detected. Faithful financial management." });
   }
   if (debtRatio > 0.3) {
     insights.push({ kind: "warn", text: `Custom deductions are ${formatPercent(debtRatio * 100)} of net income — review obligations.` });
@@ -74,7 +74,7 @@ function Insights() {
     <div className="space-y-6">
       <div>
         <p className="text-sm text-muted-foreground">Smart insights</p>
-        <h2 className="text-2xl font-semibold tracking-tight">How you're stewarding your finances</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">How you're managing your finances</h2>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -121,7 +121,7 @@ function Insights() {
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border bg-card p-5 shadow-card">
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
-            <HandCoins className="h-4 w-4" /> Tithes (month)
+            <HandCoins className="h-4 w-4" /> Giving (month)
           </div>
           <div className="mt-2 text-2xl font-semibold tabular-nums">{formatCurrency(breakdown.tithe, currency)}</div>
         </div>

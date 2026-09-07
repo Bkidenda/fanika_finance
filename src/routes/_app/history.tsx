@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export const Route = createFileRoute("/_app/history")({ component: History });
+export const Route = createFileRoute("/_app/history")({ head: () => ({ meta: [{ title: "History — Fanika" }] }), component: History });
 
 function History() {
   const closures = useMonthClosures();
