@@ -18,12 +18,10 @@ import { PublicLayout, BtnPrimary, BtnSecondary, SectionHeading, Eyebrow, DEMO_U
 import {
   PhoneFrame,
   ScreenOverview,
-  ScreenTransactions,
-  ScreenBudgets,
-  ScreenGoals,
   ScreenInsights,
   FloatingCard,
   DesktopFrame,
+  StoryVisual,
 } from "@/components/marketing/device";
 import { useAuth } from "@/hooks/use-auth";
 import { PLANS } from "@/lib/plans";
@@ -168,7 +166,7 @@ function Home() {
               <Link to="/signup"><BtnPrimary className="pulse-primary">Start free <ArrowRight className="h-4 w-4" /></BtnPrimary></Link>
               <a href={DEMO_URL}><BtnSecondary>Book a demo</BtnSecondary></a>
             </div>
-            <dl className="mt-12 grid max-w-lg grid-cols-3 gap-4">
+            <dl className="mt-12 grid max-w-lg grid-cols-1 gap-3 min-[380px]:grid-cols-3 sm:gap-4">
               {STATS.map(([v, l]) => (
                 <div key={l} className="rounded-2xl border border-border bg-card/70 p-4 backdrop-blur">
                   <dt className="money text-xl font-semibold text-primary md:text-2xl">{v}</dt>
@@ -223,7 +221,11 @@ function Home() {
               </Link>
             </div>
             <div className="flex justify-center">
-              <PhoneFrame label={`Fanika ${s.eyebrow.toLowerCase()} screen`}>{s.screen}</PhoneFrame>
+              <StoryVisual
+                heading={s.visual.heading}
+                rows={s.visual.rows}
+                footNote={s.visual.footNote}
+              />
             </div>
           </div>
         </section>
