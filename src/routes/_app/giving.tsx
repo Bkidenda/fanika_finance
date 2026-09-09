@@ -245,9 +245,6 @@ function GivingPage() {
         </div>
       </div>
 
-      <div className="text-xs text-muted-foreground">
-        Looking for the old <Link to="/tithe" className="text-primary underline">Tithe</Link> page? It now lives here as part of Charity & Giving.
-      </div>
     </div>
   );
 }
