@@ -188,7 +188,7 @@ function Home() {
               title="Health score"
               value="78 / 100"
               note="Improving"
-              className="absolute -right-2 top-6 hidden w-40 md:block"
+              className="absolute -right-4 -top-4 hidden w-40 md:block lg:-right-8"
             />
           </div>
         </div>
