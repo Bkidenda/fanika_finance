@@ -13,7 +13,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Trash2, HandHeart, Church } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_app/giving")({ head: () => ({ meta: [{ title: "Charity export const Route = createFileRoute("/_app/giving")({ Giving — Fanika" }] }), component: GivingPage });
+export const Route = createFileRoute("/_app/giving")({
+  head: () => ({
+    meta: [
+      { title: "Charity & Giving — Fanika" },
+      { name: "description", content: "Record tithes, offerings and other giving, and see what you have set aside this month." },
+      { property: "og:title", content: "Charity & Giving — Fanika" },
+      { property: "og:description", content: "Track giving alongside your budget in Fanika." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: GivingPage,
+});
 
 const OFFERING_CATEGORIES = [
   "Tithe", "Offering", "Church Development", "Church Lunch",
