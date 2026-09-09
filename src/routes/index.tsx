@@ -64,8 +64,17 @@ const STORY = [
     body:
       "Set each line while the month is still ahead of you. Rent, school fees and other recurring lines carry forward automatically; everything else starts clean at zero.",
     bullets: ["Budget months ahead", "Recurring lines carry over", "Giving set aside before disposable"],
-    screen: <ScreenBudgets />,
     to: "/features" as const,
+    visual: {
+      heading: "August budget",
+      rows: [
+        { label: "Rent", value: "KES 35,000", pct: 100 },
+        { label: "School fees", value: "KES 18,000", pct: 62 },
+        { label: "Groceries", value: "KES 12,400", pct: 44 },
+        { label: "Giving", value: "KES 6,800", pct: 24 },
+      ],
+      footNote: "Recurring lines carried over from July. Everything else starts at zero.",
+    },
   },
   {
     eyebrow: "Track",
@@ -73,8 +82,17 @@ const STORY = [
     body:
       "Income and expenses share a single tracker with timestamps, categories, transaction fees and multi-currency support. Balances and budgets update the moment you record.",
     bullets: ["Bank, mobile money, SACCO and cash", "Bulk entry with edit and undo", "Daily CBK conversion rates"],
-    screen: <ScreenTransactions />,
     to: "/how-it-works" as const,
+    visual: {
+      heading: "This week",
+      rows: [
+        { label: "Salary received", value: "KES 96,000", pct: 100 },
+        { label: "Mobile money out", value: "KES 21,350", pct: 42 },
+        { label: "Card spending", value: "KES 9,120", pct: 26 },
+        { label: "Cash", value: "KES 3,400", pct: 12 },
+      ],
+      footNote: "Every entry is timestamped and grouped by week.",
+    },
   },
   {
     eyebrow: "Grow",
@@ -82,8 +100,17 @@ const STORY = [
     body:
       "Savings goals, investments and debt payoff sit in one net-worth view, so progress on one is never a surprise on another.",
     bullets: ["Goal progress at a glance", "Debt payments post themselves", "Settled debts archive automatically"],
-    screen: <ScreenGoals />,
     to: "/features" as const,
+    visual: {
+      heading: "Goals & debt",
+      rows: [
+        { label: "Emergency fund", value: "68%", pct: 68 },
+        { label: "Land deposit", value: "41%", pct: 41 },
+        { label: "Car loan cleared", value: "77%", pct: 77 },
+        { label: "Unit trust", value: "23%", pct: 23 },
+      ],
+      footNote: "Debt payments post themselves and settled debts archive automatically.",
+    },
   },
 ];
 
