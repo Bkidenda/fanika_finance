@@ -392,3 +392,46 @@ export function DesktopFrame({ className = "" }: { className?: string }) {
     </div>
   );
 }
+
+/* ── Story visual ──────────────────────────────────────────────────────────
+   A flat card presentation used for the storytelling sections so the home
+   page keeps only two full device mockups. */
+
+export function StoryVisual({
+  heading,
+  rows,
+  footNote,
+  className = "",
+}: {
+  heading: string;
+  rows: { label: string; value: string; pct: number }[];
+  footNote?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      role="img"
+      aria-label={heading}
+      className={`w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-elevated ${className}`}
+    >
+      <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{heading}</p>
+      <div className="mt-5 space-y-4">
+        {rows.map((r, i) => (
+          <div key={r.label}>
+            <div className="flex items-baseline justify-between text-sm">
+              <span className="font-medium">{r.label}</span>
+              <span className="num font-semibold">{r.value}</span>
+            </div>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full"
+                style={{ width: `${Math.min(100, r.pct)}%`, backgroundColor: `var(--chart-${(i % 8) + 1})` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      {footNote && <p className="mt-6 text-xs leading-relaxed text-muted-foreground">{footNote}</p>}
+    </div>
+  );
+}

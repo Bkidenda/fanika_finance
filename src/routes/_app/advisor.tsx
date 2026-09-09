@@ -33,7 +33,7 @@ function Advisor() {
   const titheEnabled = !!profile.data?.tithe_enabled;
   const titheRate = profile.data?.tithe_rate ?? 0.10;
   const receivedIncome = (incomeEntries.data ?? []).reduce((s, e) => s + Number(e.amount), 0);
-  const b = computeBreakdown(receivedIncome, deductions.data ?? [], { givingEnabled, titheRate });
+  const b = computeBreakdown(receivedIncome, deductions.data ?? [], { titheEnabled, titheRate });
 
   const spendByCat = new Map<string, number>();
   (expenses.data ?? []).forEach((e) => spendByCat.set(e.category, (spendByCat.get(e.category) ?? 0) + Number(e.amount)));
@@ -60,7 +60,7 @@ function Advisor() {
       data: {
         period: monthKey().slice(0, 7),
         context: {
-          currency, givingEnabled, net: b.net, disposable: b.disposable, giving: b.tithe,
+          currency, titheEnabled, net: b.net, disposable: b.disposable, giving: b.tithe,
           customDeductions: b.custom, monthlySpend, budgetTotal,
           savingsRate, debtRatio, familySupportRatio, subscriptionsMonthly: subsMonthly,
           debtsTotal, portfolioValue,
