@@ -26,17 +26,30 @@ export async function createOrUpdateProfile(profile: ProfileInsert) {
   return { error };
 }
 
-export async function signInWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
+/**
+ * Starts Google sign-in. Inside an embedded preview frame Google refuses to
+ * render, so we take the URL ourselves and open it at the top level.
+ */
+export async function signInWithGoogle(path = '/dashboard') {
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: getAuthRedirectUrl('/dashboard'),
+      redirectTo: getAuthRedirectUrl(path),
+      skipBrowserRedirect: true,
     },
   });
 
-  if (error) {
-    toast.error(error.message);
+  if (error || !data?.url) {
+    toast.error(error?.message ?? 'Sign-in failed');
+    return;
   }
+
+  const framed = typeof window !== 'undefined' && window.top && window.top !== window;
+  if (framed) {
+    window.open(data.url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  window.location.assign(data.url);
 }
 
 export async function signUpWithEmail({
