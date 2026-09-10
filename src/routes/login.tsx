@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getAuthRedirectUrl } from "@/integrations/supabase/auth";
 import { Button } from "@/components/ui/button";
@@ -19,13 +19,18 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  // Interactive only once React has taken over the page; otherwise an early
+  // click submits the form natively and reloads without signing in.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
 
-  if (user) {
-    navigate({ to: "/dashboard" });
-  }
+  useEffect(() => {
+    if (user) navigate({ to: "/dashboard" });
+  }, [user, navigate]);
 
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
+    if (!ready) return;
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
