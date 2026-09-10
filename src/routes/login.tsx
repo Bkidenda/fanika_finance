@@ -61,7 +61,7 @@ function Login() {
           Sign in to your Fanika dashboard.
         </p>
 
-        <Button variant="outline" className="mt-6 w-full" onClick={google}>
+        <Button variant="outline" className="mt-6 w-full" onClick={google} disabled={!ready}>
           Continue with Google
         </Button>
 

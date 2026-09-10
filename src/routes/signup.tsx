@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getAuthRedirectUrl } from "@/integrations/supabase/auth";
+import { getAuthRedirectUrl, signInWithGoogle } from "@/integrations/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,9 +19,12 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!ready) return;
     if (password.length < 8) return toast.error("Password must be at least 8 characters");
     const handle = username.trim().toLowerCase();
     if (!/^[a-z0-9_]{3,30}$/.test(handle)) return toast.error("Username: 3–30 chars, letters/numbers/underscore.");
@@ -51,13 +54,7 @@ function Signup() {
   }
 
   async function google() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: getAuthRedirectUrl('/dashboard'),
-      },
-    });
-    if (error) toast.error(error.message ?? "Sign-up failed");
+    await signInWithGoogle("/dashboard");
   }
 
   return (
@@ -72,7 +69,7 @@ function Signup() {
         <h1 className="mt-6 text-2xl font-semibold tracking-tight">Create your account</h1>
         <p className="mt-1 text-sm text-muted-foreground">Start your financial discipline journey today.</p>
 
-        <Button variant="outline" className="mt-6 w-full" onClick={google}>
+        <Button variant="outline" className="mt-6 w-full" onClick={google} disabled={!ready}>
           Continue with Google
         </Button>
         <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
@@ -100,7 +97,7 @@ function Signup() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
-          <Button type="submit" className="w-full" disabled={busy}>
+          <Button type="submit" className="w-full" disabled={busy || !ready}>
             {busy ? "Creating account…" : "Create account"}
           </Button>
         </form>
