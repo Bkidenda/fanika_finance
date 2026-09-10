@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getAuthRedirectUrl } from "@/integrations/supabase/auth";
+import { signInWithGoogle } from "@/integrations/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,13 +19,18 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  // Interactive only once React has taken over the page; otherwise an early
+  // click submits the form natively and reloads without signing in.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
 
-  if (user) {
-    navigate({ to: "/dashboard" });
-  }
+  useEffect(() => {
+    if (user) navigate({ to: "/dashboard" });
+  }, [user, navigate]);
 
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
+    if (!ready) return;
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
@@ -35,14 +40,7 @@ function Login() {
   }
 
   async function google() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: getAuthRedirectUrl("/dashboard"),
-      },
-    });
-
-    if (error) toast.error(error.message ?? "Sign-in failed");
+    await signInWithGoogle("/dashboard");
   }
 
   return (
@@ -63,7 +61,7 @@ function Login() {
           Sign in to your Fanika dashboard.
         </p>
 
-        <Button variant="outline" className="mt-6 w-full" onClick={google}>
+        <Button variant="outline" className="mt-6 w-full" onClick={google} disabled={!ready}>
           Continue with Google
         </Button>
 
@@ -104,7 +102,7 @@ function Login() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={busy}>
+          <Button type="submit" className="w-full" disabled={busy || !ready}>
             {busy ? "Signing in…" : "Sign in"}
           </Button>
         </form>
