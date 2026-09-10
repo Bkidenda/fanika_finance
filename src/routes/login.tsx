@@ -102,7 +102,7 @@ function Login() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={busy}>
+          <Button type="submit" className="w-full" disabled={busy || !ready}>
             {busy ? "Signing in…" : "Sign in"}
           </Button>
         </form>
