@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getAuthRedirectUrl } from "@/integrations/supabase/auth";
+import { signInWithGoogle } from "@/integrations/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,14 +40,7 @@ function Login() {
   }
 
   async function google() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: getAuthRedirectUrl("/dashboard"),
-      },
-    });
-
-    if (error) toast.error(error.message ?? "Sign-in failed");
+    await signInWithGoogle("/dashboard");
   }
 
   return (
