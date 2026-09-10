@@ -9,7 +9,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
 import appCss from "../styles.css?url";
-import faviconUrl from "@/assets/favicon.png?url";
+
 
 function NotFound() {
   return (
