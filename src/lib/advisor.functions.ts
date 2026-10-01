@@ -3,26 +3,30 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { extractJson } from "@/lib/advisor.server";
 
+// Lenient numeric: tolerates NaN/Infinity/strings from client-side maths.
+const num = z.preprocess((v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; }, z.number());
+
 const AdvisorInput = z.object({
   period: z.string().min(1).max(20),
   context: z.object({
-    currency: z.string(),
+    currency: z.string().default("KES"),
     titheEnabled: z.boolean().optional(),
-    net: z.number(),
-    disposable: z.number(),
-    tithe: z.number(),
-    customDeductions: z.number(),
-    monthlySpend: z.number(),
-    budgetTotal: z.number(),
-    savingsRate: z.number(),
-    debtRatio: z.number(),
-    familySupportRatio: z.number(),
-    subscriptionsMonthly: z.number(),
-    debtsTotal: z.number(),
-    portfolioValue: z.number(),
-    topCategories: z.array(z.object({ category: z.string(), amount: z.number() })).max(15),
-    incomeStreams: z.number(),
-  }),
+    net: num,
+    disposable: num,
+    tithe: num.optional(),
+    giving: num.optional(),
+    customDeductions: num,
+    monthlySpend: num,
+    budgetTotal: num,
+    savingsRate: num,
+    debtRatio: num,
+    familySupportRatio: num,
+    subscriptionsMonthly: num,
+    debtsTotal: num,
+    portfolioValue: num,
+    topCategories: z.array(z.object({ category: z.string(), amount: num })).max(30).transform((a) => a.slice(0, 15)),
+    incomeStreams: num,
+  }).passthrough().transform((c) => ({ ...c, tithe: Number(c.tithe ?? c.giving ?? 0) })),
 });
 
 export const runAdvisor = createServerFn({ method: "POST" })
