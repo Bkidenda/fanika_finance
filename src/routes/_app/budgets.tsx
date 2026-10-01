@@ -482,6 +482,52 @@ function Budgets() {
         )}
 
       </div>
+
+      <ArchivedLines month={month} onRestore={(id) => updateField(id, { archived_at: null }).then(() => { qc.invalidateQueries({ queryKey: ["budgets-archived"] }); toast.success("Budget line restored"); })} />
+    </div>
+  );
+}
+
+function ArchivedLines({ month, onRestore }: { month: string; onRestore: (id: string) => void }) {
+  const { user } = useAuth();
+  const [show, setShow] = useState(false);
+  const [rows, setRows] = useState<Array<{ id: string; category: string; limit_amount: number; month: string; archived_at: string }>>([]);
+  const qc = useQueryClient();
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    const load = async () => {
+      const { data } = await supabase.from("budgets").select("id,category,limit_amount,month,archived_at")
+        .not("archived_at", "is", null).order("archived_at", { ascending: false });
+      if (alive) setRows((data ?? []) as never);
+    };
+    void load();
+    const unsub = qc.getQueryCache().subscribe((e) => {
+      const k = e.query.queryKey[0];
+      if (e.type === "updated" && (k === "budgets" || k === "budgets-archived")) void load();
+    });
+    return () => { alive = false; unsub(); };
+  }, [user, month, qc]);
+  if (!rows.length) return null;
+  return (
+    <div className="rounded-2xl border bg-card p-3 shadow-card md:p-6">
+      <button onClick={() => setShow((s) => !s)} className="flex w-full items-center justify-between text-sm font-medium">
+        <span className="flex items-center gap-2"><Archive className="h-4 w-4" /> Archived lines ({rows.length})</span>
+        <span className="text-muted-foreground">{show ? "Hide" : "Show"}</span>
+      </button>
+      {show && (
+        <ul className="mt-3 divide-y">
+          {rows.map((r) => (
+            <li key={r.id} className="flex items-center justify-between gap-2 py-2 text-sm">
+              <div className="min-w-0">
+                <div className="truncate font-medium">{r.category}</div>
+                <div className="text-xs text-muted-foreground">{labelForMonth(r.month)}</div>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => onRestore(r.id)}>Restore</Button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
