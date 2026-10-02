@@ -117,6 +117,10 @@ function TransactionsPage() {
   // Auto-select method based on chosen account's type
   useEffect(() => {
     if (!selectedAccount) return;
+    if (selectedAccount.type === "cash") {
+      if (method !== "Cash") setMethod("Cash");
+      return;
+    }
     const opts = METHODS_BY_TYPE[selectedAccount.type];
     const def = DEFAULT_METHOD_BY_TYPE[selectedAccount.type];
     if (opts && !opts.includes(method)) setMethod(def ?? opts[0]);
