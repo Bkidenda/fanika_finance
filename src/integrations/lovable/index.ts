@@ -1,7 +1,7 @@
-// Compatibility shim for older auth calls.
-// This routes Google OAuth through Supabase so it does not hit the Lovable /~oauth/initiate endpoint.
-
+import { createLovableAuth } from "@lovable.dev/cloud-auth-js";
 import { supabase } from "../supabase/client";
+
+const lovableAuth = createLovableAuth();
 
 type SignInOptions = {
   redirect_uri?: string;
@@ -11,23 +11,20 @@ type SignInOptions = {
 export const lovable = {
   auth: {
     signInWithOAuth: async (provider: "google" | "apple" | "microsoft" | "lovable", opts?: SignInOptions) => {
-      if (provider !== "google") {
-        return { error: new Error(`Unsupported provider: ${provider}`) };
-      }
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: opts?.redirect_uri ?? `${window.location.origin}/dashboard`,
-          queryParams: opts?.extraParams,
-        },
+      const result = await lovableAuth.signInWithOAuth(provider, {
+        redirect_uri: opts?.redirect_uri,
+        extraParams: { ...opts?.extraParams },
       });
 
-      if (error) {
-        return { data, error };
-      }
+      if (result.redirected) return result;
+      if (result.error) return result;
 
-      return { data, error: null, redirected: true };
+      try {
+        await supabase.auth.setSession(result.tokens);
+      } catch (e) {
+        return { error: e instanceof Error ? e : new Error(String(e)) };
+      }
+      return result;
     },
   },
 };

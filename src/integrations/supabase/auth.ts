@@ -27,29 +27,24 @@ export async function createOrUpdateProfile(profile: ProfileInsert) {
 }
 
 /**
- * Starts Google sign-in. Inside an embedded preview frame Google refuses to
- * render, so we take the URL ourselves and open it at the top level.
+ * Starts Google sign-in through the managed broker (works inside the editor
+ * preview and on the published site). After sign-in the user returns to the
+ * public origin and the login page forwards them to `path`.
  */
 export async function signInWithGoogle(path = '/dashboard') {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: getAuthRedirectUrl(path),
-      skipBrowserRedirect: true,
-    },
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.setItem('fanika:after_login', path.startsWith('/') ? path : '/dashboard');
+  } catch {
+    /* ignore */
+  }
+  const { lovable } = await import('@/integrations/lovable');
+  const result = await lovable.auth.signInWithOAuth('google', {
+    redirect_uri: window.location.origin + '/login',
   });
-
-  if (error || !data?.url) {
-    toast.error(error?.message ?? 'Sign-in failed');
-    return;
+  if (result.error) {
+    toast.error(result.error.message || 'Google sign-in failed');
   }
-
-  const framed = typeof window !== 'undefined' && window.top && window.top !== window;
-  if (framed) {
-    window.open(data.url, '_blank', 'noopener,noreferrer');
-    return;
-  }
-  window.location.assign(data.url);
 }
 
 export async function signUpWithEmail({
