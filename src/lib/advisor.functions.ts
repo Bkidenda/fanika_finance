@@ -34,7 +34,7 @@ export const runAdvisor = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => AdvisorInput.parse(input))
   .handler(async ({ data, context }) => {
     const apiKey = process.env['LOVABLE_API_KEY'];
-    if (!apiKey) throw new Error("AI advisor is not configured yet. Please try again later.");
+
 
 
 
@@ -71,6 +71,9 @@ ${JSON.stringify(data.context, null, 2)}
 History (most recent first, up to 3 closed months):
 ${JSON.stringify(history, null, 2)}`;
 
+    let parsed: { score: number; summary: string; recommendations: Array<{ kind: string; text: string }> };
+    try {
+    if (!apiKey) throw new Error("no-key");
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { "Lovable-API-Key": apiKey, "Content-Type": "application/json" },
@@ -130,11 +133,12 @@ ${JSON.stringify(history, null, 2)}`;
     const raw = msg?.tool_calls?.[0]?.function?.arguments ?? extractJson(msg?.content ?? "");
     if (!raw) throw new Error("The advisor returned an empty report. Please try again.");
 
-    let parsed: { score: number; summary: string; recommendations: Array<{ kind: string; text: string }> };
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      throw new Error("The advisor returned an unreadable report. Please try again.");
+    parsed = JSON.parse(raw);
+    } catch (err) {
+      const m = err instanceof Error ? err.message : "";
+      if (/busy|credits/i.test(m)) throw err;
+      console.error("AI advisor fallback:", m);
+      parsed = ruleBasedReport(data.context);
     }
     parsed.score = Math.max(0, Math.min(100, Math.round(Number(parsed.score) || 0)));
     parsed.summary = String(parsed.summary ?? "").slice(0, 2000) || "No summary available.";
@@ -160,3 +164,20 @@ ${JSON.stringify(history, null, 2)}`;
 
     return row;
   });
+
+// Built-in analysis used when the AI service is unavailable.
+function ruleBasedReport(c: { net: number; disposable: number; monthlySpend: number; budgetTotal: number; savingsRate: number; debtRatio: number; familySupportRatio: number; subscriptionsMonthly: number; debtsTotal: number; currency: string }) {
+  const recs: Array<{ kind: string; text: string }> = [];
+  let score = 60;
+  const f = (n: number) => `${c.currency} ${Math.round(n).toLocaleString()}`;
+  if (c.savingsRate >= 0.2) { score += 15; recs.push({ kind: "good", text: `You are saving ${(c.savingsRate * 100).toFixed(0)}% of net income — keep it up.` }); }
+  else { score -= 10; recs.push({ kind: "action", text: "Aim to save at least 20% of net income; automate a transfer on payday." }); }
+  if (c.debtRatio > 0.4) { score -= 20; recs.push({ kind: "warn", text: `Debt repayments take ${(c.debtRatio * 100).toFixed(0)}% of income. Prioritise the highest-interest loan first.` }); }
+  else if (c.debtsTotal > 0) recs.push({ kind: "info", text: `Outstanding debt is ${f(c.debtsTotal)}. Keep repayments on schedule.` });
+  if (c.budgetTotal > 0 && c.monthlySpend > c.budgetTotal) { score -= 10; recs.push({ kind: "warn", text: `Spending (${f(c.monthlySpend)}) is above your budget (${f(c.budgetTotal)}).` }); }
+  if (c.subscriptionsMonthly > 0) recs.push({ kind: "info", text: `Subscriptions cost ${f(c.subscriptionsMonthly)} a month — cancel any you rarely use.` });
+  if (c.familySupportRatio > 0.25) recs.push({ kind: "info", text: "Family support is a large share of income; agree a fixed monthly amount." });
+  if (recs.length < 4) recs.push({ kind: "action", text: "Build an emergency fund covering 3–6 months of expenses." });
+  score = Math.max(0, Math.min(100, score));
+  return { score, summary: `Net income ${f(c.net)}, spending ${f(c.monthlySpend)}, disposable ${f(c.disposable)}. This is a quick built-in review based on your figures.`, recommendations: recs };
+}

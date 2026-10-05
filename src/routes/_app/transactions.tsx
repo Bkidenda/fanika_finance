@@ -114,22 +114,30 @@ function TransactionsPage() {
     [accounts.data]
   );
 
-  // Auto-select method based on chosen account's type
-  useEffect(() => {
-    if (!selectedAccount) return;
-    if (selectedAccount.type === "cash") {
-      if (method !== "Cash") setMethod("Cash");
-      return;
-    }
-    const opts = METHODS_BY_TYPE[selectedAccount.type];
-    const def = DEFAULT_METHOD_BY_TYPE[selectedAccount.type];
-    if (opts && !opts.includes(method)) setMethod(def ?? opts[0]);
-  }, [selectedAccount, method]);
+  // Resolve effective type (treat any account named/typed "cash" as cash)
+  const accType = selectedAccount
+    ? (String(selectedAccount.type).toLowerCase().trim() === "cash" || /\bcash\b/i.test(selectedAccount.name) ? "cash" : String(selectedAccount.type).toLowerCase().trim())
+    : null;
+  const isCash = accType === "cash";
 
-  const methodOptions = selectedAccount
-    ? METHODS_BY_TYPE[selectedAccount.type] ?? ALL_METHODS
-    : ALL_METHODS;
-  const methodLocked = selectedAccount?.type === "cash";
+  function pickAccount(id: string) {
+    setAccountId(id);
+    const a = (accounts.data ?? []).find((x) => x.id === id);
+    if (!a) return;
+    const t = String(a.type).toLowerCase().trim() === "cash" || /\bcash\b/i.test(a.name) ? "cash" : String(a.type).toLowerCase().trim();
+    setMethod(DEFAULT_METHOD_BY_TYPE[t] ?? METHODS_BY_TYPE[t]?.[0] ?? method);
+  }
+
+  // Keep method consistent with chosen account
+  useEffect(() => {
+    if (!accType) return;
+    if (isCash) { if (method !== "Cash") setMethod("Cash"); return; }
+    const opts = METHODS_BY_TYPE[accType];
+    if (opts && !opts.includes(method)) setMethod(DEFAULT_METHOD_BY_TYPE[accType] ?? opts[0]);
+  }, [accType, isCash, method]);
+
+  const methodOptions = isCash ? ["Cash"] : accType ? METHODS_BY_TYPE[accType] ?? ALL_METHODS : ALL_METHODS;
+  const methodLocked = isCash;
 
   function invalidateAll() {
     qc.invalidateQueries({ queryKey: ["expenses"] });
@@ -145,7 +153,7 @@ function TransactionsPage() {
     const cat = availableCats.includes(category) ? category : availableCats[0];
     const { error } = await supabase.from("expenses").insert({
       user_id: user.id, date, amount: Number(amount), category: cat,
-      description: desc || null, payment_method: method,
+      description: desc || null, payment_method: isCash ? "Cash" : method,
       is_emergency: emergency, account_id: accountId || null,
       transaction_fee: Number(fee) || 0,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -287,7 +295,7 @@ function TransactionsPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5"><Label>Paid from</Label>
-                    <Select value={accountId} onValueChange={setAccountId}>
+                    <Select value={accountId} onValueChange={pickAccount}>
                       <SelectTrigger><SelectValue placeholder="Select account" /></SelectTrigger>
                       <SelectContent>{paymentAccounts.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
                     </Select>
