@@ -905,6 +905,60 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_transactions: {
+        Row: {
+          account_hint: string | null
+          amount: number
+          category: string | null
+          confidence: string | null
+          counterparty: string
+          created_at: string
+          direction: string
+          id: string
+          kind: string | null
+          message_text: string
+          occurred_at: string | null
+          reference: string | null
+          source: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          account_hint?: string | null
+          amount: number
+          category?: string | null
+          confidence?: string | null
+          counterparty: string
+          created_at?: string
+          direction: string
+          id?: string
+          kind?: string | null
+          message_text: string
+          occurred_at?: string | null
+          reference?: string | null
+          source: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          account_hint?: string | null
+          amount?: number
+          category?: string | null
+          confidence?: string | null
+          counterparty?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          kind?: string | null
+          message_text?: string
+          occurred_at?: string | null
+          reference?: string | null
+          source?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
