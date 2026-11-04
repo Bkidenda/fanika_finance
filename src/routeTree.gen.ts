@@ -36,7 +36,10 @@ import { Route as AppIncomeRouteImport } from './routes/_app/income'
 import { Route as AppIncomeEntriesRouteImport } from './routes/_app/income-entries'
 import { Route as AppInsightsRouteImport } from './routes/_app/insights'
 import { Route as AppInvestmentsRouteImport } from './routes/_app/investments'
+import { Route as AppMoreRouteImport } from './routes/_app/more'
+import { Route as AppOnboardingRouteImport } from './routes/_app/onboarding'
 import { Route as AppReportsRouteImport } from './routes/_app/reports'
+import { Route as AppReviewRouteImport } from './routes/_app/review'
 import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppStatementsRouteImport } from './routes/_app/statements'
 import { Route as AppStewardshipRouteImport } from './routes/_app/stewardship'
@@ -178,9 +181,24 @@ const AppInvestmentsRoute = AppInvestmentsRouteImport.update({
   path: '/investments',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMoreRoute = AppMoreRouteImport.update({
+  id: '/more',
+  path: '/more',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOnboardingRoute = AppOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppReportsRoute = AppReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReviewRoute = AppReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
@@ -241,7 +259,10 @@ export interface FileRoutesByFullPath {
   '/income-entries': typeof AppIncomeEntriesRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
+  '/more': typeof AppMoreRoute
+  '/onboarding': typeof AppOnboardingRoute
   '/reports': typeof AppReportsRoute
+  '/review': typeof AppReviewRoute
   '/settings': typeof AppSettingsRoute
   '/statements': typeof AppStatementsRoute
   '/stewardship': typeof AppStewardshipRoute
@@ -276,7 +297,10 @@ export interface FileRoutesByTo {
   '/income-entries': typeof AppIncomeEntriesRoute
   '/insights': typeof AppInsightsRoute
   '/investments': typeof AppInvestmentsRoute
+  '/more': typeof AppMoreRoute
+  '/onboarding': typeof AppOnboardingRoute
   '/reports': typeof AppReportsRoute
+  '/review': typeof AppReviewRoute
   '/settings': typeof AppSettingsRoute
   '/statements': typeof AppStatementsRoute
   '/stewardship': typeof AppStewardshipRoute
@@ -313,7 +337,10 @@ export interface FileRoutesById {
   '/_app/income-entries': typeof AppIncomeEntriesRoute
   '/_app/insights': typeof AppInsightsRoute
   '/_app/investments': typeof AppInvestmentsRoute
+  '/_app/more': typeof AppMoreRoute
+  '/_app/onboarding': typeof AppOnboardingRoute
   '/_app/reports': typeof AppReportsRoute
+  '/_app/review': typeof AppReviewRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/statements': typeof AppStatementsRoute
   '/_app/stewardship': typeof AppStewardshipRoute
@@ -350,7 +377,10 @@ export interface FileRouteTypes {
     | '/income-entries'
     | '/insights'
     | '/investments'
+    | '/more'
+    | '/onboarding'
     | '/reports'
+    | '/review'
     | '/settings'
     | '/statements'
     | '/stewardship'
@@ -385,7 +415,10 @@ export interface FileRouteTypes {
     | '/income-entries'
     | '/insights'
     | '/investments'
+    | '/more'
+    | '/onboarding'
     | '/reports'
+    | '/review'
     | '/settings'
     | '/statements'
     | '/stewardship'
@@ -421,7 +454,10 @@ export interface FileRouteTypes {
     | '/_app/income-entries'
     | '/_app/insights'
     | '/_app/investments'
+    | '/_app/more'
+    | '/_app/onboarding'
     | '/_app/reports'
+    | '/_app/review'
     | '/_app/settings'
     | '/_app/statements'
     | '/_app/stewardship'
@@ -636,11 +672,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInvestmentsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/more': {
+      id: '/_app/more'
+      path: '/more'
+      fullPath: '/more'
+      preLoaderRoute: typeof AppMoreRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/onboarding': {
+      id: '/_app/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AppOnboardingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/reports': {
       id: '/_app/reports'
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/review': {
+      id: '/_app/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof AppReviewRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/settings': {
@@ -705,7 +762,10 @@ interface AppRouteChildren {
   AppIncomeEntriesRoute: typeof AppIncomeEntriesRoute
   AppInsightsRoute: typeof AppInsightsRoute
   AppInvestmentsRoute: typeof AppInvestmentsRoute
+  AppMoreRoute: typeof AppMoreRoute
+  AppOnboardingRoute: typeof AppOnboardingRoute
   AppReportsRoute: typeof AppReportsRoute
+  AppReviewRoute: typeof AppReviewRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppStatementsRoute: typeof AppStatementsRoute
   AppStewardshipRoute: typeof AppStewardshipRoute
@@ -730,7 +790,10 @@ const AppRouteChildren: AppRouteChildren = {
   AppIncomeEntriesRoute: AppIncomeEntriesRoute,
   AppInsightsRoute: AppInsightsRoute,
   AppInvestmentsRoute: AppInvestmentsRoute,
+  AppMoreRoute: AppMoreRoute,
+  AppOnboardingRoute: AppOnboardingRoute,
   AppReportsRoute: AppReportsRoute,
+  AppReviewRoute: AppReviewRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppStatementsRoute: AppStatementsRoute,
   AppStewardshipRoute: AppStewardshipRoute,
