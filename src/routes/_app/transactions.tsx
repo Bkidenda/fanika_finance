@@ -15,6 +15,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, Trash2, AlertTriangle, Pencil, ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
+import { BottomSheet } from "@/components/app/sheet";
+import { monthLabel } from "@/lib/format";
 
 // Payment-capable account types
 const PAYMENT_TYPES = new Set(["bank", "mpesa", "cash", "sacco"]);
@@ -98,6 +100,7 @@ function TransactionsPage() {
   const [incAccountId, setIncAccountId] = useState("");
 
   const [edit, setEdit] = useState<EditState>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const availableCats = emergency ? DEFAULT_BUDGET_CATEGORIES : (budgetCats.length ? budgetCats : DEFAULT_BUDGET_CATEGORIES);
   const selectedAccount = (accounts.data ?? []).find((a) => a.id === accountId);
