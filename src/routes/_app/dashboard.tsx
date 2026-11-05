@@ -101,7 +101,10 @@ function Dashboard() {
     }
   }
 
-  const tierIdx = TIERS.findLastIndex((t) => streak >= t.days);
+  let tierIdx = -1;
+  for (let i = TIERS.length - 1; i >= 0; i--) {
+    if (streak >= TIERS[i].days) { tierIdx = i; break; }
+  }
   const tier = tierIdx >= 0 ? TIERS[tierIdx] : TIERS[0];
   const next = TIERS[tierIdx + 1];
   const tierPct = next ? Math.min(100, Math.round((streak / next.days) * 100)) : 100;
