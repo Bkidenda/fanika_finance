@@ -246,14 +246,61 @@ function TransactionsPage() {
   const totalOut = filtered.filter((r) => r.kind === "expense").reduce((s, r) => s + r.amount + r.fee, 0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Money Tracker</h2>
-          <p className="text-xs text-muted-foreground">The unified income + expense ledger, showing this month by default.</p>
+    <div className="space-y-4">
+      <header className="pt-1">
+        <h1 className="font-display text-[28px] leading-tight">Money Tracker</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">
+          {dateScope === "all" ? "All time" : monthLabel()}
+        </p>
+      </header>
+
+      <div className="grid grid-cols-2 gap-2.5">
+        <div className="rounded-3xl bg-card p-4 shadow-card">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">In</div>
+          <div className="mt-1 font-display text-[22px] leading-none text-success">+{formatCurrency(totalIn, currency)}</div>
         </div>
-        <div className="flex items-center gap-2">
-          <Dialog open={incomeOpen} onOpenChange={setIncomeOpen}>
+        <div className="rounded-3xl bg-card p-4 shadow-card">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Out</div>
+          <div className="mt-1 font-display text-[22px] leading-none text-destructive">−{formatCurrency(totalOut, currency)}</div>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Button className="h-12 w-full rounded-full text-[15px]" onClick={() => setAddOpen(true)}>
+          Add transaction
+        </Button>
+        {paymentAccounts.length === 0 && (
+          <p className="text-center text-[12px] text-muted-foreground">
+            Tip: add a Bank, M-Pesa or Cash account on the Accounts page first.
+          </p>
+        )}
+      </div>
+
+      <BottomSheet open={addOpen} onClose={() => setAddOpen(false)} title="Add transaction">
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            type="button"
+            onClick={() => { setAddOpen(false); setOpen(true); }}
+            className="flex flex-col items-center gap-2 rounded-3xl bg-secondary p-5 text-secondary-foreground transition active:scale-[0.98]"
+          >
+            <ArrowUpRight className="h-6 w-6" />
+            <span className="text-[15px] font-bold">Expense</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => { setAddOpen(false); setIncomeOpen(true); }}
+            className="flex flex-col items-center gap-2 rounded-3xl bg-primary-subtle p-5 text-primary transition active:scale-[0.98]"
+          >
+            <ArrowDownRight className="h-6 w-6" />
+            <span className="text-[15px] font-bold">Income</span>
+          </button>
+        </div>
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          Moving money between your own accounts? Use Transfer on the Accounts page.
+        </p>
+      </BottomSheet>
+
+      <Dialog open={incomeOpen} onOpenChange={setIncomeOpen}>
             <DialogTrigger asChild><Button variant="outline"><Plus className="mr-1 h-4 w-4" /> Add income</Button></DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>Add income</DialogTitle></DialogHeader>
