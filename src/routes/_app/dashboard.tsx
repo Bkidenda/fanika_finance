@@ -8,7 +8,7 @@ import {
 } from "@/lib/queries";
 import { computeDashboard } from "@/lib/services/dashboard";
 import { formatCurrency, monthKey, monthLabel } from "@/lib/format";
-import { PageHeader, PartyAvatar, SectionLabel } from "@/components/app/page-header";
+import { SectionLabel } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Lock, Sparkles, Plus, Landmark, Target, ArrowRight } from "lucide-react";
