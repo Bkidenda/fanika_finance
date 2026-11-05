@@ -7,11 +7,11 @@ import {
   useAllExpenses, useAllIncomeEntries, useMonthClosures, useIsMonthClosed,
 } from "@/lib/queries";
 import { computeDashboard } from "@/lib/services/dashboard";
-import { formatCurrency, monthLabel } from "@/lib/format";
-import { PageHeader, PartyAvatar, SectionLabel } from "@/components/app/page-header";
+import { formatCurrency, monthKey, monthLabel } from "@/lib/format";
+import { SectionLabel } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Lock, Sparkles, Inbox, Plus, Landmark, Target, BookOpen, ArrowRight } from "lucide-react";
+import { Lock, Sparkles, Plus, Landmark, Target, ArrowRight } from "lucide-react";
 import { closeMonth } from "@/lib/close-month.functions";
 import { toast } from "sonner";
 import { usePendingCount } from "@/lib/pending";
@@ -270,6 +270,3 @@ function loggingStreak(expenses: { date: string }[], income: { date: string }[])
   }
   return streak;
 }
-
-// re-export unused imports used by other shared code paths
-export { BookOpen, Inbox };

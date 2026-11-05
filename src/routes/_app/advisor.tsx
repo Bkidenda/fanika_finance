@@ -86,16 +86,20 @@ function Advisor() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-end justify-between">
-        <div><p className="text-sm text-muted-foreground">Personalized financial review</p><h2 className="text-2xl font-semibold tracking-tight">AI Advisor</h2></div>
-        <Button onClick={runAnalysis} disabled={m.isPending} aria-busy={m.isPending} aria-label="Run AI financial analysis"><Wand2 className={`mr-1 h-4 w-4 ${m.isPending ? "animate-spin" : ""}`} />{m.isPending ? "Analyzing..." : "Run analysis"}</Button>
-      </div>
+    <div className="space-y-4">
+      <header className="pt-1">
+        <h1 className="font-display text-[28px] leading-tight">AI Advisor</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">A personalized review of your money</p>
+      </header>
 
+      <Button onClick={runAnalysis} disabled={m.isPending} aria-busy={m.isPending} className="h-12 w-full rounded-full text-[15px]" aria-label="Run AI financial analysis">
+        <Wand2 className={`mr-1.5 h-4 w-4 ${m.isPending ? "animate-spin" : ""}`} />
+        {m.isPending ? "Analyzing…" : "Run analysis"}
+      </Button>
 
-      <div className="rounded-2xl border bg-gradient-hero p-6 text-primary-foreground shadow-elevated">
-        <div className="flex items-center gap-2 text-xs uppercase tracking-widest opacity-80"><Bot className="h-4 w-4" /> Snapshot</div>
-        <div className="mt-3 grid gap-3 md:grid-cols-4">
+      <div className="rounded-3xl bg-gradient-hero p-5 text-primary-foreground shadow-elevated">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em] opacity-85"><Bot className="h-4 w-4" /> Snapshot</div>
+        <div className="mt-3 grid grid-cols-2 gap-2.5">
           <Tile l="Disposable" v={formatCurrency(b.disposable, currency)} />
           <Tile l="Monthly spend" v={formatCurrency(monthlySpend, currency)} />
           <Tile l="Family support" v={formatCurrency(familyTotal, currency)} />
@@ -104,40 +108,40 @@ function Advisor() {
       </div>
 
       {latest ? (
-        <div className="rounded-2xl border bg-card p-6 shadow-card">
+        <div className="rounded-3xl bg-card p-5 shadow-card">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">Latest report · {latest.period}</div>
-              <div className="mt-1 text-3xl font-semibold tabular-nums">{latest.score}<span className="text-base text-muted-foreground">/100</span></div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Latest report · {latest.period}</div>
+              <div className="mt-1 font-display text-3xl tabular-nums">{latest.score}<span className="text-base text-muted-foreground">/100</span></div>
             </div>
             <Sparkles className="h-6 w-6 text-primary" />
           </div>
-          <p className="mt-4 text-sm leading-relaxed">{latest.summary}</p>
-          <div className="mt-5 space-y-2">
+          <p className="mt-3 text-sm leading-relaxed">{latest.summary}</p>
+          <div className="mt-4 space-y-2">
             {latest.recommendations.map((r, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-xl border p-3">
-                <div className={`mt-0.5 flex h-7 w-7 items-center justify-center rounded-lg ${r.kind === "warn" ? "bg-warning/15 text-warning-foreground" : r.kind === "good" ? "bg-success/15 text-success" : "bg-secondary text-primary"}`}>
+              <div key={i} className="flex items-start gap-3 rounded-2xl bg-muted/50 p-3">
+                <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${r.kind === "warn" ? "bg-warning/15 text-warning-foreground" : r.kind === "good" ? "bg-success/15 text-success" : "bg-secondary text-primary"}`}>
                   {r.kind === "warn" ? <AlertTriangle className="h-4 w-4" /> : r.kind === "good" ? <CheckCircle2 className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
                 </div>
-                <p className="text-sm">{r.text}</p>
+                <p className="text-sm leading-relaxed">{r.text}</p>
               </div>
             ))}
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-3xl border border-dashed p-6 text-center text-sm text-muted-foreground">
           No reports yet. Run an analysis to get a personalized financial review.
         </div>
       )}
 
       {insights.data && insights.data.length > 1 && (
-        <div className="rounded-2xl border bg-card p-6 shadow-card">
-          <h3 className="font-semibold">History</h3>
-          <div className="mt-3 divide-y">
+        <div className="rounded-3xl bg-card p-5 shadow-card">
+          <h3 className="font-display text-lg">History</h3>
+          <div className="mt-2 divide-y">
             {insights.data.slice(1).map((r) => (
-              <div key={r.id} className="flex items-center justify-between py-3 text-sm">
+              <div key={r.id} className="flex items-center justify-between py-2.5 text-sm">
                 <div><div className="font-medium">{r.period}</div><div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</div></div>
-                <div className="tabular-nums font-medium">{r.score}/100</div>
+                <div className="tabular-nums font-semibold">{r.score}/100</div>
               </div>
             ))}
           </div>

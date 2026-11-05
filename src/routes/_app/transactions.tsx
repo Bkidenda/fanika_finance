@@ -15,6 +15,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, Trash2, AlertTriangle, Pencil, ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
+import { BottomSheet } from "@/components/app/sheet";
+import { monthLabel } from "@/lib/format";
 
 // Payment-capable account types
 const PAYMENT_TYPES = new Set(["bank", "mpesa", "cash", "sacco"]);
@@ -98,6 +100,7 @@ function TransactionsPage() {
   const [incAccountId, setIncAccountId] = useState("");
 
   const [edit, setEdit] = useState<EditState>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const availableCats = emergency ? DEFAULT_BUDGET_CATEGORIES : (budgetCats.length ? budgetCats : DEFAULT_BUDGET_CATEGORIES);
   const selectedAccount = (accounts.data ?? []).find((a) => a.id === accountId);
@@ -243,14 +246,61 @@ function TransactionsPage() {
   const totalOut = filtered.filter((r) => r.kind === "expense").reduce((s, r) => s + r.amount + r.fee, 0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Money Tracker</h2>
-          <p className="text-xs text-muted-foreground">The unified income + expense ledger, showing this month by default.</p>
+    <div className="space-y-4">
+      <header className="pt-1">
+        <h1 className="font-display text-[28px] leading-tight">Money Tracker</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground">
+          {dateScope === "all" ? "All time" : monthLabel()}
+        </p>
+      </header>
+
+      <div className="grid grid-cols-2 gap-2.5">
+        <div className="rounded-3xl bg-card p-4 shadow-card">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">In</div>
+          <div className="mt-1 font-display text-[22px] leading-none text-success">+{formatCurrency(totalIn, currency)}</div>
         </div>
-        <div className="flex items-center gap-2">
-          <Dialog open={incomeOpen} onOpenChange={setIncomeOpen}>
+        <div className="rounded-3xl bg-card p-4 shadow-card">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Out</div>
+          <div className="mt-1 font-display text-[22px] leading-none text-destructive">−{formatCurrency(totalOut, currency)}</div>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Button className="h-12 w-full rounded-full text-[15px]" onClick={() => setAddOpen(true)}>
+          Add transaction
+        </Button>
+        {paymentAccounts.length === 0 && (
+          <p className="text-center text-[12px] text-muted-foreground">
+            Tip: add a Bank, M-Pesa or Cash account on the Accounts page first.
+          </p>
+        )}
+      </div>
+
+      <BottomSheet open={addOpen} onClose={() => setAddOpen(false)} title="Add transaction">
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            type="button"
+            onClick={() => { setAddOpen(false); setOpen(true); }}
+            className="flex flex-col items-center gap-2 rounded-3xl bg-secondary p-5 text-secondary-foreground transition active:scale-[0.98]"
+          >
+            <ArrowUpRight className="h-6 w-6" />
+            <span className="text-[15px] font-bold">Expense</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => { setAddOpen(false); setIncomeOpen(true); }}
+            className="flex flex-col items-center gap-2 rounded-3xl bg-primary-subtle p-5 text-primary transition active:scale-[0.98]"
+          >
+            <ArrowDownRight className="h-6 w-6" />
+            <span className="text-[15px] font-bold">Income</span>
+          </button>
+        </div>
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          Moving money between your own accounts? Use Transfer on the Accounts page.
+        </p>
+      </BottomSheet>
+
+      <Dialog open={incomeOpen} onOpenChange={setIncomeOpen}>
             <DialogTrigger asChild><Button variant="outline"><Plus className="mr-1 h-4 w-4" /> Add income</Button></DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>Add income</DialogTitle></DialogHeader>
@@ -329,15 +379,6 @@ function TransactionsPage() {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2.5 md:gap-4">
-        <Kpi label="Money in" value={formatCurrency(totalIn, currency)} tone="success" />
-        <Kpi label="Money out" value={formatCurrency(totalOut, currency)} />
-        <Kpi label="Net" value={formatCurrency(totalIn - totalOut, currency)} tone={totalIn - totalOut >= 0 ? "success" : "destructive"} />
-      </div>
-
       <div className="rounded-2xl border bg-card shadow-card">
         <div className="flex flex-col gap-2 border-b p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
@@ -420,17 +461,6 @@ function TransactionsPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-function Kpi({ label, value, tone }: { label: string; value: string; tone?: "success" | "destructive" }) {
-  return (
-    <div className="rounded-2xl border bg-card p-3 shadow-card md:p-4">
-      <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:text-[11px]">{label}</div>
-      <div className={`mt-1 truncate text-base font-bold tabular-nums md:text-xl ${tone === "success" ? "text-success" : tone === "destructive" ? "text-destructive" : ""}`}>
-        {value}
-      </div>
     </div>
   );
 }
