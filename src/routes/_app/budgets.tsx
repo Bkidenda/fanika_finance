@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2, Archive, ChevronLeft, ChevronRight, Repeat } from "lucide-react";
 import { toast } from "sonner";
+import { chartColorByRank } from "@/lib/chart-colors";
 import { ListSkeleton, EmptyState, ConfirmDelete } from "@/components/ui-states";
 
 export const Route = createFileRoute("/_app/budgets")({ head: () => ({ meta: [{ title: "Budgets — Fanika" }] }), component: Budgets });
@@ -423,17 +424,19 @@ function Budgets() {
           <ListSkeleton rows={5} />
 
         ) : budgets.data?.length ? (
-          <ul className="divide-y">
-            {budgets.data.map((b) => {
+          <ul className="space-y-3">
+            {budgets.data.map((b, idx) => {
               const spent = spendByCat.get(b.category) ?? 0;
               const pct = b.limit_amount > 0 ? Math.min(100, (spent / b.limit_amount) * 100) : 0;
               const over = spent > b.limit_amount && b.limit_amount > 0;
+              const dot = chartColorByRank(idx % 8);
               return (
-                <li key={b.id} className="space-y-2 py-3">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 md:grid-cols-[minmax(0,1.4fr)_auto_auto_auto]">
+                <li key={b.id} className="space-y-2 rounded-3xl bg-card p-4 shadow-card">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="truncate font-medium">{b.category}</span>
+                        <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: dot }} />
+                        <span className="truncate text-[15px] font-bold">{b.category}</span>
                         {b.is_recurring && (
                           <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
                             <Repeat className="h-2.5 w-2.5" /> Recurring
@@ -442,19 +445,25 @@ function Budgets() {
                       </div>
                       <EditableNotes id={b.id} value={b.notes ?? ""} onSaved={(v) => updateField(b.id, { notes: v || null })} />
                     </div>
-                    <div className="text-right text-xs text-muted-foreground md:text-sm">
-                      <div className={over ? "text-destructive" : ""}>
-                        {formatCurrency(spent, currency)} <span className="text-muted-foreground">/</span>{" "}
-                        <EditableAmount value={Number(b.limit_amount)} currency={currency} onSave={(n) => updateField(b.id, { limit_amount: n })} />
-                      </div>
+                    <div className="text-right text-[15px] font-semibold tabular-nums">
+                      {formatCurrency(spent, currency)} <span className="text-muted-foreground">/</span>{" "}
+                      <EditableAmount value={Number(b.limit_amount)} currency={currency} onSave={(n) => updateField(b.id, { limit_amount: n })} />
                     </div>
-                    <div className="col-span-2 flex items-center justify-end gap-3 md:col-span-1">
+                  </div>
+                  <Progress value={pct} className="[&>div]:rounded-full" style={{ ["--progress-bg" as string]: dot }} />
+                  <div className="flex items-center justify-between text-[13px]">
+                    <span className={over ? "font-semibold text-destructive" : "text-muted-foreground"}>
+                      {over
+                        ? `Over by ${formatCurrency(spent - Number(b.limit_amount), currency)}`
+                        : b.limit_amount > 0
+                          ? `${formatCurrency(b.limit_amount - spent, currency)} left`
+                          : "No limit set"}
+                    </span>
+                    <div className="flex items-center gap-3">
                       <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                         <Switch checked={b.is_recurring} onCheckedChange={(v) => updateField(b.id, { is_recurring: v })} />
                         Recurring
                       </label>
-                    </div>
-                    <div className="col-span-2 flex justify-end gap-1 md:col-span-1">
                       <button
                         title="Archive"
                         aria-label={`Archive ${b.category}`}
@@ -474,10 +483,7 @@ function Budgets() {
                         onConfirm={async () => { await removeLine({ id: b.id, category: b.category, limit_amount: Number(b.limit_amount), is_recurring: b.is_recurring, notes: b.notes ?? null }); }}
                       />
                     </div>
-
                   </div>
-                  <Progress value={pct} />
-                  {over && <p className="text-xs text-destructive">Over budget by {formatCurrency(spent - Number(b.limit_amount), currency)}</p>}
                 </li>
               );
             })}
@@ -543,12 +549,20 @@ function ArchivedLines({ month, onRestore }: { month: string; onRestore: (id: st
   );
 }
 
-function TotalCard({ label, value, tone = "normal" }: { label: string; value: string; tone?: "normal" | "danger" }) {
+function BudgetRing({ pct, over }: { pct: number; over: boolean }) {
+  const r = 30;
+  const c = 2 * Math.PI * r;
+  const filled = (Math.min(100, pct) / 100) * c;
   return (
-    <div className="rounded-2xl border bg-card p-3 shadow-card md:p-5">
-      <div className="text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs">{label}</div>
-      <div className={`mt-0.5 text-base font-semibold tabular-nums md:text-2xl ${tone === "danger" ? "text-destructive" : ""}`}>{value}</div>
-    </div>
+    <svg viewBox="0 0 72 72" className="h-[72px] w-[72px] shrink-0 -rotate-90" role="img" aria-label={`${Math.round(pct)}% of budget used`}>
+      <circle cx="36" cy="36" r={r} fill="none" stroke="var(--muted)" strokeWidth="8" />
+      <circle
+        cx="36" cy="36" r={r} fill="none"
+        stroke={over ? "var(--destructive)" : "var(--primary)"}
+        strokeWidth="8" strokeLinecap="round"
+        strokeDasharray={`${filled} ${c}`}
+      />
+    </svg>
   );
 }
 
