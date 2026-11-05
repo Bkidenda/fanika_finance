@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Wallet, Inbox, PieChart, Ellipsis } from "lucide-react";
 import { usePendingCount } from "@/lib/pending";
 
-const TABS = [
+const TABS: { to: string; label: string; icon: typeof Home; badge?: boolean }[] = [
   { to: "/dashboard", label: "Home", icon: Home },
   { to: "/transactions", label: "Money", icon: Wallet },
   { to: "/review", label: "Review", icon: Inbox, badge: true },
