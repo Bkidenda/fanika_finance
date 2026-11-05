@@ -382,12 +382,6 @@ function TransactionsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2.5 md:gap-4">
-        <Kpi label="Money in" value={formatCurrency(totalIn, currency)} tone="success" />
-        <Kpi label="Money out" value={formatCurrency(totalOut, currency)} />
-        <Kpi label="Net" value={formatCurrency(totalIn - totalOut, currency)} tone={totalIn - totalOut >= 0 ? "success" : "destructive"} />
-      </div>
-
       <div className="rounded-2xl border bg-card shadow-card">
         <div className="flex flex-col gap-2 border-b p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
