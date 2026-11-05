@@ -250,21 +250,26 @@ function Budgets() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
+      {/* Title */}
+      <header className="pt-1">
+        <h1 className="font-display text-[28px] leading-tight">Budgets</h1>
+      </header>
+
       {/* Month nav */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 rounded-full border bg-card p-1 shadow-card">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-1 rounded-full bg-card p-1 shadow-card">
           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full" onClick={() => setMonth((m) => shiftMonth(m, -1))} aria-label="Previous month">
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <div className="min-w-[140px] text-center text-sm font-semibold">{labelForMonth(month)}</div>
+          <div className="min-w-[130px] text-center text-sm font-semibold">{labelForMonth(month)}</div>
           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full" onClick={() => setMonth((m) => shiftMonth(m, +1))} aria-label="Next month">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="mr-1 h-4 w-4" /> Add budget line</Button>
+            <Button size="sm" className="rounded-full"><Plus className="mr-1 h-4 w-4" /> Add line</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>New budget line — {labelForMonth(month)}</DialogTitle></DialogHeader>
@@ -303,12 +308,18 @@ function Budgets() {
         </Dialog>
       </div>
 
-      {/* Totals grid */}
-      <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
-        <TotalCard label="Total budget" value={formatCurrency(totalBudget, currency)} />
-        <TotalCard label="Total spent" value={formatCurrency(totalSpent, currency)} />
-        <TotalCard label="Remaining" value={formatCurrency(remaining, currency)} tone={remaining < 0 ? "danger" : "normal"} />
-        <TotalCard label="Utilization" value={`${utilization.toFixed(1)}%`} tone={utilization > 100 ? "danger" : "normal"} />
+      {/* Ring summary */}
+      <div className="flex items-center gap-4 rounded-3xl bg-card p-5 shadow-card">
+        <BudgetRing pct={Math.min(100, utilization)} over={utilization > 100} />
+        <div className="min-w-0">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">Spent so far</div>
+          <div className="mt-0.5 font-display text-[28px] leading-none">{formatCurrency(totalSpent, currency)}</div>
+          <div className="mt-1 text-sm text-muted-foreground">
+            {remaining >= 0
+              ? `${formatCurrency(remaining, currency)} left of ${formatCurrency(totalBudget, currency)} planned`
+              : `${formatCurrency(-remaining, currency)} over ${formatCurrency(totalBudget, currency)} planned`}
+          </div>
+        </div>
       </div>
 
       {/* Percentage split tools */}
