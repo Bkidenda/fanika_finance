@@ -379,9 +379,6 @@ function TransactionsPage() {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
-      </div>
-
       <div className="rounded-2xl border bg-card shadow-card">
         <div className="flex flex-col gap-2 border-b p-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
@@ -464,17 +461,6 @@ function TransactionsPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
-
-function Kpi({ label, value, tone }: { label: string; value: string; tone?: "success" | "destructive" }) {
-  return (
-    <div className="rounded-2xl border bg-card p-3 shadow-card md:p-4">
-      <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground md:text-[11px]">{label}</div>
-      <div className={`mt-1 truncate text-base font-bold tabular-nums md:text-xl ${tone === "success" ? "text-success" : tone === "destructive" ? "text-destructive" : ""}`}>
-        {value}
-      </div>
     </div>
   );
 }
