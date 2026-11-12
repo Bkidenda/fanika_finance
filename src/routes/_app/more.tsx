@@ -39,7 +39,7 @@ function More() {
     { to: "/goals", label: "Goals", detail: "Progress", icon: Target, chip: "bg-warning/25 text-warning-foreground" },
     { to: "/accounts", label: "Accounts", detail: "Balances and transfers", icon: Landmark, chip: "bg-success/20 text-success" },
     { to: "/family", label: "Family", detail: "Shared money, chores", icon: Users, chip: "bg-info/20 text-info" },
-    { to: "/onboarding", label: "Message detection", detail: "M-PESA and bank alerts", icon: MessageSquareText, chip: "bg-success/20 text-success" },
+    { to: "/onboarding", label: "Message review", detail: "Paste M-PESA, Airtel or bank alerts", icon: MessageSquareText, chip: "bg-success/20 text-success" },
   ];
 
   return (

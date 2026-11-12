@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { SectionLabel } from "@/components/app/page-header";
 import { Mail, Landmark, Smartphone } from "lucide-react";
 
@@ -27,6 +28,7 @@ function Onboarding() {
   const [step, setStep] = useState(1);
   const [mpesa, setMpesa] = useState(true);
   const [bank, setBank] = useState(true);
+  const [airtel, setAirtel] = useState(true);
 
   function finish() {
     markDone();
@@ -41,17 +43,17 @@ function Onboarding() {
           onClick={finish}
           className="rounded-full bg-secondary px-3.5 py-1.5 text-sm font-semibold text-secondary-foreground"
         >
-          Back
+          Skip for now
         </button>
         <h1 className="font-display text-[30px] leading-[1.1]">Let Fanika suggest your transactions</h1>
         <p className="text-[15px] leading-relaxed text-muted-foreground">
-          When an M-PESA or bank message arrives, Fanika can draft a log entry. Nothing is added until you confirm it.
+          Paste or forward a payment alert into Review. Fanika will prepare a draft, and nothing is recorded until you confirm it.
         </p>
         <div className="rounded-3xl bg-card p-5 shadow-card">
           <div className="space-y-4 text-[15px] leading-relaxed">
             <div>
-              <SectionLabel>What Fanika reads</SectionLabel>
-              <p className="mt-1 text-foreground/90">Only messages from senders you choose, such as M-PESA or your bank.</p>
+              <SectionLabel>How it works</SectionLabel>
+              <p className="mt-1 text-foreground/90">Choose an alert from M-PESA, Airtel Money or your bank and paste its text into Review.</p>
             </div>
             <div>
               <SectionLabel>What it extracts</SectionLabel>
@@ -60,7 +62,7 @@ function Onboarding() {
             <div>
               <SectionLabel>Why</SectionLabel>
               <p className="mt-1 text-foreground/90">
-                To save you typing. Fanika cannot move money or send messages. You can turn this off any time.
+                This web app cannot read your phone inbox automatically. Fanika only uses alert text you choose to share, and never moves money.
               </p>
             </div>
           </div>
@@ -89,7 +91,7 @@ function Onboarding() {
         </button>
         <h1 className="font-display text-[30px] leading-[1.1]">Choose what to include</h1>
         <p className="text-[15px] leading-relaxed text-muted-foreground">
-          Pick senders now; change them later in More → Message detection.
+          Choose the alert types you usually paste into Review. These preferences do not grant inbox access.
         </p>
         <div className="divide-y rounded-3xl bg-card shadow-card">
           <SourceRow
@@ -111,25 +113,23 @@ function Onboarding() {
           <SourceRow
             icon={<Smartphone className="h-5 w-5" />}
             name="Airtel Money"
-            detail="Not supported yet"
-            enabled={false}
-            disabled
-            onToggle={() => {}}
+            detail="Incoming and outgoing alerts"
+            enabled={airtel}
+            onToggle={() => setAirtel((v) => !v)}
           />
         </div>
         <div className="space-y-2.5">
           <Button
             className="h-12 w-full rounded-full text-[15px]"
-            disabled={!mpesa && !bank}
             onClick={() => {
               window.localStorage.setItem(
                 "fanika:detection-sources",
-                JSON.stringify({ mpesa, bank }),
+                JSON.stringify({ mpesa, bank, airtel }),
               );
               setStep(3);
             }}
           >
-            Allow message access
+            Save preferences
           </Button>
           <Button
             variant="ghost"
@@ -157,13 +157,12 @@ function Onboarding() {
           Back
         </button>
         <span className="inline-flex rounded-full bg-primary-subtle px-3 py-1 text-xs font-semibold text-primary">
-          Message access is on
+          Ready to review
         </span>
         <h1 className="font-display text-[30px] leading-[1.1]">Forward a message, get a draft</h1>
         <p className="text-[15px] leading-relaxed text-muted-foreground">
-          On the web, Fanika reads messages you send it. Forward an M-PESA or bank alert into
-          <span className="font-semibold text-foreground"> Review</span> — Fanika drafts the entry, and you confirm it
-          before anything is logged.
+          Open an M-PESA, Airtel Money or bank alert, copy its text, then paste it into
+          <span className="font-semibold text-foreground"> Review</span>. Fanika drafts the entry for your approval.
         </p>
         <div className="rounded-3xl bg-card p-5 shadow-card">
           <div className="flex items-start gap-3">
@@ -171,8 +170,7 @@ function Onboarding() {
               <Mail className="h-5 w-5" />
             </span>
             <p className="text-[15px] leading-relaxed text-foreground/90">
-              Your phone never shares anything on its own. Fanika cannot move money or send messages, and you can turn
-              this off any time from More.
+              Fanika cannot read your phone messages in the background, move money or send messages. Only the alert text you paste is used.
             </p>
           </div>
         </div>
@@ -201,11 +199,11 @@ function Onboarding() {
   return (
     <div className="space-y-5 pt-10 text-center">
       <span className="inline-flex rounded-full bg-primary-subtle px-3 py-1 text-xs font-semibold text-primary">
-        Message access is off
+        Manual entry is always available
       </span>
       <h1 className="font-display text-[30px] leading-[1.15]">No problem, Fanika works without it</h1>
       <p className="mx-auto max-w-xs text-[15px] leading-relaxed text-muted-foreground">
-        You can log transactions by hand, and turn on detection later from More.
+        You can log transactions by hand, or paste an alert into Review whenever you want.
       </p>
       <div className="space-y-2.5 pt-2 text-left">
         <Button
@@ -245,32 +243,15 @@ function SourceRow({
   onToggle: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      disabled={disabled}
-      className={`flex w-full items-center justify-between gap-3 p-4 text-left ${disabled ? "opacity-60" : "active:bg-muted/40"}`}
-    >
-      <div className="flex items-center gap-3">
+    <div className={`flex w-full items-center justify-between gap-3 p-4 text-left ${disabled ? "opacity-60" : ""}`}>
+      <button type="button" onClick={onToggle} disabled={disabled} className="flex min-w-0 flex-1 items-center gap-3 text-left disabled:cursor-not-allowed">
         <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-subtle text-primary">{icon}</span>
-        <div>
+        <div className="min-w-0">
           <div className="font-semibold">{name}</div>
           <div className="text-sm text-muted-foreground">{detail}</div>
         </div>
-      </div>
-      <Toggle on={enabled} />
-    </button>
-  );
-}
-
-function Toggle({ on }: { on: boolean }) {
-  return (
-    <span
-      className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition ${on ? "bg-primary" : "bg-muted-foreground/30"}`}
-    >
-      <span
-        className={`absolute h-5 w-5 rounded-full bg-white shadow transition-all ${on ? "left-[26px]" : "left-1"}`}
-      />
-    </span>
+      </button>
+      <Switch checked={enabled} onCheckedChange={onToggle} disabled={disabled} aria-label={`Include ${name} alerts`} />
+    </div>
   );
 }

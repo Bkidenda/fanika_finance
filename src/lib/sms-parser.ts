@@ -103,6 +103,7 @@ export function parseMessage(text: string): ParsedMessage | null {
   const bankIn = body.match(/(?:credited|deposited)\s*(?:with|by)?\s*(?:KES|Ksh\.?|Kshs\.?)\s*([\d,]+(?:\.\d{1,2})?)/i);
   // Airtel: "You have sent Ksh X to NAME" / "You have received Ksh X from NAME"
   const airtelOut = body.match(/(?:You have sent|sent)\s*Ksh\.?\s*([\d,]+(?:\.\d{1,2})?)\s*to\s+(.+?)(?:\s+on\s+|\.$|$)/i);
+  const airtelIn = body.match(/(?:You have received|received)\s*Ksh\.?\s*([\d,]+(?:\.\d{1,2})?)\s*from\s+(.+?)(?:\s+on\s+|\.$|$)/i);
   const genericIn = body.match(/(?:received|deposit(?:ed)?|credited)\s*(?:KES|Ksh\.?|Kshs\.?)\s*([\d,]+(?:\.\d{1,2})?)/i);
   const genericOut = body.match(/(?:paid|spent|purchase(?:d)?|bought)\s*(?:KES|Ksh\.?|Kshs\.?)\s*([\d,]+(?:\.\d{1,2})?)/i);
 
@@ -115,6 +116,8 @@ export function parseMessage(text: string): ParsedMessage | null {
     direction = "in"; amount = parseAmount(bankIn[1]); kind = "Deposit"; counterparty = bankCounterparty(body) || "Deposit";
   } else if (airtelOut) {
     direction = "out"; amount = parseAmount(airtelOut[1]); counterparty = cleanParty(airtelOut[2]); kind = "Sent";
+  } else if (airtelIn) {
+    direction = "in"; amount = parseAmount(airtelIn[1]); counterparty = cleanParty(airtelIn[2]); kind = "Received";
   } else if (mpesaOut) {
     direction = "out"; amount = parseAmount(mpesaOut[1]); counterparty = cleanParty(mpesaOut[2]); kind = kindForMpesa(body);
   } else if (mpesaWithdraw) {

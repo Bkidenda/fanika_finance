@@ -87,7 +87,7 @@ function Review() {
     <div className="space-y-4">
       <PageHeader
         title="To review"
-        subtitle="Detected from your messages. Nothing is logged until you confirm."
+        subtitle="Drafts from alerts you share. Nothing is logged until you confirm."
         right={
           <Button size="sm" className="rounded-full" onClick={() => setPasteOpen(true)}>
             <MessageSquareText className="mr-1 h-4 w-4" /> Message
@@ -125,7 +125,7 @@ function Review() {
       {/* Paste / forward a message */}
       <BottomSheet open={pasteOpen} onClose={() => setPasteOpen(false)} title="Add from a message">
         <p className="mb-3 text-sm text-muted-foreground">
-          Paste or forward an M-PESA, Airtel or bank alert. Fanika reads the amount, date, who was paid and the
+          Paste the text from an M-PESA, Airtel or bank alert. Fanika reads the amount, date, who was paid and the
           reference, then drafts it here.
         </p>
         <textarea
@@ -426,7 +426,7 @@ function EmptyReview({ loading, onSamples }: { loading: boolean; onSamples: () =
       </span>
       <h2 className="mt-3 font-display text-xl">Nothing waiting</h2>
       <p className="mx-auto mt-1 max-w-xs text-sm text-muted-foreground">
-        Forward an M-PESA or bank alert with the <span className="font-semibold">Message</span> button and Fanika will
+        Paste an M-PESA, Airtel or bank alert with the <span className="font-semibold">Message</span> button and Fanika will
         draft it here for you to confirm.
       </p>
       <Button variant="outline" className="mt-4 rounded-full" onClick={onSamples} disabled={loading}>

@@ -154,7 +154,7 @@ function Dashboard() {
         </div>
         <h2 className="mt-2 text-[17px] font-bold leading-snug">Suggested from your messages</h2>
         <p className="text-[13px] text-muted-foreground">
-          {pendingCount > 0 ? "Confirm to update your budgets" : "Forward an M-PESA or bank alert and Fanika drafts it for you."}
+          {pendingCount > 0 ? "Confirm to update your budgets" : "Paste an M-PESA, Airtel or bank alert to create a draft."}
         </p>
       </Link>
 

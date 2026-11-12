@@ -45,7 +45,10 @@ function AppLayout() {
   }
   if (!user) return <Navigate to="/login" />;
 
-  if (ready && desktopBlocked) return <DesktopNotice onAllow={() => setDesktopBlocked(false)} />;
+  if (ready && desktopBlocked) return <DesktopNotice onAllow={() => {
+    window.sessionStorage.setItem("fanika:desktop-allowed", "1");
+    setDesktopBlocked(false);
+  }} />;
 
   return (
     <div className="min-h-dvh bg-page-warm">
