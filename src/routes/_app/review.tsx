@@ -17,9 +17,9 @@ export const Route = createFileRoute("/_app/review")({
   head: () => ({
     meta: [
       { title: "To review — Fanika" },
-      { name: "description", content: "Transactions detected from your messages. Nothing is logged until you confirm." },
+      { name: "description", content: "Review drafts made from payment alerts you share. Nothing is logged until you confirm." },
       { property: "og:title", content: "To review — Fanika" },
-      { property: "og:description", content: "Confirm, edit or ignore the transactions Fanika drafted from your messages." },
+      { property: "og:description", content: "Confirm, edit or ignore transaction drafts made from alerts you share." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

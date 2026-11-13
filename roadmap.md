@@ -26,6 +26,7 @@
 - [x] Login restyle to match app identity
 
 ## Stage 5 — QA
-- [ ] Typecheck + build clean
-- [ ] Mobile route and review-flow checks without writing sample transactions to the live account
+- [x] Typecheck + build clean
+- [x] Airtel Money incoming-message parsing check
+- [ ] Authenticated mobile route and review-flow check; the preview test session did not persist in the browser
 - [x] Preview set to mobile viewport
