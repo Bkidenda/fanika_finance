@@ -28,5 +28,5 @@
 ## Stage 5 — QA
 - [x] Typecheck + build clean
 - [x] Airtel Money incoming-message parsing check
-- [ ] Authenticated mobile route and review-flow check; the preview test session did not persist in the browser
+- [x] Authenticated mobile route and review-flow check; Home and Review verified on a signed-in account
 - [x] Preview set to mobile viewport
